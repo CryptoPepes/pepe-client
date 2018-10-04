@@ -1,0 +1,21 @@
+
+.openQuote {
+  display: inline-block;
+  position: absolute;
+  width: 114px;
+  height: 124px;
+  background: url("/img/home/quotes_left.png") no-repeat 50% 50%;
+  top: 0;
+  left: 0;
+}
+
+.closeQuote {
+  content: " ";
+  display: inline-block;
+  position: absolute;
+  width: 114px;
+  height: 124px;
+  background: url("/img/home/quotes_right.png") no-repeat 50% 50%;
+  bottom: 20px;
+  right: 100px;
+}

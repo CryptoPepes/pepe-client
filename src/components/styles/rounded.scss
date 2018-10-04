@@ -1,0 +1,28 @@
+
+.roundedUp {
+  padding: 60px 200px 0 200px;
+  border-top-right-radius: 100vw 200px;
+  margin-right: -200px;
+  border-top-left-radius: 100vw 200px;
+  margin-left: -200px;
+  position: relative;
+  margin-top:-100px;
+  z-index:0;
+  border-top: 0 solid transparent;
+  background-size: 100px;
+  background-position: center;
+}
+
+.roundedDown {
+  padding: 0 200px 60px 200px;
+  border-bottom-right-radius: 100vw 200px;
+  margin-right: -200px;
+  border-bottom-left-radius: 100vw 200px;
+  margin-left: -200px;
+  position: relative;
+  z-index:0;
+  border-bottom: 0 solid transparent;
+  margin-bottom:-200px;
+  background-size: 100px;
+  background-position: center;
+}

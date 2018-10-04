@@ -1,0 +1,17 @@
+# IDE config files
+.idea
+*.iml
+
+# NodeJS
+node_modules
+
+# Dev build output
+dist-dev
+
+# Prod build output
+dist-prod
+
+# Full package tree version data is unnecessary, package.json is sufficient
+package-lock.json
+yarn.lock
+

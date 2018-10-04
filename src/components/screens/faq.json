@@ -1,0 +1,121 @@
+{
+  "entries": [
+    {
+      "header": "Getting started",
+      "entries": [
+        {
+          "question": "What do I need to play CryptoPepes?",
+          "answer": "<ol><li>You need a computer with a working internet connection with an installed browser  (preferably Google Chrome)</li><li>In Chrome, you need an installed Ethereum wallet called MetaMask</li><li>In MetaMask, you need the currency Ether</li></ol>"
+        },
+        {
+          "question": "How do I install MetaMask?",
+          "answer": "<p>In Chrome, MetaMask can be installed under ‘More Tools - Extensions’.</p><p>It is important to note that MetaMask functions like a bank account, so be safe and write down all the codes, especially your seed words.</p><p>Keep your seed words private like the login details to your bank account, never give them to anyone nor send them through e-mail.</p><p>This is an instruction video on how to install it and transfer an initial balance of Ether:</p><p><iframe width='100%' height='480' src='https://www.youtube.com/embed/6Gf_kRE4MJU' frameborder='0' allow='autoplay; encrypted-media'></iframe>"
+        },
+        {
+          "question": "Why MetaMask is locked or not working?",
+          "answer": "At a certain point in time MetaMask logs you out automatically, in this case you have to click on the MetaMask icon in the browser and login again."
+        },
+        {
+          "question": "Reinstalling MetaMask",
+          "answer": "<p>In some cases it is needed to completely reinstall MetaMask, don’t worry; if you have your seed words you can always recover your balance.</p><p>So go ahead, delete the extension, reinstall it and enter your seed words and voila you will have full access to your wallet again.</p>"
+        },
+        {
+          "question": "How to get Ether",
+          "answer": "<p>Ether is the digital currency that is needed to play CryptoPepes. Inside MetaMask, you can buy Ether with fiat using Coinbase, but this only works in the United States.</p><p>It is also possible to buy inside MetaMask with Bitcoin, using Shapeshift.</p><p>Alternatively, you can buy Ether on an exchange first and then transfer to the deposit address of your MetaMask.</p>"
+        },
+        {
+          "question": "How to send Ether to MetaMask",
+          "answer": "<p>It is easier to buy Ether within MetaMask using Shapeshift or Coinbase, but it is also possible to buy Ether on an exchange and then send it to MetaMask. This video demonstrates how to do that:</p><p><iframe width='100%' height='480' src='https://www.youtube.com/embed/PtdMDtCVck0' frameborder='0' allow='autoplay; encrypted-media'></iframe></p>"
+        }
+      ]
+    },
+    {
+      "header": "Understanding CryptoPepes",
+      "entries": [
+        {
+          "question": "What is CryptoPepes?",
+          "answer": "<p>CryptoPepes is a game that allows breeding on the blockchain. The Pepes can be collected and if you select a mother and a father, they can breed. You can start a pepe family. You can choose to trade offspring Pepes, collect them and or let them battle against each other. Since you own the private key all the Pepes are 100% owned by you!</p>"
+        },
+        {
+          "question": "What is so cool about CryptoPepes?",
+          "answer": "<p>The concept of collecting and breeding on the blockchain was popularized by another game called CryptoKitties. CryptoPepes is based on a popular internet meme; Pepe The Frog. Thanks to our advanced DNA algoritms our game can generate over 10 million unique pepes that can be collected and used for breeding and battling !</p>"
+        },
+        {
+          "question": "Do I need money to play CryptoPepes?",
+          "answer": "Yes, you need some money for buying some initial Pepes and also to cover transaction costs; each time you do an action in the game like breeding Pepes, you are charged with a transaction fee."
+        }
+      ]
+    },
+    {
+      "header": "Buying and selling Pepes",
+      "entries": [
+        {
+          "question": "Where to get Pepes?",
+          "answer": "<p>If you need initial Pepes you should go to the Marketplace, browse through the offering and buy two that you like. Once you have the two Pepes in your wallet, you can let them breed and start a family. Remember that offspring cannot breed with parents. You could also buy only one Pepe and then rent someone else's Pepe for Cozy Time.</p>"
+        },
+        {
+          "question": "How to buy and sell Pepes?",
+          "answer": "<p>Once you are on a detail page of a Pepe that is not already owned by you, you can open MetaMask and press the BUY button. Once you confirm that action, the order for that Pepe has been set and a little while later your Pepe is likely to appear in your wallet.</p><p>If you go to de detailpage of a Pepe that is already owned by you, you will see a number of buttons; Transfer, Give Name, Sell Pepe, Start Cozy Time and Hop with other Pepe.</p><p>The button ‘Sell Pepe’ will allow you to sell it.</p>"
+        },
+        {
+          "question": "What else can I do with my pepes?",
+          "answer": "<p>If you go to de detail-page of a Pepe that is owned by you, you will see a number of buttons; Transfer, Give Name, Sell Pepe, Start Cozy Time and Hop with other Pepe.</p><p>We will cover those also.</p>"
+        },
+        {
+          "question": "If one of my auctions passes without a buyer, how do I get my pepe back?",
+          "answer": "<p>During an auction, your pepe safely resides in the respective auction contract, if no buyer moves it out for you, you can take it back after the auction passes.</p><p>Navigate to your pepes, select the auction tab, then select the expired tab: here you can find the pepes that are stuck in auction contracts. Open the pepe, and use the 'Retrieve from auction' button to create a TX for retrieval.</p>"
+        }
+      ]
+    },
+    {
+      "header": "Hopping pepes",
+      "entries": [
+        {
+          "question": "What is a Gen 0 Pepe?",
+          "answer": "<p>A Gen 0 pepe is on top of the family. He has the best characteristics and DNA. Only 1100 Gen 0 Pepes will ever be issued in the game.</p>"
+        },
+        {
+          "question": "What is the cooldown time?",
+          "answer": "<p>This is the time that it takes before a Pepe can hop (breed) again. A Gen 0 Pepe has the lowest cooldown time. Later generations all have increased cooldown time.</p>"
+        },
+        {
+          "question": "What does it cost to breed a Pepe?",
+          "answer": "You pay a transaction fee which is actually the same as a regular ethereum transaction."
+        },
+        {
+          "question": "How to let two Pepes breed together?",
+          "answer": "<p>You have to select one as a mother and one as a father. There is a small icon under each Pepe that can be used for that, visible only when you are correctly logged into MetaMask.</p><p>Once you selected both mother and father, press the breeding button in the navigation menu. Then you will see your preselected mother and father and a button to start the breeding. When you click that button a MetaMask dialogue will open asking you to confirm the transaction.</p><p>Once you confirmed it will take a short while before your new Pepe is added to your wallet, if the transaction was successful.</p>"
+        },
+        {
+          "question": "Can I breed with other people’s Pepes?",
+          "answer": "<p>Yes you can breed with other people’s Pepes if they have put their Pepe up on the Cozy Time Auction. You can breed with Pepes that are on that auction.</p>"
+        }
+      ]
+    },
+    {
+      "header": "Other",
+      "entries": [
+        {
+          "question": "What are all the options I have with my Pepes?",
+          "answer": "<p>On the detail page of each pepe that is owned by you, you will find the following buttons:</p><p><strong>Transfer</strong><br/>Transfer your Pepe to another wallet by providing the Ether address.</p><p><strong>Give Name</strong><br/>Give a name to your Pepe, this can be done only once in a lifetime, it can never be changed.</p><p><strong>Sell Pepe</strong><br/>Sell your Pepe on the market.</p><p><strong>Start Cozy Time</strong><br/>Auction your pepe for breeding (cozy time).</p><p><strong>Hop with other Pepe</strong><br/>Breed with another pepe to get children,</p><p>In a later stage we will also offer battling between Pepes.</p><p>It is also possible to rename your account, that can be done from within the wallet. The wallet can be accessed from the navigation menu.</p>"
+        },
+        {
+          "question": "What is the purpose of the (sidebar) wallet?",
+          "answer": "<p>The actual wallet is inside MetaMask, but the main navigation also contains a button called Wallet. This wallet shows all the transactions made with MetaMask, combined with information about what the transaction changed.</p><p>In future versions the wallet may get more functionality.</p>"
+        },
+        {
+          "question": "Why can’t I see my sale or hopping transaction in Etherscan?",
+          "answer": "<p>This is because those type of transactions are shown on Etherscan as internal transactions. You can see those transactions on another tab called ‘Internal Transactions’ on Etherscan.</p>"
+        },
+        {
+          "question": "How are you making money on CryptoPepes?",
+          "answer": "<p>We have a fund for game development and founder rewards containing 1100 Gen 0 CryptoPepes and 20% of PEP Tokens. In addition to that, there will be a 3.5% transaction fee on transactions that are made with Ethereum.</p>"
+        },
+        {
+          "question": "How can we reach the team of CryptoPepes for partnerships?",
+          "answer": "<p>We are most active on telegram, join our main group on <a href='https://t.me/cryptopepes'>@CryptoPepes</a> and contact an admin, for example <a href='https://t.me/cr_mn'>@cr_mn</a> our marketing guy.</p>"
+        }
+      ]
+    }
+  ]
+}
