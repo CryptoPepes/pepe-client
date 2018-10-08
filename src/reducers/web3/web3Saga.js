@@ -3,7 +3,12 @@ import {
 } from 'redux-saga/effects';
 import web3AT from './web3AT';
 import poller from "../util/poller";
+import {targetNetID, cpepAddr, cozyAddr, saleAddr} from "../../web3Settings";
 import redappSaga from 'redapp/es/saga';
+import { addContract } from 'redapp/es/contracts/actions';
+import CPEP_abi from 'abi/CPEP_abi';
+import sale_abi from 'abi/sale_abi';
+import cozy_abi from 'abi/cozy_abi';
 
 const getRedappState = rootState => rootState.redapp;
 
@@ -86,10 +91,14 @@ const getNetID = (state) => state.web3.networkID;
 
 function* runRedappSaga() {
     const netID = yield select(getNetID);
-    const currentRedapp = yield fork(redappSaga, window.web3, netID, getRedappState);
+    const currentRedappTask = yield fork(redappSaga, window.web3, netID, getRedappState);
+    // Load contracts, these will hook into the newly connected web3 instance passed to Redapp
+    yield call(addContract, "PepeBase", CPEP_abi, { [targetNetID]: { "address": cpepAddr } });
+    yield call(addContract, "PepeAuctionSale", sale_abi, { [targetNetID]: { "address": saleAddr } });
+    yield call(addContract, "CozyTimeAuction", cozy_abi, { [targetNetID]: { "address": cozyAddr } });
     // When disconnected, stop Redapp processing
     yield take(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"));
-    yield cancel(currentRedapp);
+    yield cancel(currentRedappTask);
 }
 
 function* web3Saga() {
