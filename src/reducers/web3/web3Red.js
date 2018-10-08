@@ -1,8 +1,9 @@
 import web3AT from './web3AT';
+import { targetNetID } from "../../web3Settings";
 
 const initialState = {
     status: 'DISCONNECTED',
-    networkID: null
+    networkID: targetNetID
 };
 
 const mapping = {

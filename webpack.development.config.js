@@ -20,7 +20,6 @@ module.exports = [
         resolve: {
             extensions: ['.js', '.jsx', '.json'],
             modules: [
-                path.resolve('./abi'),
                 path.resolve('./assets'),
                 path.resolve('./node_modules')
             ]

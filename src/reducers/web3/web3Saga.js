@@ -6,37 +6,17 @@ import poller from "../util/poller";
 import {targetNetID, cpepAddr, cozyAddr, saleAddr} from "../../web3Settings";
 import redappSaga from 'redapp/es/saga';
 import { addContract } from 'redapp/es/contracts/actions';
-import CPEP_abi from 'abi/CPEP_abi';
-import sale_abi from 'abi/sale_abi';
-import cozy_abi from 'abi/cozy_abi';
+import CPEP_abi from '../../abi/CPEP_abi.json';
+import sale_abi from '../../abi/sale_abi.json';
+import cozy_abi from '../../abi/cozy_abi.json';
 import {startAccountPolling} from "redapp/es/tracking/accounts/actions";
 import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
+import Web3 from "web3";
 
 const getRedappState = rootState => rootState.redapp;
 
-
-async function reconnectWeb3() {
-    if (window.ethereum) {
-        // Modern dapp browsers...
-        // keep old window.web3
-        try {
-            // Request account access if needed
-            await ethereum.enable();
-            return 'SUCCESS';
-        } catch (error) {
-            return 'DENIED'
-        }
-    } else if (window.web3) {
-        // Legacy dapp browsers...
-        window.web3.setProvider(web3.currentProvider);
-        return 'SUCCESS'
-    } else {
-        // No web3
-        return 'NO_WEB3'
-    }
-}
-
 async function getNewWeb3() {
+    console.log("Creating new web3 instance");
     if (window.ethereum) {
         // Modern dapp browsers...
         window.web3 = new Web3(ethereum);
@@ -49,7 +29,7 @@ async function getNewWeb3() {
         }
     } else if (window.web3) {
         // Legacy dapp browsers...
-        window.web3 = new Web3(web3.currentProvider);
+        window.pepeWeb3v1 = new Web3(web3.currentProvider);
         return 'SUCCESS'
     } else {
         // No web3
@@ -57,18 +37,10 @@ async function getNewWeb3() {
     }
 }
 
-function* connectWeb3() {
+function* connectWeb3(action) {
+    console.log("Connecting web3");
     // check current web3 instance
-    if (window.web3) {
-        // already have an web3, re-connect it if necessary
-        if (!window.web3.isConnected()) {
-            const web3ReconnectStatus = yield call(reconnectWeb3);
-            yield put({
-                type: web3AT.WEB3_CONNECT_STATUS,
-                status: web3ReconnectStatus
-            });
-        }
-    } else {
+    if (!window.pepeWeb3v1) {
         const web3InitStatus = yield call(getNewWeb3);
         yield put({
             type: web3AT.WEB3_CONNECT_STATUS,
@@ -92,18 +64,21 @@ function* netidPollError(err) {
 const getNetID = (state) => state.web3.networkID;
 
 function* runRedappSaga() {
-    const netID = yield select(getNetID);
-    const currentRedappTask = yield fork(redappSaga, window.web3, netID, getRedappState);
+    console.log("Running redapp saga");
+    const currentRedappTask = yield fork(redappSaga, window.pepeWeb3v1, targetNetID, getRedappState);
+    console.log("Initializing contracts");
     // Load contracts, these will hook into the newly connected web3 instance passed to Redapp
-    yield call(addContract, "PepeBase", CPEP_abi, { [targetNetID]: { "address": cpepAddr } });
-    yield call(addContract, "PepeAuctionSale", sale_abi, { [targetNetID]: { "address": saleAddr } });
-    yield call(addContract, "CozyTimeAuction", cozy_abi, { [targetNetID]: { "address": cozyAddr } });
+    yield put(addContract("PepeBase", CPEP_abi, { [targetNetID]: { "address": cpepAddr } }));
+    yield put(addContract("PepeAuctionSale", sale_abi, { [targetNetID]: { "address": saleAddr } }));
+    yield put(addContract("CozyTimeAuction", cozy_abi, { [targetNetID]: { "address": cozyAddr } }));
 
-    yield call(startAccountPolling, 5000);
-    yield call(startBlockPolling, 10000);
+    console.log("Start background tasks");
+    yield put(startAccountPolling(5000));
+    yield put(startBlockPolling(10000));
 
     // When disconnected, stop Redapp processing
-    yield take(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"));
+    yield take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED");
+    console.log("Cancelling redapp task");
     yield cancel(currentRedappTask);
 }
 
@@ -116,8 +91,10 @@ function* web3Saga() {
         netidPollError
     ));
     // When connected, start Redapp processing
-    yield takeLatest(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "SUCCESS"),
+    yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "SUCCESS"),
         runRedappSaga);
+    yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"),
+        connectWeb3);
 }
 
 export default web3Saga;

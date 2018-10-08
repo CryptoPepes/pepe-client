@@ -4,12 +4,9 @@ import reducer from './reducer';
 import rootSaga from './rootSaga';
 import createSagaMiddleware from 'redux-saga';
 
-import initWeb3 from 'redapp/es/initWeb3';
-import { startAccountPolling } from 'redapp/es/tracking/accounts/actions';
-import { startBlockPolling } from 'redapp/es/tracking/blocks/actions';
-
 import {persistStore, persistReducer} from 'redux-persist'
-import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
+import storage from 'redux-persist/lib/storage'
+import web3AT from "./web3/web3AT"; // defaults to localStorage for web
 
 
 // Redux DevTools
@@ -44,7 +41,9 @@ export default () => {
         )
     );
 
-    //sagaMiddleware.run(rootSaga);
+    sagaMiddleware.run(rootSaga);
+
+    store.dispatch({type: web3AT.ASK_WEB3_ON});
 
     const persistor = persistStore(store);
 

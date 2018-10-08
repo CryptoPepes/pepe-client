@@ -125,8 +125,8 @@ class Header extends React.Component {
     render() {
         const { classes, uiTheme, wallet } = this.props;
 
-        const walletBtnText = "test";//wallet.openDrawer ? "Close wallet" : "Show wallet";
-        const breederBtnText = "abc";//wallet.openDrawer ? "Close cozy time plans" : "Show cozy time plans";
+        const walletBtnText = wallet.openDrawer ? "Close wallet" : "Show wallet";
+        const breederBtnText = wallet.openDrawer ? "Close cozy time plans" : "Show cozy time plans";
 
         return (
             <div className={classes.root}>
