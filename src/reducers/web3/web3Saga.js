@@ -1,15 +1,12 @@
 import {
-    call, fork, put, takeLatest
+    call, fork, put, takeLatest, take, cancel
 } from 'redux-saga/effects';
 import web3AT from './web3AT';
 import poller from "../util/poller";
+import redappSaga from 'redapp/es/saga';
 
-// TODO
-// - detect web3 ON
-// - detect web3 disconnected -> set OFF
-// - detect web3 connected
-// - handle ON action; enable
-// - poll network ID
+const getRedappState = rootState => rootState.redapp;
+
 
 async function reconnectWeb3() {
     if (window.ethereum) {
@@ -73,8 +70,8 @@ function* connectWeb3() {
     }
 }
 
-function* netidPollWorker(web3) {
-    const netID = yield call(web3.eth.net.getId);
+function* netidPollWorker() {
+    const netID = yield call(window.web3.eth.net.getId);
     yield put({type: web3AT.WEB3_NETID, networkID: netID});
 }
 
@@ -85,13 +82,25 @@ function* netidPollError(err) {
     });
 }
 
+const getNetID = (state) => state.web3.networkID;
+
+function* runRedappSaga() {
+    const netID = yield select(getNetID);
+    const currentRedapp = yield fork(redappSaga, window.web3, netID, getRedappState);
+    // When disconnected, stop Redapp processing
+    yield take(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"));
+    yield cancel(currentRedapp);
+}
+
 function* web3Saga() {
     yield takeLatest(web3AT.ASK_WEB3_ON, connectWeb3);
     yield fork(poller(
         web3AT.WEB3_NETID_START_POLL,
         web3AT.WEB3_NETID_STOP_POLL,
         netidPollWorker,
-        netidPollError,
-        web3, getAccountsState
+        netidPollError
     ));
+    // When connected, start Redapp processing
+    yield takeLatest(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "SUCCESS"),
+        runRedappSaga);
 }
