@@ -9,6 +9,8 @@ import { addContract } from 'redapp/es/contracts/actions';
 import CPEP_abi from 'abi/CPEP_abi';
 import sale_abi from 'abi/sale_abi';
 import cozy_abi from 'abi/cozy_abi';
+import {startAccountPolling} from "redapp/es/tracking/accounts/actions";
+import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
 
 const getRedappState = rootState => rootState.redapp;
 
@@ -96,6 +98,10 @@ function* runRedappSaga() {
     yield call(addContract, "PepeBase", CPEP_abi, { [targetNetID]: { "address": cpepAddr } });
     yield call(addContract, "PepeAuctionSale", sale_abi, { [targetNetID]: { "address": saleAddr } });
     yield call(addContract, "CozyTimeAuction", cozy_abi, { [targetNetID]: { "address": cozyAddr } });
+
+    yield call(startAccountPolling, 5000);
+    yield call(startBlockPolling, 10000);
+
     // When disconnected, stop Redapp processing
     yield take(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"));
     yield cancel(currentRedappTask);
@@ -113,3 +119,5 @@ function* web3Saga() {
     yield takeLatest(take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "SUCCESS"),
         runRedappSaga);
 }
+
+export default web3Saga;

@@ -7,6 +7,7 @@ module.exports = [
     {
         name: 'client',
         target: 'web',
+        mode: 'development',
         entry: [
             'react-hot-loader/patch',
             './src/client.js',

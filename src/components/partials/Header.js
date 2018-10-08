@@ -13,9 +13,10 @@ import walletActionTypes from "../../reducers/wallet/walletActionTypes";
 import breederActionTypes from "../../reducers/breeder/breederActionTypes";
 import {
     // FormatTextdirectionLToR, FormatTextdirectionRToL,
-    LightbulbOutline, AccountBalanceWallet, Menu, ViewList, Store, HelpOutline, InfoOutline,
+    AccountBalanceWallet, Menu, ViewList, Store, HelpOutline, InfoOutlined,
     QuestionAnswer
 } from "@material-ui/icons";
+import { LightbulbOnOutline, LightbulbOutline } from 'mdi-material-ui';
 import {Link} from "react-router-dom";
 import AdvancedLink from "../elements/util/AdvancedLink";
 import {TagHeart} from "mdi-material-ui";
@@ -124,8 +125,8 @@ class Header extends React.Component {
     render() {
         const { classes, uiTheme, wallet } = this.props;
 
-        const walletBtnText = wallet.openDrawer ? "Close wallet" : "Show wallet";
-        const breederBtnText = wallet.openDrawer ? "Close cozy time plans" : "Show cozy time plans";
+        const walletBtnText = "test";//wallet.openDrawer ? "Close wallet" : "Show wallet";
+        const breederBtnText = "abc";//wallet.openDrawer ? "Close cozy time plans" : "Show cozy time plans";
 
         return (
             <div className={classes.root}>
@@ -188,7 +189,7 @@ class Header extends React.Component {
                                     <Link to='/about' className={AppStyle.noDeco}>
                                         <ListItem button>
                                             <ListItemIcon>
-                                                <InfoOutline />
+                                                <InfoOutlined />
                                             </ListItemIcon>
                                             <ListItemText primary="About us" />
                                         </ListItem>
@@ -235,7 +236,11 @@ class Header extends React.Component {
                                     className={classes.headerButton}
                                     onClick={this.handleTogglePaletteType}
                                     aria-labelledby="appbar-theme">
-                                    <LightbulbOutline />
+                                    { uiTheme.paletteType === 'light'
+                                        ? <LightbulbOnOutline />
+                                        : <LightbulbOutline />
+                                    }
+
                                 </IconButton>
                             </Tooltip>
 
@@ -307,7 +312,7 @@ class Header extends React.Component {
                                     <Link to='/about' className={AppStyle.noDeco}>
                                         <ListItem button>
                                             <ListItemIcon>
-                                                <InfoOutline />
+                                                <InfoOutlined />
                                             </ListItemIcon>
                                             <ListItemText primary="About us" />
                                         </ListItem>
@@ -352,7 +357,10 @@ class Header extends React.Component {
                                     <ListItem button
                                               onClick={this.handleTogglePaletteType}>
                                         <ListItemIcon>
-                                            <LightbulbOutline />
+                                            { uiTheme.paletteType === 'light'
+                                                ? <LightbulbOnOutline />
+                                                : <LightbulbOutline />
+                                            }
                                         </ListItemIcon>
                                         <ListItemText primary="Toggle light/dark theme" />
                                     </ListItem>

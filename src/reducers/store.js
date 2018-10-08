@@ -17,9 +17,8 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const sagaMiddleware = createSagaMiddleware();
 
-// TODO: maybe load TX hashes etc. from storage (?)
 const initialState = {
-    hasWeb3: true
+
 };
 
 
@@ -31,16 +30,6 @@ const rootPersistConfig = {
 };
 
 export default () => {
-
-    // Just try initializing and catch any error.
-    try {
-        const web3 = initWeb3();
-        sagaMiddleware.run(rootSaga, web3);
-    } catch (err) {
-        alert('Failed to find web3 provider.'
-            + ' Please activate your web3 wallet, then reload the page.');
-    }
-
 
     const persistedReducer = persistReducer(rootPersistConfig, reducer);
 
@@ -55,11 +44,7 @@ export default () => {
         )
     );
 
-    sagaMiddleware.run(rootSaga);
-
-
-    store.dispatch(startAccountPolling(5000));
-    store.dispatch(startBlockPolling(10000));
+    //sagaMiddleware.run(rootSaga);
 
     const persistor = persistStore(store);
 
