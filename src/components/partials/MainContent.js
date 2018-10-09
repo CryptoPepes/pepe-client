@@ -8,6 +8,7 @@ import FaqPage from "../screens/FaqPage";
 import About from "../screens/About";
 import Tutorial from "../screens/Tutorial";
 import NoWeb3 from "../screens/NoWeb3";
+import NoAccount from "../screens/NoAccount";
 import {connect} from "react-redux";
 import {getDefaultAccount} from "../../util/web3AccountsUtil";
 import ScrollToTop from "../elements/util/ScrollToTop";
@@ -28,7 +29,7 @@ const MainContent = ({hasWeb3, wallet}) => {
                 }}/>
                 <Route exact strict={false} path='/my-pepes'>
                     {!defaultPortfolioAddress ?
-                        <Redirect to='/no-web3'/> :
+                        (hasWeb3 ? <Redirect to='/no-web3'/> : <Redirect to='/no-account'/>):
                         <Redirect to={"/portfolio/" + defaultPortfolioAddress}/>
                     }
                 </Route>
@@ -42,6 +43,7 @@ const MainContent = ({hasWeb3, wallet}) => {
                 <Route exact strict={false} path='/about' component={About}/>
                 <Route exact strict={false} path='/tutorial' component={Tutorial}/>
                 <Route exact strict={false} path='/no-web3' component={NoWeb3}/>
+                <Route exact strict={false} path='/no-account' component={NoAccount}/>
             </Switch>
         </main>
     );

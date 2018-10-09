@@ -32,27 +32,27 @@ const AdvancedLink = (props) => {
             if (!!newTab) {
                 return (
                     <a href={to} className={classData} target="_blank">
-                        <Typography className={classes.inheritColor} {...remainingProps}/>
+                        <Typography component="span" className={classes.inheritColor} {...remainingProps}/>
                     </a>
                 );
             } else {
                 return (
                     <a href={to} className={classData}>
-                        <Typography className={classes.inheritColor} {...remainingProps}/>
+                        <Typography component="span" className={classes.inheritColor} {...remainingProps}/>
                     </a>
                 );
             }
         } else {
           return (
               <Link to={to} className={classData}>
-                  <Typography className={classes.inheritColor} {...remainingProps}/>
+                  <Typography component="span" className={classes.inheritColor} {...remainingProps}/>
               </Link>
           );
         }
     } else {
         return (
             <span className={classData}>
-                <Typography className={classes.inheritColor} {...remainingProps}/>
+                <Typography component="span" className={classes.inheritColor} {...remainingProps}/>
             </span>
         );
     }

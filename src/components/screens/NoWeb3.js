@@ -27,6 +27,8 @@ const NoWeb3 = ({classes, hasWeb3, wallet}) => {
     // Redirect to portfolio when web3 is loaded & recognized.
     if (!!defaultPortfolioAddress) return <Redirect to={"/portfolio/" + defaultPortfolioAddress}/>;
 
+    if (!defaultPortfolioAddress && hasWeb3) return <Redirect to={"/no-account/"}/>;
+
     return (
         <div className={classes.root}>
             <Grid container spacing={40} justify="center">
@@ -59,7 +61,8 @@ const NoWeb3 = ({classes, hasWeb3, wallet}) => {
                             </Typography>
                             <br/>
                             <Typography variant="body1" component="p">
-                                Make sure your wallet is on and you're
+                                Make sure your wallet is ON. If you want to interact with this DApp you need
+                                to log into your wallet, so that we know which ethereum address you use. If you're
                                 logged in, <strong>then refresh the page</strong>, and then try navigating
                                 to your <AdvancedLink to="/my-pepes" disableLinkPadding variant="body2" className={classes.link}>
                                 pepe portfolio
