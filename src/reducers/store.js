@@ -60,6 +60,10 @@ export default () => {
     window.store.dispatch({
         type: web3AT.WEB3_NETID_START_POLL, interval: 5000
     });
+    // Check web3 availability every 5 seconds
+    window.store.dispatch({
+        type: web3AT.WEB3_ACTIVE_START_POLL, interval: 5000
+    });
 
     const persistor = persistStore(window.store);
 

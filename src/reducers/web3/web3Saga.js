@@ -1,5 +1,5 @@
 import {
-    call, fork, put, takeLatest, take, cancel
+    call, fork, put, takeLatest, take, cancel, select
 } from 'redux-saga/effects';
 import web3AT from './web3AT';
 import poller from "../util/poller";
@@ -10,14 +10,15 @@ import CPEP_abi from '../../abi/CPEP_abi.json';
 import sale_abi from '../../abi/sale_abi.json';
 import cozy_abi from '../../abi/cozy_abi.json';
 import {startAccountPolling} from "redapp/es/tracking/accounts/actions";
-import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
+//import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
 import Web3 from "web3";
 
 const getRedappState = rootState => rootState.redapp;
 
 async function getNewWeb3() {
-    console.log("Creating new web3 instance");
+    console.log("Looking to create new web3 instance");
     if (window.ethereum) {
+        console.log("Connecting web3 using new protocol (window.ethereum).");
         // Modern dapp browsers...
         window.web3 = new Web3(window.ethereum);
         try {
@@ -28,10 +29,12 @@ async function getNewWeb3() {
         }
         return 'CONNECTED';
     } else if (window.web3) {
+        console.log("Connecting web3 using legacy protocol (window.web3).");
         // Legacy dapp browsers...
         window.pepeWeb3v1 = new Web3(web3.currentProvider);
         return 'CONNECTED'
     } else {
+        console.log("No window.ethereum or window.web3 found, cannot connect to web3.");
         // No web3
         return 'NO_WEB3'
     }
@@ -49,15 +52,42 @@ function* connectWeb3() {
     }
 }
 
+function* web3ActivePollWorker() {
+    const oldStatus = yield select((state) => state.web3.status);
+    // Try connect if we can and weren't already
+    if (oldStatus !== 'CONNECTED' && (window.ethereum || window.web3)) {
+        // Out of sync case; web3js v1 instance sticks, while we are not running redapp. Remove it.
+        window.pepeWeb3v1 = undefined;
+        yield put({type: web3AT.ASK_WEB3_ON});
+    }
+    // Fully disconnect if we can't find the web3 anymore
+    if (oldStatus === 'CONNECTED' && !(window.ethereum || window.web3)) {
+        window.pepeWeb3v1 = undefined;
+        yield put({type: web3AT.WEB3_CONNECT_STATUS, status: 'NO_WEB3'});
+    }
+}
+
+function* web3ActivePollError(err) {
+    console.log(err);
+}
+
 function* netidPollWorker() {
-    const netID = yield call(window.pepeWeb3v1.eth.net.getId);
-    yield put({type: web3AT.WEB3_NETID, networkID: netID});
+    const status = yield select((state) => state.web3.status);
+    if (status === 'CONNECTED') {
+        if (window.pepeWeb3v1) {
+            const netID = yield call(window.pepeWeb3v1.eth.net.getId);
+            yield put({type: web3AT.WEB3_NETID, networkID: netID});
+        } else {
+            yield put({
+                type: web3AT.WEB3_NETID_ERR
+            });
+        }
+    }
 }
 
 function* netidPollError(err) {
     yield put({
-        type: web3AT.WEB3_CONNECT_STATUS,
-        status: 'DISCONNECTED'
+        type: web3AT.WEB3_NETID_ERR
     });
 }
 
@@ -79,7 +109,7 @@ function* runRedappSaga() {
     //yield put(startBlockPolling(10000));
 
     // When disconnected, stop Redapp processing
-    yield take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED");
+    yield take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status !== "CONNECTED");
     console.log("Cancelling redapp task");
     yield cancel(currentRedappTask);
 }
@@ -92,11 +122,15 @@ function* web3Saga() {
         netidPollWorker,
         netidPollError
     ));
+    yield fork(poller(
+        web3AT.WEB3_ACTIVE_START_POLL,
+        web3AT.WEB3_ACTIVE_STOP_POLL,
+        web3ActivePollWorker,
+        web3ActivePollError
+    ));
     // When connected, start Redapp processing
     yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "CONNECTED"),
         runRedappSaga);
-    yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"),
-        connectWeb3);
 }
 
 export default web3Saga;

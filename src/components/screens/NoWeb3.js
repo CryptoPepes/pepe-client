@@ -63,7 +63,7 @@ const NoWeb3 = ({classes, hasWeb3, wallet}) => {
                             <Typography variant="body1" component="p">
                                 Make sure your wallet is ON. If you want to interact with this DApp you need
                                 to log into your wallet, so that we know which ethereum address you use. If you're
-                                logged in, <strong>then refresh the page</strong>, and then try navigating
+                                logged in, and nothing happens, <strong>then refresh the page</strong>, and then try navigating
                                 to your <AdvancedLink to="/my-pepes" disableLinkPadding variant="body2" className={classes.link}>
                                 pepe portfolio
                             </AdvancedLink>.
