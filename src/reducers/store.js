@@ -23,31 +23,46 @@ const rootPersistConfig = {
     key: 'root',
     storage,
     // Do not whitelist breeder, that reducer has its own persistor
-    whitelist: ["theme", "wallet", "transactions", "transactionTracker"]
+    whitelist: ["theme", "wallet"]
 };
 
 export default () => {
 
+    console.log("Creating new store!!!");
+
     const persistedReducer = persistReducer(rootPersistConfig, reducer);
 
-    const store = createStore(
-        persistedReducer,
-        initialState,
-        composeEnhancers(
-            applyMiddleware(
-                thunkMiddleware,
-                sagaMiddleware
+    // Only create store once (Hot module replacement etc.)
+    if (window.store == null) {
+        const store = createStore(
+            persistedReducer,
+            initialState,
+            composeEnhancers(
+                applyMiddleware(
+                    thunkMiddleware,
+                    sagaMiddleware
+                )
             )
-        )
-    );
+        );
 
-    sagaMiddleware.run(rootSaga);
+        sagaMiddleware.run(rootSaga);
 
-    store.dispatch({type: web3AT.ASK_WEB3_ON});
-    store.dispatch({type: web3AT.WEB3_NETID_START_POLL});
+        window.store = store;
 
-    const persistor = persistStore(store);
+    } else if (process.env.NODE_ENV === "development") {
+        // But replace the root reducer in development
+        window.store.replaceReducer(persistedReducer);
+    }
 
-    return {store, persistor};
+    // Trigger connection
+    window.store.dispatch({type: web3AT.ASK_WEB3_ON});
+    // Check network ID every 5 seconds
+    window.store.dispatch({
+        type: web3AT.WEB3_NETID_START_POLL, interval: 5000
+    });
+
+    const persistor = persistStore(window.store);
+
+    return {store: window.store, persistor};
 
 }

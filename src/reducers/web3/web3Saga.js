@@ -74,7 +74,9 @@ function* runRedappSaga() {
 
     console.log("Start background tasks");
     yield put(startAccountPolling(5000));
-    yield put(startBlockPolling(10000));
+
+    // We could enable block-polling (or sub-based) later on, if necessary
+    //yield put(startBlockPolling(10000));
 
     // When disconnected, stop Redapp processing
     yield take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED");

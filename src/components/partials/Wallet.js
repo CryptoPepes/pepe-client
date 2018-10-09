@@ -67,6 +67,7 @@ class Wallet extends React.Component {
             for (let addr of Object.keys(wallet)) {
                 const addrData = wallet[addr];
                 const balance = addrData.balance;
+                // Note: balance may be null, since it is loaded with a different web3 call than the account
                 balanceList.push([addr, balance]);
             }
         }
@@ -99,7 +100,11 @@ class Wallet extends React.Component {
                                         <Link className={classes.portfolioLink}
                                               to={"/portfolio/" + addr.toLowerCase()}>Open portfolio</Link>
                                         <span
-                                            className={classes.balance}>Ξ {Web3Utils.fromWei(balance, "ether")}</span>
+                                            className={classes.balance}>Ξ {
+                                                (balance === undefined || balance === null)
+                                                    ? "?"
+                                                    : Web3Utils.fromWei(balance, "ether")
+                                            }</span>
                                     </span>
                                     </EthAccount>
 
