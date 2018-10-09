@@ -3,6 +3,7 @@ import {withStyles} from "@material-ui/core/styles";
 import { connect } from 'react-redux';
 import PropTypes from "prop-types";
 import TxListItem from "./TxListItem";
+import decodeTx from "../../../decode/decodeTx";
 
 const styles = (theme) => ({
     root: {
@@ -25,6 +26,7 @@ class TrackedTxInner extends React.Component {
             //  and fallback "broadcasting" will be used.
         }
 
+        const decodedTx = decodeTx(transaction);
         return (
             <div className={classes.root}>
                     {
@@ -33,7 +35,7 @@ class TrackedTxInner extends React.Component {
                             status={txStatus}
                             confirmations={confirmations}
                             txHash={transaction.hash}
-                            txInfo={null}/>
+                            decodedTx={decodedTx}/>
                         : <div>Loading...</div>
                     }
             </div>

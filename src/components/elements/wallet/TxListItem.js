@@ -74,11 +74,11 @@ class TxListItem extends Component {
     };
 
     txInfoRenderers = {
-        "TRANSFER": (txInfo, classes) => (
+        "transfer": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>From:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -90,7 +90,7 @@ class TxListItem extends Component {
                 </ListItem>
             </List>
         ),
-        "NAME_PEPE": (txInfo, classes) => (
+        "namePepe": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>From:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -98,7 +98,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Name:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -106,7 +106,7 @@ class TxListItem extends Component {
                 </ListItem>
             </List>
         ),
-        "NAME_USER": (txInfo, classes) => (
+        "claimUsername": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Account:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -118,7 +118,7 @@ class TxListItem extends Component {
                 </ListItem>
             </List>
         ),
-        "BREED": (txInfo, classes) => (
+        "breed": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>From:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -126,19 +126,19 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Mother:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.motherPepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.motherPepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Father:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.fatherPepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.fatherPepeId}/>
                 </ListItem>
             </List>
         ),
-        "SALE_AUCTION_BUY": (txInfo, classes) => (
+        "buyPepe": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Buying account:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -148,9 +148,14 @@ class TxListItem extends Component {
                 <ListItem className={classes.detailList}>
                     <PriceText priceWei={txInfo.bidPrice} className={classes.priceText}/>
                 </ListItem>
+                {txInfo.affiliate && <ListSubheader className={classes.detailList}>Affiliate:</ListSubheader>}
+                {txInfo.affiliate && <ListItem className={classes.detailList}>
+                    <EthAccount address={txInfo.affiliate} small/>
+                    </ListItem>
+                }
             </List>
         ),
-        "COZY_AUCTION_BUY": (txInfo, classes) => (
+        "buyCozy": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Buying account:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -158,7 +163,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Hoppin' Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.auctionSubject}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Candidate Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -168,9 +173,14 @@ class TxListItem extends Component {
                 <ListItem className={classes.detailList}>
                     <PriceText priceWei={txInfo.bidPrice} className={classes.priceText}/>
                 </ListItem>
+                {txInfo.affiliate && <ListSubheader className={classes.detailList}>Affiliate:</ListSubheader>}
+                {txInfo.affiliate && <ListItem className={classes.detailList}>
+                    <EthAccount address={txInfo.affiliate} small/>
+                </ListItem>
+                }
             </List>
         ),
-        "SALE_AUCTION_START": (txInfo, classes) => (
+        "startSaleAuction": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>from:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -178,7 +188,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Start price:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -196,7 +206,7 @@ class TxListItem extends Component {
                 </ListItem>
             </List>
         ),
-        "COZY_AUCTION_START": (txInfo, classes) => (
+        "startCozyAuction": (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>from:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -204,7 +214,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Start price:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -222,7 +232,7 @@ class TxListItem extends Component {
                 </ListItem>
             </List>
         ),
-        "SAVE_PEPE":  (txInfo, classes) => (
+        "savePepe":  (txInfo, classes) => (
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>from:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -230,7 +240,23 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepe}/>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                </ListItem>
+            </List>
+        ),
+        "approve":  (txInfo, classes) => (
+            <List component="div" disablePadding dense>
+                <ListSubheader className={classes.detailList}>from:</ListSubheader>
+                <ListItem className={classes.detailList}>
+                    <EthAccount address={txInfo.from} small/>
+                </ListItem>
+                <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
+                <ListItem className={classes.detailList}>
+                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                </ListItem>
+                <ListSubheader className={classes.detailList}>approved to:</ListSubheader>
+                <ListItem className={classes.detailList}>
+                    <EthAccount address={txInfo.to} small/>
                 </ListItem>
             </List>
         ),
@@ -245,15 +271,16 @@ class TxListItem extends Component {
 
 
     txInfoTitleMakers = {
-        "TRANSFER": (txInfo) => `Transfer pepe #${txInfo.pepe}`,
-        "NAME_PEPE": (txInfo) => `Name pepe #${txInfo.pepe}: ${!txInfo.nameHex ? "?" : Web3Utils.hexToUtf8(txInfo.nameHex)}`,
-        "NAME_USER": (txInfo) => `Change username to ${!txInfo.nameHex ? "?" : Web3Utils.hexToUtf8(txInfo.nameHex)}`,
-        "BREED": (txInfo) => `Hop pepe #${txInfo.motherPepe} with #${txInfo.fatherPepe}`,
-        "SALE_AUCTION_BUY": (txInfo) => `Buy pepe #${txInfo.pepe}`,
-        "COZY_AUCTION_BUY": (txInfo) => `Buy cozy-time with pepe #${txInfo.auctionSubject} for pepe #${txInfo.cozyCandidate}`,
-        "SALE_AUCTION_START": (txInfo) => `Start sale auction: sell pepe #${txInfo.pepe}`,
-        "COZY_AUCTION_START": (txInfo) => `Start cozy auction: hop pepe #${txInfo.pepe}`,
-        "SAVE_PEPE": (txInfo) => `Retrieve pepe #${txInfo.pepe} from expired auction`
+        "transfer": (txInfo) => `Transfer pepe #${txInfo.pepeId}`,
+        "approve": (txInfo) => `Approve pepe #${txInfo.pepeId} to ${txInfo.to}`,
+        "namePepe": (txInfo) => `Name pepe #${txInfo.pepeId}: ${!txInfo.nameHex ? "?" : Web3Utils.hexToUtf8(txInfo.nameHex)}`,
+        "claimUsername": (txInfo) => `Change username to ${!txInfo.nameHex ? "?" : Web3Utils.hexToUtf8(txInfo.nameHex)}`,
+        "breed": (txInfo) => `Hop pepe #${txInfo.motherPepeId} with #${txInfo.fatherPepeId}`,
+        "buyPepe": (txInfo) => `Buy pepe #${txInfo.pepeId}`,
+        "buyCozy": (txInfo) => `Buy cozy-time with pepe #${txInfo.pepeId} for pepe #${txInfo.cozyCandidate}`,
+        "startSaleAuction": (txInfo) => `Start sale auction: sell pepe #${txInfo.pepeId}`,
+        "startCozyAuction": (txInfo) => `Start cozy auction: hop pepe #${txInfo.pepeId}`,
+        "savePepe": (txInfo) => `Retrieve pepe #${txInfo.pepeId} from expired ${txInfo.auctionType} auction`
     };
 
     getTitleForTxInfo = (txInfo) => {
@@ -264,7 +291,7 @@ class TxListItem extends Component {
     };
 
     render() {
-        const {status, confirmations, txHash, txInfo, onRemove, classes} = this.props;
+        const {status, confirmations, txHash, decodedTx, onRemove, classes} = this.props;
         
         let statusText = "";
         let statusIcon = null;
@@ -291,10 +318,10 @@ class TxListItem extends Component {
                 break;
         }
 
-        const txInfoEl = null;// TODO this.getElementForTxInfo(txInfo, classes);
+        const txInfoEl = this.getElementForTxInfo(decodedTx, classes);
 
-        // txInfo.title can override the title generated from the txInfo
-        const title = "Tx title";// TODO txInfo.title || this.getTitleForTxInfo(txInfo);
+        // decodedTx.title can override the title generated from the decodedTx
+        const title = decodedTx.title || this.getTitleForTxInfo(decodedTx);
 
         return (
             <div>
@@ -341,7 +368,7 @@ TxListItem.propTypes = {
     // Optional, used if status is "confirmed"
     confirmations: PropTypes.number,
     txHash: PropTypes.string,
-    txInfo: PropTypes.shape({
+    decodedTx: PropTypes.shape({
         type: PropTypes.string.isRequired,
         from: PropTypes.string.isRequired
         // Other fields are dependent on type

@@ -4,7 +4,7 @@ import CPEP_abi from '../abi/CPEP_abi.json';
 import sale_abi from '../abi/sale_abi.json';
 import cozy_abi from '../abi/cozy_abi.json';
 
-function decodeInput(input, contractABI) {
+function decodeTxInput(input, contractABI) {
 
     const web3 = window.pepeWeb3v1;
     if (!web3) return null;
@@ -45,7 +45,7 @@ function decodeCPEPTx(txReceipt) {
     const fromAddr = txReceipt.from;
     const input = txReceipt.input;
     try {
-        const decoded = decodeInput(input, CPEP_abi);
+        const decoded = decodeTxInput(input, CPEP_abi);
         if (decoded === null) return null;
         switch (decoded.name) {
             case "transfer": return {
@@ -58,23 +58,22 @@ function decodeCPEPTx(txReceipt) {
                 type: 'breed',
                 from: fromAddr,
                 to: decoded['_pepeReceiver'],
-                mother: decoded['_mother'],
-                father: decoded['_father']
+                motherPepeId: decoded['_mother'],
+                fatherPepeId: decoded['_father']
             };
             case "setPepeName": return {
                 type: 'namePepe',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
-                name: decoded['_name'] // TODO maybe decode bytes into string? Instead of in UI?
+                nameHex: decoded['_name']
             };
             case "claimUsername": return {
                 type: 'claimUsername',
                 from: fromAddr,
-                name: decoded['_username'] // TODO maybe decode bytes into string? Instead of in UI?
+                nameHex: decoded['_username']
             };
             case "transferAndAuction": return {
-                type: 'startAuction',
-                auctionType: (decoded['_auction'] === saleAddr) ? 'sale' : 'cozy',
+                type: (decoded['_auction'] === saleAddr) ? 'startSaleAuction' : 'startCozyAuction',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
                 beginPrice: decoded['_beginPrice'],
@@ -86,6 +85,7 @@ function decodeCPEPTx(txReceipt) {
                 type: (decoded['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 cozyCandidate: decoded['_cozyCandidate'],
                 candidateAsFather: decoded['_candidateAsFather'],
                 pepeReceiver: fromAddr,
@@ -95,6 +95,7 @@ function decodeCPEPTx(txReceipt) {
                 type: (decoded['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 cozyCandidate: decoded['_cozyCandidate'],
                 candidateAsFather: decoded['_candidateAsFather'],
                 pepeReceiver: fromAddr,
@@ -118,13 +119,14 @@ function decodeCozyTx(txReceipt) {
     const fromAddr = txReceipt.from;
     const input = txReceipt.input;
     try {
-        const decoded = decodeInput(input, cozy_abi);
+        const decoded = decodeTxInput(input, cozy_abi);
         if (decoded === null) return null;
         switch (decoded.name) {
             case "buyCozy": return {
                 type: 'buyCozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 cozyCandidate: decoded['_cozyCandidate'],
                 candidateAsFather: decoded['_candidateAsFather'],
                 pepeReceiver: decoded['_pepeReceiver'],
@@ -134,13 +136,14 @@ function decodeCozyTx(txReceipt) {
                 type: 'buyCozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 cozyCandidate: decoded['_cozyCandidate'],
                 candidateAsFather: decoded['_candidateAsFather'],
                 pepeReceiver: decoded['_pepeReceiver'],
                 affiliate: decoded['_affiliate']
             };
             case "startAuction": return {
-                type: 'startAuction',
+                type: 'startCozyAuction',
                 auctionType: 'cozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
@@ -151,6 +154,7 @@ function decodeCozyTx(txReceipt) {
             };
             case "savePepe": return {
                 type: 'savePepe',
+                auctionType: 'cozy',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
             };
@@ -166,23 +170,25 @@ function decodeSaleTx(txReceipt) {
     const fromAddr = txReceipt.from;
     const input = txReceipt.input;
     try {
-        const decoded = decodeInput(input, sale_abi);
+        const decoded = decodeTxInput(input, sale_abi);
         if (decoded === null) return null;
         switch (decoded.name) {
             case "buyPepe": return {
                 type: 'buyPepe',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 affiliate: null
             };
             case "buyPepeAffiliated": return {
                 type: 'buyPepe',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
+                bidPrice: txReceipt['value'],
                 affiliate: decoded['_affiliate']
             };
             case "startAuction": return {
-                type: 'startAuction',
+                type: 'startSaleAuction',
                 auctionType: 'sale',
                 from: fromAddr,
                 pepeId: decoded['_pepeId'],
@@ -193,6 +199,7 @@ function decodeSaleTx(txReceipt) {
             };
             case "savePepe": return {
                 type: 'savePepe',
+                auctionType: 'sale',
                 from: fromAddr,
                 pepeId: decoded['_pepeId']
             };
@@ -204,7 +211,7 @@ function decodeSaleTx(txReceipt) {
     }
 }
 
-function decode(txReceipt) {
+function decodeTx(txReceipt) {
     switch (txReceipt.to) {
         case cpepAddr:
             return decodeCPEPTx(txReceipt);
@@ -217,4 +224,4 @@ function decode(txReceipt) {
     }
 }
 
-export default decode;
+export default decodeTx;
