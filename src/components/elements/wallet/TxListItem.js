@@ -291,10 +291,10 @@ class TxListItem extends Component {
                 break;
         }
 
-        const txInfoEl = this.getElementForTxInfo(txInfo, classes);
+        const txInfoEl = null;// TODO this.getElementForTxInfo(txInfo, classes);
 
         // txInfo.title can override the title generated from the txInfo
-        const title = txInfo.title || this.getTitleForTxInfo(txInfo);
+        const title = "Tx title";// TODO txInfo.title || this.getTitleForTxInfo(txInfo);
 
         return (
             <div>
@@ -345,7 +345,7 @@ TxListItem.propTypes = {
         type: PropTypes.string.isRequired,
         from: PropTypes.string.isRequired
         // Other fields are dependent on type
-    }).isRequired,
+    }),
     // Optional listener, if present, the list item shows a remove icon, to hook removal to.
     onRemove: PropTypes.func
 };
