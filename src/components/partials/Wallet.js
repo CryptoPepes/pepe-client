@@ -7,8 +7,7 @@ import {connect} from 'react-redux';
 import {Link} from "react-router-dom";
 import walletActionTypes from "../../reducers/wallet/walletActionTypes";
 import CloseIcon from '@material-ui/icons/Close';
-// import BroadcastingTxList from "../elements/wallet/BroadcastingTxList";
-// import ProcessedTxList from "../elements/wallet/ProcessedTxList";
+import LiveTxList from "../elements/wallet/LiveTxList";
 import EthAccount from "../elements/util/EthAccount";
 import Web3Utils from "web3-utils";
 import ChangeUsernameDialog from "../elements/actions/ChangeUsernameDialog";
@@ -124,8 +123,7 @@ class Wallet extends React.Component {
                     <Divider/>
                 </List>
 
-                {/*<BroadcastingTxList/>*/}
-                {/*<ProcessedTxList/>*/}
+                <LiveTxList/>
             </Drawer>
         );
     }

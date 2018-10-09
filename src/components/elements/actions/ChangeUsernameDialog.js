@@ -37,8 +37,6 @@ class ChangeUsernameDialog extends React.Component {
 
         const username = ev.target.value;
 
-        console.log(ev);
-
         // short circuit to exit if we already handled the username.
         if (username === this.state.lastUsername) return;
 

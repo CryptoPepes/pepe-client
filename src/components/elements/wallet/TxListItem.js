@@ -321,7 +321,7 @@ class TxListItem extends Component {
         const txInfoEl = this.getElementForTxInfo(decodedTx, classes);
 
         // decodedTx.title can override the title generated from the decodedTx
-        const title = decodedTx.title || this.getTitleForTxInfo(decodedTx);
+        const title = (!!decodedTx && decodedTx.title) ? decodedTx.title : this.getTitleForTxInfo(decodedTx);
 
         return (
             <div>

@@ -212,6 +212,8 @@ function decodeSaleTx(txReceipt) {
 }
 
 function decodeTx(txReceipt) {
+    // Tx receipt may not be available yet.
+    if (!txReceipt) return null;
     switch (txReceipt.to) {
         case cpepAddr:
             return decodeCPEPTx(txReceipt);

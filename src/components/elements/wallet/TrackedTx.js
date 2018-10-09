@@ -15,10 +15,14 @@ class TrackedTxInner extends React.Component {
 
 
     render() {
-        const {hasWeb3, transaction, confirmations, classes} = this.props;
+        const {hasWeb3, transaction, confirmations, onRemove, classes} = this.props;
 
+        let receipt = null;
+        let hash = "";
         let txStatus = "broadcasting";
         if (!!transaction) {
+            receipt = transaction.receipt;
+            hash = transaction.hash;
             if (transaction.status === "pending") txStatus = "pending";
             else if (transaction.status === "success") txStatus = "confirmed";
             else if (transaction.status === "error") txStatus = "error";
@@ -26,15 +30,16 @@ class TrackedTxInner extends React.Component {
             //  and fallback "broadcasting" will be used.
         }
 
-        const decodedTx = decodeTx(transaction);
+        const decodedTx = decodeTx(receipt);
         return (
             <div className={classes.root}>
                     {
                         (hasWeb3)
                         ? <TxListItem
+                            onRemove={onRemove}
                             status={txStatus}
                             confirmations={confirmations}
-                            txHash={transaction.hash}
+                            txHash={hash}
                             decodedTx={decodedTx}/>
                         : <div>Loading...</div>
                     }
@@ -59,7 +64,9 @@ const TrackedTx = connect((state, props) => {
 })(styledTrackedTx);
 
 TrackedTx.propTypes = {
-    txTrackingId: PropTypes.string.isRequired
+    txTrackingId: PropTypes.string.isRequired,
+    // Optional listener, if present, the list item shows a remove icon, to hook removal to.
+    onRemove: PropTypes.func
 };
 
 export default TrackedTx;
