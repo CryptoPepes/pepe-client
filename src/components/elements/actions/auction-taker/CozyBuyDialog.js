@@ -17,6 +17,7 @@ import PepeGridItem from "../../grid/PepeGridItem";
 import {withStyles} from "@material-ui/core/styles/index";
 import TxDialog from "../TxDialog";
 import ReporterContent from "../../reporting/ReporterContent";
+import {cozyAddr} from "../../../../web3Settings";
 
 
 const styles = (theme) => ({
@@ -217,9 +218,9 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 const styledCozyBuyDialog = withStyles(styles)(CozyBuyDialogInner);
 
 const CozyBuyDialog = connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet,
-    auctionAddress: state.hasWeb3 ? state.redapp.contracts.CozyTimeAuction.networks[state.web3.networkId].address : undefined,
+    auctionAddress: cozyAddr,
     PepeBase: state.redapp.contracts.PepeBase
 }))(styledCozyBuyDialog);
 

@@ -132,7 +132,7 @@ const styledWallet = withStyles(styles)(Wallet);
 
 const ConnectedWallet = connect(state => ({
     walletUI: state.wallet,
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet
 }))(styledWallet);
 

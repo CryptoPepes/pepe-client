@@ -94,9 +94,9 @@ export default connect((state, props) => {
         ? state.redapp.contracts.PepeAuctionSale
         : state.redapp.contracts.CozyTimeAuction;
     return ({
-            hasWeb3: state.hasWeb3,
+            hasWeb3: state.web3.hasWeb3,
             auctionContract: auctionContract,
-            auctionAddress: state.hasWeb3 ? auctionContract.networks[state.web3.networkId].address : undefined,
+            auctionAddress: state.web3.hasWeb3 ? auctionContract.networks[state.web3.networkId].address : undefined,
 
     })
 })(styledSavePepeDialog);

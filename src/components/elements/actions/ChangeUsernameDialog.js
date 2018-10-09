@@ -127,7 +127,7 @@ ChangeUsernameDialog.propTypes = {
 const styledChangeUsernameDialog = withStyles(styles)(ChangeUsernameDialog);
 
 export default connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     PepeBase: state.redapp.contracts.PepeBase
 }))(styledChangeUsernameDialog);
 

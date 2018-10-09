@@ -19,25 +19,25 @@ async function getNewWeb3() {
     console.log("Creating new web3 instance");
     if (window.ethereum) {
         // Modern dapp browsers...
-        window.web3 = new Web3(ethereum);
+        window.web3 = new Web3(window.ethereum);
         try {
             // Request account access if needed
-            await ethereum.enable();
-            return 'SUCCESS';
+            await window.ethereum.enable();
         } catch (error) {
-            return 'DENIED'
+            console.log("Could not enable Web3 account discovery.")
         }
+        return 'CONNECTED';
     } else if (window.web3) {
         // Legacy dapp browsers...
         window.pepeWeb3v1 = new Web3(web3.currentProvider);
-        return 'SUCCESS'
+        return 'CONNECTED'
     } else {
         // No web3
         return 'NO_WEB3'
     }
 }
 
-function* connectWeb3(action) {
+function* connectWeb3() {
     console.log("Connecting web3");
     // check current web3 instance
     if (!window.pepeWeb3v1) {
@@ -50,7 +50,7 @@ function* connectWeb3(action) {
 }
 
 function* netidPollWorker() {
-    const netID = yield call(window.web3.eth.net.getId);
+    const netID = yield call(window.pepeWeb3v1.eth.net.getId);
     yield put({type: web3AT.WEB3_NETID, networkID: netID});
 }
 
@@ -91,7 +91,7 @@ function* web3Saga() {
         netidPollError
     ));
     // When connected, start Redapp processing
-    yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "SUCCESS"),
+    yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "CONNECTED"),
         runRedappSaga);
     yield takeLatest((action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status === "DISCONNECTED"),
         connectWeb3);

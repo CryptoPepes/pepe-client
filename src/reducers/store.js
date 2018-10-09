@@ -44,6 +44,7 @@ export default () => {
     sagaMiddleware.run(rootSaga);
 
     store.dispatch({type: web3AT.ASK_WEB3_ON});
+    store.dispatch({type: web3AT.WEB3_NETID_START_POLL});
 
     const persistor = persistStore(store);
 

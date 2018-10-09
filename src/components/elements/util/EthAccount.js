@@ -162,7 +162,7 @@ class AccountName extends React.Component {
 }
 
 const Web3LoadedAccountName = connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     PepeBase: state.redapp.contracts.PepeBase,
     calls: state.redapp.tracking.calls
 }))(AccountName);

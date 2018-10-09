@@ -128,7 +128,7 @@ class ProcessedTxList extends React.Component {
 const styledConfirmedTxList = withStyles(styles)(ProcessedTxList);
 
 export default connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     transactions: state.transactions,
     transactionTracker: state.transactionTracker
 }))(styledConfirmedTxList);

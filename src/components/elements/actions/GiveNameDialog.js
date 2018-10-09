@@ -127,6 +127,6 @@ GiveNameDialog.propTypes = {
 const styledGiveNameDialog = withStyles(styles)(GiveNameDialog);
 
 export default connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     PepeBase: state.redapp.contracts.PepeBase
 }))(styledGiveNameDialog);

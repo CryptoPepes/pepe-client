@@ -53,7 +53,7 @@ const TrackedTx = connect((state, props) => {
     const trackedData = state.transactionTracker[props.txTrackingId];
     const txData = (!trackedData || !trackedData.hash) ? null : (state.transactions[trackedData.hash]);
     return ({
-        hasWeb3: state.hasWeb3,
+        hasWeb3: state.web3.hasWeb3,
         txTracked: trackedData,
         transaction: txData
     });

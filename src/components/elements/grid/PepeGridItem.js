@@ -186,7 +186,7 @@ PepeGridItem.propTypes = {
 
 const ConnectedPepeGridItem = connect(state => ({
     breeder: state.breeder,
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet
 }))(PepeGridItem);
 

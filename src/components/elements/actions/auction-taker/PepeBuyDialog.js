@@ -16,6 +16,7 @@ import {getDefaultAccount} from "../../../../util/web3AccountsUtil";
 import PepeGridItem from "../../grid/PepeGridItem";
 import {withStyles} from "@material-ui/core/styles/index";
 import TxDialog from "../TxDialog";
+import {saleAddr} from "../../../../web3Settings";
 
 
 const styles = (theme) => ({
@@ -158,14 +159,14 @@ class PepeBuyDialogInner extends BidAuctionDialog {
     }
 }
 
-const styledCozyBuyDialog = withStyles(styles)(PepeBuyDialogInner);
+const styledSaleBuyDialog = withStyles(styles)(PepeBuyDialogInner);
 
 const PepeBuyDialog = connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet,
-    auctionAddress: state.hasWeb3 ? state.redapp.contracts.PepeAuctionSale.networks[state.web3.networkId].address : undefined,
+    auctionAddress: saleAddr,
     auctionContract: state.redapp.contracts.PepeAuctionSale
-}))(styledCozyBuyDialog);
+}))(styledSaleBuyDialog);
 
 
 PepeBuyDialog.propTypes = {

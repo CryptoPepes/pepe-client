@@ -282,7 +282,7 @@ LoadingPepePage.propTypes = {
 };
 
 const ConnectedPepePage = connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet
 }))(LoadingPepePage);
 

@@ -82,7 +82,7 @@ class BroadcastingTxList extends React.Component {
 const styledBroadcastingTxList = withStyles(styles)(BroadcastingTxList);
 
 export default connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     transactionTracker: state.transactionTracker
 }))(styledBroadcastingTxList);
 

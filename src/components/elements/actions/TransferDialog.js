@@ -111,7 +111,7 @@ TransferDialog.propTypes = {
 const styledTransferDialog = withStyles(styles)(TransferDialog);
 
 export default connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     PepeBase: state.redapp.contracts.PepeBase
 }))(styledTransferDialog);
 

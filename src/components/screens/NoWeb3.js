@@ -76,7 +76,7 @@ const NoWeb3 = ({classes, hasWeb3, wallet}) => {
 
 // Connect to Web3 to load default portfolio account etc.
 const connectedNoWeb3 = connect(state => ({
-    hasWeb3: state.hasWeb3,
+    hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet
 }))(NoWeb3);
 
