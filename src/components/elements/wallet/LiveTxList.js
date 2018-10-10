@@ -29,19 +29,17 @@ class LiveTxList extends React.Component {
     };
 
     handleRemove = (trackingId) => () => {
-
-        const txData = this.props.transactions[trackingId];
-
-        this.props.dispatch(forgetTX(txData));
+        this.props.dispatch(forgetTX(trackingId));
     };
 
     render() {
         const {hasWeb3, transactions, classes} = this.props;
 
         const sent = [];
+        const broadcast = [];
+        const pending = [];
         const confirmed = [];
         const failed = [];
-        const pending = [];
         if (hasWeb3) {
             for (const trackingId in transactions) {
                 if (transactions.hasOwnProperty(trackingId)) {
@@ -52,7 +50,9 @@ class LiveTxList extends React.Component {
                         targetList = sent;
                     } else if (data.status === "success") { // Mined in a block
                         targetList = confirmed;
-                    } else if (data.status === "broadcast") { // It being broadcast implies that's pending to be mined
+                    } else if (data.status === "broadcast") {
+                        targetList = broadcast;
+                    } else if (data.status === "pending") {
                         targetList = pending;
                     } else if (data.status === "error") {
                         targetList = failed;
@@ -74,6 +74,16 @@ class LiveTxList extends React.Component {
                     <List component="div" dense disablePadding>
                         {hasWeb3 && sent.reverse()}
                         {sent.length === 0 && <ListItemText inset secondary="No created transactions."/>}
+                    </List>
+                </Collapse>
+                <ListItem button onClick={this.toggleOpen("openBroadcast")}>
+                    <ListItemText secondary="Broadcast transactions"/>
+                    {this.state.openBroadcast ? <ExpandLess/> : <ExpandMore/>}
+                </ListItem>
+                <Collapse in={this.state.openBroadcast} timeout="auto" unmountOnExit>
+                    <List component="div" dense disablePadding>
+                        {hasWeb3 && broadcast.reverse()}
+                        {broadcast.length === 0 && <ListItemText inset secondary="No broadcast transactions."/>}
                     </List>
                 </Collapse>
                 <ListItem button onClick={this.toggleOpen("openPending")}>

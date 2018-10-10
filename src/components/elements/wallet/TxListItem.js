@@ -296,15 +296,19 @@ class TxListItem extends Component {
         let statusText = "";
         let statusIcon = null;
         switch (status) {
-            case "broadcasting":
+            case "sent":
                 statusText = "Broadcasting...";
+                statusIcon = <CloudUpload/>;
+                break;
+            case "broadcast":
+                statusText = "Broadcast to network";
                 statusIcon = <CloudUpload/>;
                 break;
             case "pending":
                 statusText = "Pending confirmation";
                 statusIcon = <HourglassEmpty/>;
                 break;
-            case "confirmed":
+            case "success":
                 statusText = (!confirmations ? "0 confirmations" : (
                     confirmations === 1 ? "1 confirmation" : (confirmations + " confirmations")));
                 statusIcon = !!confirmations && confirmations >= 12 ? <DoneAll/> : <Done/>;
@@ -318,13 +322,16 @@ class TxListItem extends Component {
                 break;
         }
 
+        console.log("Showing tx: ", decodedTx);
+
         const txInfoEl = this.getElementForTxInfo(decodedTx, classes);
 
         // decodedTx.title can override the title generated from the decodedTx
         const title = (!!decodedTx && decodedTx.title) ? decodedTx.title : this.getTitleForTxInfo(decodedTx);
 
         return (
-            <div>
+            // Force refresh on status change
+            <div key={'tx'+statusText}>
                 <ListItem button onClick={this.toggleOpen}>
                     {statusIcon &&
                         <ListItemIcon>

@@ -12,6 +12,7 @@ import EthAccount from "../elements/util/EthAccount";
 import Web3Utils from "web3-utils";
 import ChangeUsernameDialog from "../elements/actions/ChangeUsernameDialog";
 import Web3Loading from "../elements/util/Web3Loading";
+import PriceText from "../elements/util/PriceText";
 
 
 const styles = theme => ({
@@ -24,7 +25,11 @@ const styles = theme => ({
     },
     balance: {
         ...theme.typography.body2,
-        color: theme.palette.type === "light" ? "#373" : "#bfb"
+        color: theme.palette.type === "light" ? "#373" : "#bfb",
+        maxWidth: 140,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
     },
     portfolioLink: {
         ...theme.typography.body1
@@ -98,12 +103,7 @@ class Wallet extends React.Component {
                                     <span className={classes.accountMetaInfo}>
                                         <Link className={classes.portfolioLink}
                                               to={"/portfolio/" + addr.toLowerCase()}>Open portfolio</Link>
-                                        <span
-                                            className={classes.balance}>Ξ {
-                                                (balance === undefined || balance === null)
-                                                    ? "?"
-                                                    : Web3Utils.fromWei(balance, "ether")
-                                            }</span>
+                                        <PriceText className={classes.balance} priceWei={balance}/>
                                     </span>
                                     </EthAccount>
 

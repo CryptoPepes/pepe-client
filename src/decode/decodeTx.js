@@ -46,66 +46,67 @@ function decodeCPEPTx(txReceipt) {
     const input = txReceipt.input;
     try {
         const decoded = decodeTxInput(input, CPEP_abi);
+        console.log("Decoded tx input: ", decoded);
         if (decoded === null) return null;
         switch (decoded.name) {
             case "transfer": return {
                 type: 'transfer',
                 from: fromAddr,
-                to: decoded['_to'],
-                pepeId: decoded['_tokenId']
+                to: decoded.params['_to'],
+                pepeId: decoded.params['_tokenId']
             };
             case "cozyTime": return {
                 type: 'breed',
                 from: fromAddr,
-                to: decoded['_pepeReceiver'],
-                motherPepeId: decoded['_mother'],
-                fatherPepeId: decoded['_father']
+                to: decoded.params['_pepeReceiver'],
+                motherPepeId: decoded.params['_mother'],
+                fatherPepeId: decoded.params['_father']
             };
             case "setPepeName": return {
                 type: 'namePepe',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
-                nameHex: decoded['_name']
+                pepeId: decoded.params['_pepeId'],
+                nameHex: decoded.params['_name']
             };
             case "claimUsername": return {
                 type: 'claimUsername',
                 from: fromAddr,
-                nameHex: decoded['_username']
+                nameHex: decoded.params['_username']
             };
             case "transferAndAuction": return {
-                type: (decoded['_auction'] === saleAddr) ? 'startSaleAuction' : 'startCozyAuction',
+                type: (decoded.params['_auction'] === saleAddr) ? 'startSaleAuction' : 'startCozyAuction',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
-                beginPrice: decoded['_beginPrice'],
-                endPrice: decoded['_endPrice'],
+                pepeId: decoded.params['_pepeId'],
+                beginPrice: decoded.params['_beginPrice'],
+                endPrice: decoded.params['_endPrice'],
                 startBlock: txReceipt['blockNumber'],
-                duration: decoded['_duration']
+                duration: decoded.params['_duration']
             };
             case "approveAndBuy": return {
-                type: (decoded['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
+                type: (decoded.params['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
-                cozyCandidate: decoded['_cozyCandidate'],
-                candidateAsFather: decoded['_candidateAsFather'],
+                cozyCandidate: decoded.params['_cozyCandidate'],
+                candidateAsFather: decoded.params['_candidateAsFather'],
                 pepeReceiver: fromAddr,
                 affiliate: null
             };
             case "approveAndBuyAffiliated": return {
-                type: (decoded['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
+                type: (decoded.params['_auction'] === saleAddr) ? 'buyPepe' : 'buyCozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
-                cozyCandidate: decoded['_cozyCandidate'],
-                candidateAsFather: decoded['_candidateAsFather'],
+                cozyCandidate: decoded.params['_cozyCandidate'],
+                candidateAsFather: decoded.params['_candidateAsFather'],
                 pepeReceiver: fromAddr,
-                affiliate: decoded['_affiliate']
+                affiliate: decoded.params['_affiliate']
             };
             case "approve": return {
                 type: 'approve',
                 from: fromAddr,
-                to: decoded['_to'],
-                pepeId: decoded['_tokenId']
+                to: decoded.params['_to'],
+                pepeId: decoded.params['_tokenId']
             };
             default: return null;
         }
@@ -125,38 +126,38 @@ function decodeCozyTx(txReceipt) {
             case "buyCozy": return {
                 type: 'buyCozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
-                cozyCandidate: decoded['_cozyCandidate'],
-                candidateAsFather: decoded['_candidateAsFather'],
-                pepeReceiver: decoded['_pepeReceiver'],
+                cozyCandidate: decoded.params['_cozyCandidate'],
+                candidateAsFather: decoded.params['_candidateAsFather'],
+                pepeReceiver: decoded.params['_pepeReceiver'],
                 affiliate: null
             };
             case "buyCozyAffiliated": return {
                 type: 'buyCozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
-                cozyCandidate: decoded['_cozyCandidate'],
-                candidateAsFather: decoded['_candidateAsFather'],
-                pepeReceiver: decoded['_pepeReceiver'],
-                affiliate: decoded['_affiliate']
+                cozyCandidate: decoded.params['_cozyCandidate'],
+                candidateAsFather: decoded.params['_candidateAsFather'],
+                pepeReceiver: decoded.params['_pepeReceiver'],
+                affiliate: decoded.params['_affiliate']
             };
             case "startAuction": return {
                 type: 'startCozyAuction',
                 auctionType: 'cozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
-                beginPrice: decoded['_beginPrice'],
-                endPrice: decoded['_endPrice'],
+                pepeId: decoded.params['_pepeId'],
+                beginPrice: decoded.params['_beginPrice'],
+                endPrice: decoded.params['_endPrice'],
                 startBlock: txReceipt['blockNumber'],
-                duration: decoded['_duration']
+                duration: decoded.params['_duration']
             };
             case "savePepe": return {
                 type: 'savePepe',
                 auctionType: 'cozy',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
             };
             default: return null;
         }
@@ -176,32 +177,32 @@ function decodeSaleTx(txReceipt) {
             case "buyPepe": return {
                 type: 'buyPepe',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
                 affiliate: null
             };
             case "buyPepeAffiliated": return {
                 type: 'buyPepe',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
+                pepeId: decoded.params['_pepeId'],
                 bidPrice: txReceipt['value'],
-                affiliate: decoded['_affiliate']
+                affiliate: decoded.params['_affiliate']
             };
             case "startAuction": return {
                 type: 'startSaleAuction',
                 auctionType: 'sale',
                 from: fromAddr,
-                pepeId: decoded['_pepeId'],
-                beginPrice: decoded['_beginPrice'],
-                endPrice: decoded['_endPrice'],
+                pepeId: decoded.params['_pepeId'],
+                beginPrice: decoded.params['_beginPrice'],
+                endPrice: decoded.params['_endPrice'],
                 startBlock: txReceipt['blockNumber'],
-                duration: decoded['_duration'],
+                duration: decoded.params['_duration'],
             };
             case "savePepe": return {
                 type: 'savePepe',
                 auctionType: 'sale',
                 from: fromAddr,
-                pepeId: decoded['_pepeId']
+                pepeId: decoded.params['_pepeId']
             };
             default: return null;
         }

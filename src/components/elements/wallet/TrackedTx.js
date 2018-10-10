@@ -19,15 +19,11 @@ class TrackedTxInner extends React.Component {
 
         let receipt = null;
         let hash = "";
-        let txStatus = "broadcasting";
+        let txStatus = "sent";
         if (!!transaction) {
             receipt = transaction.receipt;
             hash = transaction.hash;
-            if (transaction.status === "pending") txStatus = "pending";
-            else if (transaction.status === "success") txStatus = "confirmed";
-            else if (transaction.status === "error") txStatus = "error";
-            // Other transaction status are considered invalid,
-            //  and fallback "broadcasting" will be used.
+            txStatus = transaction.status;
         }
 
         const decodedTx = decodeTx(receipt);
@@ -58,7 +54,7 @@ const TrackedTx = connect((state, props) => {
     // TODO check if it's not in an orphaned block
     return ({
         hasWeb3: state.web3.hasWeb3,
-        transaction: txData.receipt,
+        transaction: txData,
         confirmations
     });
 })(styledTrackedTx);
