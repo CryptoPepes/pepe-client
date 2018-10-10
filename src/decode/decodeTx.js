@@ -46,7 +46,6 @@ function decodeCPEPTx(txReceipt) {
     const input = txReceipt.input;
     try {
         const decoded = decodeTxInput(input, CPEP_abi);
-        console.log("Decoded tx input: ", decoded);
         if (decoded === null) return null;
         switch (decoded.name) {
             case "transfer": return {

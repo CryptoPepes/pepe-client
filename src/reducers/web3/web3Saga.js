@@ -10,7 +10,7 @@ import CPEP_abi from '../../abi/CPEP_abi.json';
 import sale_abi from '../../abi/sale_abi.json';
 import cozy_abi from '../../abi/cozy_abi.json';
 import {startAccountPolling} from "redapp/es/tracking/accounts/actions";
-//import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
+import {startBlockPolling} from "redapp/es/tracking/blocks/actions";
 import Web3 from "web3";
 
 const getRedappState = rootState => rootState.redapp;
@@ -106,7 +106,7 @@ function* runRedappSaga() {
     yield put(startAccountPolling(5000));
 
     // We could enable block-polling (or sub-based) later on, if necessary
-    //yield put(startBlockPolling(10000));
+    yield put(startBlockPolling(10000));
 
     // When disconnected, stop Redapp processing
     yield take(action => action.type === web3AT.WEB3_CONNECT_STATUS && action.status !== "CONNECTED");

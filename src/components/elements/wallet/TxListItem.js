@@ -310,7 +310,7 @@ class TxListItem extends Component {
                 break;
             case "success":
                 statusText = (!confirmations ? "0 confirmations" : (
-                    confirmations === 1 ? "1 confirmation" : (confirmations + " confirmations")));
+                    confirmations === 1 ? "1 confirmation" : ((confirmations > 24) ? "24+ confirmations" : (confirmations + " confirmations"))));
                 statusIcon = !!confirmations && confirmations >= 12 ? <DoneAll/> : <Done/>;
                 break;
             case "error":
@@ -321,8 +321,6 @@ class TxListItem extends Component {
                 statusText = "Unknown";
                 break;
         }
-
-        console.log("Showing tx: ", decodedTx);
 
         const txInfoEl = this.getElementForTxInfo(decodedTx, classes);
 

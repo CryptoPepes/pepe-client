@@ -50,7 +50,14 @@ const styledTrackedTx = withStyles(styles)(TrackedTxInner);
 
 const TrackedTx = connect((state, props) => {
     const txData = state.redapp.tracking.transactions[props.txTrackingId];
-    const confirmations = txData.status === "confirmed" ? (state.redapp.tracking.blocks.latest.number - txData.blockNumber + 1) : 0;
+    let confirmations = txData.status === "success"
+        ? (
+            state.redapp.tracking.blocks.latest.number
+                - (txData.receipt || {blockNumber: state.redapp.tracking.blocks.latest.number}).blockNumber + 1
+        )
+        : 0;
+    // Cap at 25 confirmations, for less UI updates in long run.
+    if (confirmations > 24) confirmations = 25;
     // TODO check if it's not in an orphaned block
     return ({
         hasWeb3: state.web3.hasWeb3,
