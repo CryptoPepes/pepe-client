@@ -130,7 +130,7 @@ class Header extends React.Component {
 
         return (
             <div className={classes.root}>
-                <AppBar position="static" className={classes.appBar}>
+                <AppBar position="static" className={classes.appBar} elevation={0}>
                     <Toolbar>
                         <Hidden smDown>
                             <Link className={AppStyle.noDeco} to="/">

@@ -13,6 +13,7 @@ import CollectingSection from "../elements/home/CollectingSection";
 import BattlingSection from "../elements/home/BattlingSection";
 import MiningSection from "../elements/home/MiningSection";
 import SeenOnSection from "../elements/home/SeenOnSection";
+import AdvancedLink from "../elements/util/AdvancedLink";
 
 const styles = theme => ({
     root: {
@@ -179,10 +180,11 @@ function Home(props) {
                                     Join Telegram
                                 </Button>
 
-                                <Button component={Link} to="/tutorial"
-                                        variant="raised" color="secondary" size="large"
+                                <Button component={AdvancedLink} to="https://airdrop.cryptopepes.io/"
+                                        external newTab disableLinkPadding
+                                        variant="raised" color="secondary" size="large" style={{color: 'white'}}
                                         className={classes.heroButton}>
-                                    Get Started
+                                    Airdrop
                                 </Button>
                             </div>
                         </Grid>
