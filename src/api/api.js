@@ -8,7 +8,9 @@ class PepeAPI {
 
     //Dev:
     //static apiRoot = "http://localhost:3000";
-    //Prod:
+    //Prod main:
+    //static apiRoot = "https://cryptopepes.io";
+    //Prod dev:
     static apiRoot = "https://dev.cryptopepes.io";
 
     /**
