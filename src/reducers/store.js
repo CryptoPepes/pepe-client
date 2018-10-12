@@ -28,7 +28,7 @@ const rootPersistConfig = {
 
 export default () => {
 
-    console.log("Creating new store!!!");
+    console.log("Re-initializing local store.");
 
     const persistedReducer = persistReducer(rootPersistConfig, reducer);
 

@@ -1,4 +1,4 @@
-import {Switch, Route, Redirect, withRouter} from 'react-router-dom'
+import {Switch, Route, /*withRouter*/} from 'react-router-dom'
 import PepePage from "../screens/PepePage";
 import React from "react";
 import Portfolio from "../screens/Portfolio";
@@ -9,13 +9,11 @@ import About from "../screens/About";
 import Tutorial from "../screens/Tutorial";
 import NoWeb3 from "../screens/NoWeb3";
 import NoAccount from "../screens/NoAccount";
-import {connect} from "react-redux";
-import {getDefaultAccount} from "../../util/web3AccountsUtil";
 import ScrollToTop from "../elements/util/ScrollToTop";
+import Web3StatusRedirector from "../screens/Web3StatusRedirector";
+import WrongNet from "../screens/WrongNet";
 
-const MainContent = ({hasWeb3, wallet}) => {
-
-    const defaultPortfolioAddress = hasWeb3 ? getDefaultAccount(wallet) : null;
+const MainContent = () => {
 
     return (
         <main>
@@ -28,10 +26,8 @@ const MainContent = ({hasWeb3, wallet}) => {
                     return (<PepePage pepeId={pepeId} {...remainingProps}/>)
                 }}/>
                 <Route exact strict={false} path='/my-pepes'>
-                    {!defaultPortfolioAddress ?
-                        (hasWeb3 ? <Redirect to='/no-web3'/> : <Redirect to='/no-account'/>):
-                        <Redirect to={"/portfolio/" + defaultPortfolioAddress}/>
-                    }
+                    {/* default settings redirect to portfolio of user in case everything is OK. */}
+                    <Web3StatusRedirector/>
                 </Route>
                 <Route exact strict={false} path='/portfolio/:portfolioAddress' render={({match, ...remainingProps}) => {
                     const portfolioAddress = match.params["portfolioAddress"];
@@ -44,15 +40,10 @@ const MainContent = ({hasWeb3, wallet}) => {
                 <Route exact strict={false} path='/tutorial' component={Tutorial}/>
                 <Route exact strict={false} path='/no-web3' component={NoWeb3}/>
                 <Route exact strict={false} path='/no-account' component={NoAccount}/>
+                <Route exact strict={false} path='/wrong-net' component={WrongNet}/>
             </Switch>
         </main>
     );
 };
 
-// Connect to Web3 to load default portfolio account etc.
-const connectedMainContent = connect(state => ({
-    hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet,
-}))(MainContent);
-
-export default withRouter(connectedMainContent);
+export default MainContent;//withRouter(MainContent);
