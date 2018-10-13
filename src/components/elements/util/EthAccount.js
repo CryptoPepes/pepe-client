@@ -34,13 +34,17 @@ const styles = (theme) => ({
         height: 30,
         width: 30,
     },
+    accountNamePart: {
+        display: "inline-block"
+    },
     accountData: {
         display: "inline-block",
         verticalAlign: "middle",
         maxWidth: "70%"
     },
     accountNameWrapper: {
-        padding: "8px 8px 0 8px"
+        padding: "8px 8px 0 8px",
+        width: "100%"
     },
     accountDataNormalSize: {
         margin: theme.spacing.unit,
@@ -78,7 +82,7 @@ const styles = (theme) => ({
 });
 
 const AccountNamePlaceholder = () =>
-    (<Typography variant="caption" component="i">Anon pepe trader (no username)</Typography>);
+    (<Typography variant="caption" component="i" style={{display: "inline-block"}}>Anon pepe trader (no username)</Typography>);
 
 const ApiLoadedAccountNameInner = ({data, isLoading, error}) => {
 
@@ -87,9 +91,9 @@ const ApiLoadedAccountNameInner = ({data, isLoading, error}) => {
         return <AccountNamePlaceholder/>
     } else {
         if (isLoading) {
-            return <Typography variant="body2">Loading...</Typography>
+            return <Typography variant="body2" style={{display: "inline-block"}}>Loading...</Typography>
         } else {
-            return <Typography variant="body2">{!data ? "?" : data.username}</Typography>
+            return <Typography variant="body2" style={{display: "inline-block"}}>{!data ? "?" : data.username}</Typography>
         }
     }
 };
@@ -151,8 +155,8 @@ class AccountName extends React.Component {
         if (!!usernameCache && usernameCache.hasOwnProperty("value")) {
             const web3username = Web3Utils.hexToUtf8(usernameCache.value);
             return (<span>
-                <Typography variant="body2">{web3username}</Typography>
-                <Typography variant="caption">(Web3 verified)</Typography>
+                <Typography variant="body2" style={{display: "inline-block"}}>{web3username}</Typography>
+                <Typography variant="caption"style={{display: "inline-block"}}>(Web3 verified)</Typography>
             </span>)
         } else {
             // No web3 username available? Then use the backend.
@@ -219,7 +223,7 @@ class EthAccount extends React.Component {
     }
 
     render() {
-        const {address, classes, children, small } = this.props;
+        const {address, classes, children, small, addOnText } = this.props;
         const {open, imgData} = this.state;
 
         const profilePicStyle = !!address && !!imgData ?
@@ -242,7 +246,7 @@ class EthAccount extends React.Component {
                         small ? classes.accountDataSmallSize : classes.accountDataNormalSize)}>
 
                     <div className={classes.accountNameWrapper}>
-                        <Web3LoadedAccountName address={address}/>
+                        <Web3LoadedAccountName address={address} className={classes.accountNamePart}/> {addOnText && <Typography variant="caption" className={classes.accountNamePart}>{addOnText}</Typography>}
                     </div>
 
                     <Modal
@@ -290,7 +294,9 @@ EthAccount.defaultProps = {
 
 EthAccount.propTypes = {
     address: PropTypes.string,
-    small: PropTypes.bool
+    small: PropTypes.bool,
+    // Optional
+    addOnText: PropTypes.string
 };
 
 export default withStyles(styles)(EthAccount);

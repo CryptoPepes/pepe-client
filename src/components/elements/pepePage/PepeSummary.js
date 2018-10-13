@@ -12,6 +12,7 @@ import Moment from 'react-moment';
 import BreederAddMenu from "../actions/breeder/BreederAddMenu";
 import {hasAccount} from "../../../util/web3AccountsUtil";
 import {connect} from "react-redux";
+import {saleAddr, cozyAddr} from "../../../web3Settings";
 
 const styles = (theme) => ({
     root: {
@@ -95,6 +96,11 @@ class PepeSummary extends React.Component {
             : (pepe.sale_auction !== undefined
                 ? pepe.sale_auction.seller
                 : pepe.master);
+        const addOnTag = pepe.cozy_auction !== undefined
+            ? "[Hop contract]"
+            : (pepe.sale_auction !== undefined
+                ? "[Sale contract]"
+                : null);
 
         const cozyWhenEl = pepe.can_cozy_again === undefined
             ? <span>...</span>
@@ -133,7 +139,7 @@ class PepeSummary extends React.Component {
                             {isLoading ? (
                                 <EthAccount/>
                             ) : (
-                                <EthAccount address={owner}/>
+                                <EthAccount address={owner} addOnText={addOnTag}/>
                             )}
 
                         </CardContent>
