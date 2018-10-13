@@ -42,9 +42,15 @@ class AppWrapperInner extends React.Component {
 
 
     componentDidMount() {
+        // Hide loader animation
+        document.getElementById("page-loader-anim").style.display = "none";
         if (document.body && !!this.state.uiTheme) {
             document.body.dir = this.state.uiTheme.direction;
         }
+    }
+
+    componentWillUnmount() {
+        document.getElementById("page-loader-anim").style.display = "block";
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
