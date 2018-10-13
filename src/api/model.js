@@ -114,7 +114,6 @@ class PepeData {
                     gen=0,
                     father="0",
                     mother="0",
-                    birth_time=0,
                     pepe_state="normal",
                     look={
                         skin: {
@@ -167,7 +166,6 @@ class PepeData {
         this.gen = gen;
         this.father = father;
         this.mother = mother;
-        this.birth_time = birth_time;
         this.pepe_state = pepe_state;
         this.look = look;
         this.sale_auction = sale_auction ? new AuctionData(sale_auction) : undefined;

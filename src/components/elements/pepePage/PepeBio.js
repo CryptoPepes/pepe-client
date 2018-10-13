@@ -44,8 +44,7 @@ PepeBio.propTypes = {
         name: PropTypes.string,
         pepeId: PropTypes.string,
         bio_title: PropTypes.string,
-        bio_description: PropTypes.string,
-        birth_time: PropTypes.number
+        bio_description: PropTypes.string
     })
 };
 

@@ -22,8 +22,7 @@ class PepeAPI {
 
         const queryStr = query.toURLParamStr();
 
-        console.log("Searching for pepes, query: "+queryStr);
-
+        // console.log("Searching for pepes, query: "+queryStr);
 
         let resp = await request(PepeAPI.apiRoot + "/api/search" + queryStr);
 
@@ -44,7 +43,7 @@ class PepeAPI {
 
     static async getPepeData(pepeId="0") {
         const resp = await request(PepeAPI.apiRoot+"/api/getPepe/"+pepeId);
-        console.log("retrieved pepe data: ", resp);
+        // console.log("retrieved pepe data: ", resp);
         return PepeAPI.parsePepeJSON(resp)
     }
 
