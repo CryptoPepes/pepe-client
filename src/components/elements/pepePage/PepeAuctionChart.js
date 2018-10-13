@@ -32,7 +32,18 @@ const chartMarginRight = 140;
 const chartMarginBottom = 30;
 const fontSize = 20;
 
-const formatTime = (stampSeconds) => new Date(stampSeconds * 1000).toTimeString().split(' ')[0];
+const daySecs = 24*60*60;
+const week2Secs = daySecs * 7 * 2;
+
+const formatTime = (stampSeconds, duration) => {
+    if (duration > daySecs) {
+        const dateObj = new Date(stampSeconds * 1000);
+        const dateStrParts = dateObj.toDateString().split(' ');
+        if (duration > week2Secs) return dateStrParts[1] + ' ' + dateStrParts[2];
+        const timeStrParts = dateObj.toTimeString().split(' ')[0].split(':');
+        return dateStrParts[2] + ' ' + dateStrParts[1] + ' ' + timeStrParts[0] + ':' + timeStrParts[1];
+    } else return new Date(stampSeconds * 1000).toTimeString().split(' ')[0];
+};
 
 // substract 200 for price info on the right
 const chartInnerWidth = chartWidth - chartMarginLeft - chartMarginRight;
@@ -57,6 +68,8 @@ const PepeAuctionChart = (props) => {
     // check currentTime against auction limits, clip it
     if (currentTime < startTime) currentTime = startTime;
     if (currentTime > endTime) currentTime = endTime - 1;
+
+    const duration = endTime - startTime;
 
     const descendingPrice = startPrice > endPrice;
     const maxPrice = descendingPrice ? startPrice : endPrice;
@@ -161,7 +174,7 @@ const PepeAuctionChart = (props) => {
                 (<text key={"time-info-"+i} className={classes.chartText} textAnchor="left"
                        x={p * chartInnerWidth + chartMarginLeft}
                        y={chartMarginTop + chartInnerHeight + fontSize + 5}
-                       fontSize={fontSize}>{formatTime(startTime + (p * (endTime - startTime)))}</text>))
+                       fontSize={fontSize}>{formatTime(startTime + (p * (endTime - startTime)), duration)}</text>))
             }
 
         </svg>)

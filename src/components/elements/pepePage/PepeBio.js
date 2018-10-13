@@ -1,23 +1,16 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
-import {Card, CardContent, Typography} from "@material-ui/core";
-import Moment from "react-moment";
+import {Typography} from "@material-ui/core";
 
 const styles = (theme) => ({
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
+
 });
 
 const PepeBio = (props) => {
     const {pepe, classes} = props;
 
     const isLoading = pepe === undefined;
-
-    const bull = <span className={classes.bullet}>•</span>;
 
     let nameEl;
     if (isLoading) {
@@ -33,9 +26,8 @@ const PepeBio = (props) => {
             <Typography variant="headline" component="h2">
                 Hello, I'm {nameEl}
             </Typography>
-            <Typography className={classes.pos} color="textSecondary">
-                {pepe.bio_title || "?"} {bull}
-                <i>Born on <Moment unix format="YYYY/MM/DD" interval={0}>{pepe.birth_time || 0}</Moment></i>
+            <Typography color="textSecondary">
+                {pepe.bio_title || "?"}
             </Typography>
             <br/>
             <Typography component="p">

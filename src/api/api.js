@@ -9,9 +9,9 @@ class PepeAPI {
     //Dev:
     //static apiRoot = "http://localhost:3000";
     //Prod main:
-    //static apiRoot = "https://cryptopepes.io";
+    static apiRoot = "https://cryptopepes.io";
     //Prod dev:
-    static apiRoot = "https://dev.cryptopepes.io";
+    // static apiRoot = "https://dev.cryptopepes.io";
 
     /**
      * Execute a query, asynchronously. Parsed results are returned in a Promise.
