@@ -174,8 +174,9 @@ function Home(props) {
                                     and Trade <strong>CryptoPepes</strong>
                                 </Typography>
 
-                                <Button component="a" href="https://t.me/cryptopepes"
-                                        variant="raised" color="secondary" size="large"
+                                <Button component={AdvancedLink} to="https://t.me/cryptopepes"
+                                        external newTab disableLinkPadding
+                                        variant="raised" color="secondary" size="large" style={{color: 'white'}}
                                         className={classes.heroButton}>
                                     Join Telegram
                                 </Button>

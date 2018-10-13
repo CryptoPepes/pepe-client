@@ -78,8 +78,8 @@ class Footer extends React.Component {
 
                     <Toolbar className={classes.bar}>
 
-                        <AdvancedLink to="/terms" variant="caption">Terms of use</AdvancedLink>
-                        <AdvancedLink to="/privacy" variant="caption">Privacy policy</AdvancedLink>
+                        {/*<AdvancedLink to="/terms" variant="caption">Terms of use</AdvancedLink>*/}
+                        {/*<AdvancedLink to="/privacy" variant="caption">Privacy policy</AdvancedLink>*/}
 
                         <Hidden smDown>
                             <AdvancedLink variant="caption">|</AdvancedLink>
