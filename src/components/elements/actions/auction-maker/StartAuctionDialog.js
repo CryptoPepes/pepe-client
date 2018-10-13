@@ -59,6 +59,7 @@ class StartAuctionDialog extends React.Component {
                 if (price.isNeg()) {
                     validPrice = false;
                 }
+                price = price.toString();
             } else {
                 validPrice = false;
             }
