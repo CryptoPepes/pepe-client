@@ -4,6 +4,7 @@ import {OpenInNew} from "@material-ui/icons";
 import {withStyles} from "@material-ui/core/styles";
 import React from "react";
 import PropTypes from "prop-types";
+import {etherscanBaseLink} from "../../../web3Settings";
 
 const styles = theme => ({
     etherscanBtn: {
@@ -14,9 +15,6 @@ const styles = theme => ({
         color: "#fff"
     }
 });
-
-// TODO: change to main-net link for release.
-const etherscanBaseLink = "https://ropsten.etherscan.io/";
 
 const EtherscanBtn = ({children, classes, link, size}) => (
     <AdvancedLink to={etherscanBaseLink + link} external newTab disableLinkPadding>
