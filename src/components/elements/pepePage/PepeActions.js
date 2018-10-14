@@ -46,9 +46,9 @@ class PepeActions extends React.Component {
 
 
         // Check if the pepe is being auctioned, and format the prices if so.
-        const isInCozyAuction = pepe.cozy_auction !== undefined;
+        const isInCozyAuction = !!pepe.cozy_auction;
         const cozyAuctionExpired = isInCozyAuction && pepe.cozy_auction.isExpired();
-        const isInSaleAuction = pepe.sale_auction !== undefined;
+        const isInSaleAuction = !!pepe.sale_auction;
         const saleAuctionExpired = isInSaleAuction && pepe.sale_auction.isExpired();
 
         const canStartAuction = !isInSaleAuction && !isInCozyAuction;

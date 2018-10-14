@@ -3,11 +3,11 @@ import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import {
     Button,
-    DialogContentText,
-    TextField
+    DialogContentText
 } from "@material-ui/core";
 import { connect } from 'react-redux';
 import TxDialog from "./TxDialog";
+import {cozyAddr, saleAddr} from "../../../web3Settings";
 
 const styles = (theme) => ({
 
@@ -93,10 +93,12 @@ export default connect((state, props) => {
     const auctionContract = props.auctionType === "sale"
         ? state.redapp.contracts.PepeAuctionSale
         : state.redapp.contracts.CozyTimeAuction;
+    const auctionAddr = props.auctionType === "sale"
+        ? saleAddr
+        : cozyAddr;
     return ({
             hasWeb3: state.web3.hasWeb3,
             auctionContract: auctionContract,
-            auctionAddress: state.web3.hasWeb3 ? auctionContract.networks[state.web3.networkId].address : undefined,
-
+            auctionAddress: auctionAddr
     })
 })(styledSavePepeDialog);
