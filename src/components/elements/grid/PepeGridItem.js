@@ -3,7 +3,7 @@ import {
     Card, CardActions, CardContent, CardMedia, IconButton,
     Typography
 } from "@material-ui/core";
-import ShareIcon from '@material-ui/icons/Share';
+// import ShareIcon from '@material-ui/icons/Share';
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import AppStyle from "../../../style.scss";
@@ -162,9 +162,9 @@ class PepeGridItem extends React.Component {
                         </IconButton>
                     }
 
-                    <IconButton aria-label="Share">
-                        <ShareIcon />
-                    </IconButton>
+                    {/*<IconButton aria-label="Share">*/}
+                        {/*<ShareIcon />*/}
+                    {/*</IconButton>*/}
 
                     { isBreedable &&
                         <BreederAddMenu open={this.state.breederMenuOpen}

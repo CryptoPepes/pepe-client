@@ -114,7 +114,7 @@ const styles = theme => ({
 class PepePageInner extends React.Component {
 
     render() {
-        const { classes, data, pepeId, isLoading, error, hasWeb3, wallet } = this.props;
+        const { classes, data, isLoading, error, hasWeb3 } = this.props;
 
         if (error) {
             console.log("Error while loading pepe: "+error.msg);
@@ -138,12 +138,10 @@ class PepePageInner extends React.Component {
         }
 
         // Check if the pepe is being auctioned, and format the prices if so.
-        const isForCozy = !isLoading && pepe.cozy_auction !== undefined && !pepe.cozy_auction.isExpired();
+        const isForCozy = !isLoading && !!pepe.cozy_auction && !pepe.cozy_auction.isExpired();
         const cozyPrice = isForCozy ? pepe.cozy_auction.getCurrentPrice() : undefined;
-        const isForSale = !isLoading && pepe.sale_auction !== undefined && !pepe.sale_auction.isExpired();
+        const isForSale = !isLoading && !!pepe.sale_auction && !pepe.sale_auction.isExpired();
         const salePrice = isForSale ? pepe.sale_auction.getCurrentPrice() : undefined;
-
-        let userIsOwner = hasWeb3 && hasAccount(wallet, pepe.master);
 
         return (
 
@@ -282,8 +280,7 @@ LoadingPepePage.propTypes = {
 };
 
 const ConnectedPepePage = connect(state => ({
-    hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet
+    hasWeb3: state.web3.hasWeb3
 }))(LoadingPepePage);
 
 const PepePage = reloadable(ConnectedPepePage);
