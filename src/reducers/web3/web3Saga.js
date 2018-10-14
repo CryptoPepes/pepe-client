@@ -3,9 +3,10 @@ import {
 } from 'redux-saga/effects';
 import web3AT from './web3AT';
 import poller from "../util/poller";
-import {targetNetID, cpepAddr, cozyAddr, saleAddr} from "../../web3Settings";
+import {targetNetID, cpepAddr, cozyAddr, saleAddr, dpepAddr} from "../../web3Settings";
 import redappSaga from 'redapp/es/saga';
 import { addContract } from 'redapp/es/contracts/actions';
+import DPEP_abi from '../../abi/DPEP_abi.json';
 import CPEP_abi from '../../abi/CPEP_abi.json';
 import sale_abi from '../../abi/sale_abi.json';
 import cozy_abi from '../../abi/cozy_abi.json';
@@ -101,6 +102,7 @@ function* runRedappSaga() {
     yield put(addContract("PepeBase", CPEP_abi, { [targetNetID]: { "address": cpepAddr } }));
     yield put(addContract("PepeAuctionSale", sale_abi, { [targetNetID]: { "address": saleAddr } }));
     yield put(addContract("CozyTimeAuction", cozy_abi, { [targetNetID]: { "address": cozyAddr } }));
+    yield put(addContract("PepeGrinder", DPEP_abi, { [targetNetID]: { "address": dpepAddr } }));
 
     console.log("Start background tasks");
     yield put(startAccountPolling(5000));
