@@ -56,6 +56,7 @@ class Footer extends React.Component {
 
 
                         <AdvancedLink to="/marketplace">Marketplace</AdvancedLink>
+                        <AdvancedLink to="/explorer">Explorer</AdvancedLink>
                         <Hidden smDown>
                             <AdvancedLink to="/faq">FAQ</AdvancedLink>
                             <AdvancedLink to="/about">About us</AdvancedLink>

@@ -13,8 +13,9 @@ const targetNetID = 1;
 const cpepAddr = "0x84ac94f17622241f313511b629e5e98f489ad6e4";
 const saleAddr = "0x28ae3df366726d248c57b19fa36f6d9c228248be";
 const cozyAddr = "0xe2c43d2c6d6875c8f24855054d77b5664c7e810f";
+const miningAddr = "0xBC2AFc039d2BFa67d582aC181daB5BE17EC91f82";
 
 const etherscanBaseLink = "https://etherscan.io";
 
-export {targetNetID, cpepAddr, saleAddr, cozyAddr, etherscanBaseLink};
+export {targetNetID, cpepAddr, saleAddr, cozyAddr, miningAddr, etherscanBaseLink};
 
