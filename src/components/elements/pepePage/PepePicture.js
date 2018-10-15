@@ -5,13 +5,13 @@ import PepeAPI from "../../../api/api";
 
 const styles = (theme) => ({
     root: {
-        width: "100%",
-        minWidth: 300
+        width: "100%"
     },
     media: {
         height: "100%",
         display: "block",
-        margin: "0 auto 0 auto"
+        margin: "0 auto 0 auto",
+        backgroundColor: "#aaa"
     }
 });
 
@@ -22,10 +22,12 @@ class PepePicture extends React.Component {
         const {pepeId, classes} = this.props;
 
         return (
-            <div>
+            <div className={classes.root}>
+                {pepeId &&
                 <img className={classes.media}
-                     src={pepeId === undefined ? "/assets/img/pepe-loading.png" : PepeAPI.getPepeSvgSrc(pepeId)}
-                     title={pepeId === undefined ? "..." : ("Pepe #" + pepeId)}/>
+                     src={PepeAPI.getPepeSvgSrc(pepeId)}
+                     title={"Pepe #" + pepeId}/>
+                }
             </div>
         );
     }
