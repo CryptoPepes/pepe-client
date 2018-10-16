@@ -20,6 +20,8 @@ class ConvertDpep extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {buttonClicked: false};
     }
 
     componentDidMount() {
@@ -44,6 +46,10 @@ class ConvertDpep extends Component {
         });
 
         this.props.dispatch(thunk);
+
+        this.setState({
+            buttonClicked: true
+        });
     }
 
     render() {
@@ -72,6 +78,10 @@ class ConvertDpep extends Component {
                                 Claim Pepe
                             </Button>)}
                         </Typography>
+
+                        {this.state.buttonClicked && (
+                            <Typography variant="subheading" align="center">Confirm the transaction in MetaMask or click again to claim another CryptoPepe.</Typography>
+                        )}
                     </Grid>
                 </Grid>
             </div>
