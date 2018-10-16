@@ -6,11 +6,14 @@ import { AppContainer as ReactHotLoader } from "react-hot-loader";
 import {Provider} from "react-redux";
 import "./style.scss";
 import AppWrapper from "./components/AppWrapper";
+import setAffiliate from "./util/affiliate";
 import storeCreator from "./reducers/store";
 
 import { PersistGate } from 'redux-persist/integration/react';
 
 const {store, persistor} = storeCreator();
+
+setAffiliate(store);
 
 const render = Component => {
     ReactDOM.render(

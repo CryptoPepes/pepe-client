@@ -84,10 +84,12 @@ class About extends Component {
                               Our Team
                           </Typography>
                       </Grid>
+
                       <TeamMember name="Programmerror" role="Development" image="/img/about/programmerror.svg"></TeamMember>
                       <TeamMember name="Pablo" role="Development" image="/img/about/pablo.svg"></TeamMember>
                       <TeamMember name="CR-MN" role="Marketing" image="/img/about/crmn.svg"></TeamMember>
                       <TeamMember name="Bribu" role="Design" image="/img/about/bribu.svg"></TeamMember>
+          
                   </Grid>
               </div>
 
