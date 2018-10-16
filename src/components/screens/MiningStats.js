@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import {BN} from "web3-utils";
 import mining_abi from "../../abi/mining_abi.json";
 import {miningAddr} from "../../web3Settings";
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
 // TODO 
 // - Add better styling
@@ -47,7 +46,7 @@ class MiningStats extends Component {
         const {contracts} = this.props;
         if(contracts.Mining) { 
             const target = contracts.Mining.methods.getMiningTarget.cacheCall({});
-            this.setState({targetCallID: target.callID})
+            this.setState({targetCallID: target.callID});
             this.props.dispatch(target.thunk);
         }
         const web3 = window.pepeWeb3v1;
@@ -71,7 +70,7 @@ class MiningStats extends Component {
                 rewards: events,
             });
         } 
-    }
+    };
 
     addMintOne = (error, event) => {
         if(this.mounted) {
@@ -79,7 +78,7 @@ class MiningStats extends Component {
                 rewards: this.state.rewards.concat([event]),
             });
         } 
-    }
+    };
 
     calcHashrate = (data) => {
         if(!data || !data.value) {
@@ -93,7 +92,7 @@ class MiningStats extends Component {
         p = p.div(new BN(1000000)).div(new BN(430));
 
         return((p.toNumber() / 1000 / 2) + " GH/s");
-    }
+    };
 
     shorten(value) {
         return(value.substr(0, 6) + "..." + value.substr(-5, 5));
@@ -101,11 +100,11 @@ class MiningStats extends Component {
 
     getEpoch = () => {
         const {rewards} = this.state;
-        if(rewards.length != 0 && rewards[rewards.length - 1].returnValues) {
+        if(!!rewards && rewards.length !== 0 && rewards[rewards.length - 1].returnValues) {
             return parseInt(rewards[rewards.length - 1].returnValues.epochCount);
         }
         return 0;
-    }
+    };
 
     render() {
         const {classes, data} = this.props;
@@ -121,13 +120,13 @@ class MiningStats extends Component {
                         <Typography align="center"><strong>Hashrate</strong> <br /> {hashrate}</Typography>
                     </Grid>
                     <Grid item xs={3}>
-                        <Typography align="center"><strong>Next Readjust</strong> <br /> {epoch != 0 ? (20 - (epoch - 1) % 20) : "Loading"}</Typography>
+                        <Typography align="center"><strong>Next Readjust</strong> <br /> {epoch !== 0 ? (20 - (epoch - 1) % 20) : "Loading"}</Typography>
                     </Grid>
                     <Grid item xs={3}>
-                        <Typography align="center"><strong>Next CPEP</strong> <br /> {epoch != 0 ? (16 - (epoch - 1) % 16) : "Loading"}</Typography>
+                        <Typography align="center"><strong>Next CPEP</strong> <br /> {epoch !== 0 ? (16 - (epoch - 1) % 16) : "Loading"}</Typography>
                     </Grid>
                     <Grid item xs={3}>
-                        <Typography align="center"><strong>Rewards Mined</strong> <br /> {epoch != 0 ? (epoch) : "Loading"}</Typography>
+                        <Typography align="center"><strong>Rewards Mined</strong> <br /> {epoch !== 0 ? (epoch) : "Loading"}</Typography>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -141,9 +140,9 @@ class MiningStats extends Component {
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                            {rewards.length != 0 && rewards.slice(0).reverse().map(reward => {
+                            {rewards.length !== 0 && rewards.slice(0).reverse().map(reward => {
                                 return (
-                                <TableRow className={(parseInt(reward.returnValues.epochCount ) - 1) % 16 == 0 ?  classes.pepReward : classes.normal} key={reward.blockHash}>
+                                <TableRow className={(parseInt(reward.returnValues.epochCount ) - 1) % 16 === 0 ?  classes.pepReward : classes.normal} key={reward.blockHash}>
                                     <TableCell className={classes.tableCell} component="th" scope="row">
                                         {reward.returnValues.epochCount}
                                     </TableCell>

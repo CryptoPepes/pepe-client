@@ -50,7 +50,7 @@ class ConvertDpep extends Component {
         this.setState({
             buttonClicked: true
         });
-    }
+    };
 
     render() {
         const {classes, data} = this.props;
@@ -73,7 +73,7 @@ class ConvertDpep extends Component {
                         </Typography>
 
                         <Typography variant="subheading" className={classes.claimSection} align="center">
-                            Your DPEP balance: {dpepBalance != undefined ? dpepBalance : "Loading"} <br />
+                            Your DPEP balance: {(dpepBalance !== undefined && dpepBalance !== null) ? dpepBalance : "Loading"} <br />
                             {dpepBalance >= 100 && (<Button onClick={this.claimPepe} size="large" variant="contained" color="secondary" className={classes.button}>
                                 Claim Pepe
                             </Button>)}
