@@ -42,7 +42,7 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 
 
     handleTxSend = () => {
-        const { PepeBase, auctionAddress, motherPepe, fatherPepe, cozyCandidateAsFather, wallet, hasWeb3 } = this.props;
+        const { PepeBase, auctionAddress, motherPepe, fatherPepe, cozyCandidateAsFather, wallet, hasWeb3, affiliate } = this.props;
         const { bidPrice, validBidPrice } = this.state;
 
         if (!hasWeb3) {
@@ -67,20 +67,32 @@ class CozyBuyDialogInner extends BidAuctionDialog {
         const candidate = cozyCandidateAsFather ? fatherPepe : motherPepe;
 
         if (hasWeb3 && validBidPrice && !!auctionAddress) {
-
-            const {txID, thunk} = PepeBase.methods.approveAndBuy.trackedSend(
-                {from: buyerAccount, value: bidPrice},
-                auctionSubject.pepeId,
-                auctionAddress,
-                candidate.pepeId,
-                cozyCandidateAsFather
-            );
+            let call;
+            //if affiliate is set
+            if (affiliate && Web3Utils.isAddress(affiliate)) {
+                call = PepeBase.methods.approveAndBuyAffiliated.trackedSend(
+                    {from: buyerAccount, value: bidPrice},
+                    auctionSubject.pepeId,
+                    auctionAddress,
+                    candidate.pepeId,
+                    cozyCandidateAsFather,
+                    affiliate
+                );
+            } else {
+                call = PepeBase.methods.approveAndBuy.trackedSend(
+                    {from: buyerAccount, value: bidPrice},
+                    auctionSubject.pepeId,
+                    auctionAddress,
+                    candidate.pepeId,
+                    cozyCandidateAsFather
+                );
+            }
 
             this.setState({
-                txTrackingId: txID,
+                txTrackingId: call.txID,
             });
 
-            this.props.dispatch(thunk);
+            this.props.dispatch(call.thunk);
         }
     };
 
@@ -221,7 +233,8 @@ const CozyBuyDialog = connect(state => ({
     hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet,
     auctionAddress: cozyAddr,
-    PepeBase: state.redapp.contracts.PepeBase
+    PepeBase: state.redapp.contracts.PepeBase,
+    affiliate: state.affiliate.affiliate
 }))(styledCozyBuyDialog);
 
 

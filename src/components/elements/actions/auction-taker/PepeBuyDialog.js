@@ -31,7 +31,7 @@ const styles = (theme) => ({
 class PepeBuyDialogInner extends BidAuctionDialog {
 
     handleTxSend = () => {
-        const { auctionContract, auctionAddress, wallet, hasWeb3, pepe } = this.props;
+        const { auctionContract, auctionAddress, wallet, hasWeb3, pepe, affiliate } = this.props;
         const { bidPrice, validBidPrice } = this.state;
 
         if (!hasWeb3) {
@@ -52,15 +52,23 @@ class PepeBuyDialogInner extends BidAuctionDialog {
 
         if (hasWeb3 && validBidPrice && !!auctionAddress) {
 
-            const {txID, thunk} = auctionContract.methods.buyPepe.trackedSend(
-                {from: buyerAccount, value: bidPrice}, pepe.pepeId
-            );
+            let call;
+
+            if (affiliate && Web3Utils.isAddress(affiliate)) {
+                call = auctionContract.methods.buyPepeAffiliated.trackedSend(
+                    {from: buyerAccount, value: bidPrice}, pepe.pepeId, affiliate
+                );
+            } else {
+                call = auctionContract.methods.buyPepe.trackedSend(
+                    {from: buyerAccount, value: bidPrice}, pepe.pepeId
+                );
+            }
 
             this.setState({
-                txTrackingId: txID,
+                txTrackingId: call.txID,
             });
 
-            this.props.dispatch(thunk);
+            this.props.dispatch(call.thunk);
         }
     };
 
@@ -165,7 +173,8 @@ const PepeBuyDialog = connect(state => ({
     hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet,
     auctionAddress: saleAddr,
-    auctionContract: state.redapp.contracts.PepeAuctionSale
+    auctionContract: state.redapp.contracts.PepeAuctionSale,
+    affiliate: state.affiliate.affiliate,
 }))(styledSaleBuyDialog);
 
 
