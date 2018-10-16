@@ -47,6 +47,9 @@ const styles = theme => ({
     cardData: {
         margin: theme.spacing.unit,
     },
+    cardActions: {
+        height: 64
+    },
     expand: {
         transform: 'rotate(0deg)',
         transition: theme.transitions.create('transform', {
@@ -140,7 +143,7 @@ class PepeGridItem extends React.Component {
                         </Typography>
                     </Link>
                 </CardContent>
-                <CardActions disableActionSpacing>
+                <CardActions disableActionSpacing className={classes.cardActions}>
                     <Typography variant="subheading" component="span" className={classes.cardData}>
                         Gen {pepe.gen}
                     </Typography>

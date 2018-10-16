@@ -49,14 +49,11 @@ class Footer extends React.Component {
                 <AppBar elevation={0} position="static" className={classes.containerBar}>
                     <Toolbar className={classes.bar}>
 
-                        <AdvancedLink to="/my-pepes"
-                                          className={classes.headerButton}>My Pepes</AdvancedLink>
-
-
-
-
+                        <AdvancedLink to="/my-pepes" className={classes.headerButton}>My Pepes</AdvancedLink>
                         <AdvancedLink to="/marketplace">Marketplace</AdvancedLink>
                         <AdvancedLink to="/convert-dpep">Convert DPEP</AdvancedLink>
+                        <AdvancedLink to="/mining-stats">Mining Stats</AdvancedLink>
+
                         <Hidden smDown>
                             <AdvancedLink to="/faq">FAQ</AdvancedLink>
                             <AdvancedLink to="/about">About us</AdvancedLink>
