@@ -101,7 +101,7 @@ class MiningStats extends Component {
 
     getEpoch = () => {
         const {rewards} = this.state;
-        if(!!rewards && rewards.length !== 0 && rewards[rewards.length - 1].returnValues) {
+        if(!!rewards && rewards.length !== 0 && !!rewards[rewards.length - 1] && rewards[rewards.length - 1].returnValues) {
             return parseInt(rewards[rewards.length - 1].returnValues.epochCount);
         }
         return 0;
@@ -141,7 +141,7 @@ class MiningStats extends Component {
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                            {rewards.length !== 0 && rewards.slice(0).reverse().map(reward => {
+                            {rewards.length !== 0 && rewards.slice(0).reverse().filter(reward => !!reward).map(reward => {
                                 return (
                                 <TableRow className={(parseInt(reward.returnValues.epochCount ) - 1) % 16 === 0 ?  classes.pepReward : classes.normal} key={reward.blockHash}>
                                     <TableCell className={classes.tableCell} component="th" scope="row">
