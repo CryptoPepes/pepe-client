@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import { withStyles } from "@material-ui/core/styles";
 import {Grid, Typography, Button} from '@material-ui/core';
 import Web3Utils from 'web3-utils';
+import Web3StatusRedirector from "./Web3StatusRedirector";
 
 const styles = theme => ({
     root: {
@@ -92,7 +93,7 @@ class ConvertDpep extends Component {
 
 
 const styledConvertDpep = withStyles(styles)(ConvertDpep);
-const connectedConvertDpep = connect(
+const ConnectedConvertDpep = connect(
     state => ({
         contracts: state.redapp.contracts,
         data: state.redapp.tracking.calls,
@@ -100,4 +101,12 @@ const connectedConvertDpep = connect(
     })
 )(styledConvertDpep);
 
-export default connectedConvertDpep;
+
+const ConnectedConvertDpepWeb3Checked = () => {
+    const dpepConvertCreator = () => <ConnectedConvertDpep/>;
+    // web3 needs to be active, and there needs to be an account available.
+    return <Web3StatusRedirector dstAddrOk={dpepConvertCreator}/>;
+};
+
+
+export default ConnectedConvertDpepWeb3Checked;

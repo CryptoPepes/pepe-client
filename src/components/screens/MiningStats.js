@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {BN} from "web3-utils";
 import mining_abi from "../../abi/mining_abi.json";
 import {miningAddr} from "../../web3Settings";
+import Web3StatusRedirector from "./Web3StatusRedirector";
 
 // TODO 
 // - Add better styling
@@ -171,9 +172,15 @@ class MiningStats extends Component {
 
 const styledMiningStats = withStyles(styles)(MiningStats);
 
-const connectedMiningStats = connect(state => ({
+const ConnectedMiningStats = connect(state => ({
     contracts: state.redapp.contracts,
     data: state.redapp.tracking.calls,
 }))(styledMiningStats);
 
-export default withStyles(styles)(connectedMiningStats);
+const MiningStatsWeb3Checked = () => {
+    const miningStatsCreator = () => <ConnectedMiningStats/>;
+    // Having no account is fine, web3 needs to be active however.
+    return <Web3StatusRedirector dstNoAccount={miningStatsCreator} dstAddrOk={miningStatsCreator}/>;
+};
+
+export default MiningStatsWeb3Checked;

@@ -16,7 +16,7 @@ import {
     AccountBalanceWallet, Menu, ViewList, Store, HelpOutline, InfoOutlined,
     QuestionAnswer
 } from "@material-ui/icons";
-import { LightbulbOnOutline, LightbulbOutline } from 'mdi-material-ui';
+import {CubeOutline, LightbulbOnOutline, LightbulbOutline, Pickaxe, SwapHorizontal} from 'mdi-material-ui';
 import {Link} from "react-router-dom";
 import AdvancedLink from "../elements/util/AdvancedLink";
 import {TagHeart} from "mdi-material-ui";
@@ -58,12 +58,14 @@ class Header extends React.Component {
             mainMenuAnchorEl: null,
             helpMenuOpen: false,
             helpMenuAnchorEl: null,
+            minerMenuOpen: false,
+            minerMenuAnchorEl: null
         }
     }
 
     menuButton = null;
     helpButton = null;
-
+    minerButton = null;
 
     handleMainMenuButtonClick = () => {
         this.setState({
@@ -79,6 +81,14 @@ class Header extends React.Component {
         });
     };
 
+    handleMinerMenuButtonClick = () => {
+        this.setState({
+            minerMenuOpen: true,
+            minerMenuAnchorEl: findDOMNode(this.minerButton),
+        });
+    };
+
+
     handleMenuClose = () => {
         this.setState({
             mainMenuOpen: false,
@@ -90,6 +100,13 @@ class Header extends React.Component {
             helpMenuOpen: false,
         });
     };
+
+    handleMinerClose = () => {
+        this.setState({
+            minerMenuOpen: false,
+        });
+    };
+
 
 
     handleTogglePaletteType = () => {
@@ -213,6 +230,51 @@ class Header extends React.Component {
                                 </List>
                             </Popover>
 
+                            <Tooltip id="appbar-miner" title="Show Miner tools" enterDelay={300}>
+                                <IconButton
+                                    ref={node => {
+                                        this.minerButton = node;
+                                    }}
+                                    className={classes.headerButton}
+                                    onClick={this.handleMinerMenuButtonClick}
+                                    aria-labelledby="appbar-miner">
+                                    <Pickaxe />
+                                </IconButton>
+                            </Tooltip>
+
+                            <Popover
+                                open={this.state.minerMenuOpen}
+                                anchorEl={this.state.minerMenuAnchorEl}
+                                anchorOrigin={{
+                                    vertical: "bottom",
+                                    horizontal: uiTheme.direction === 'rtl' ? "left" : "right",
+                                }}
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: uiTheme.direction === 'rtl' ? "left" : "right",
+                                }}
+                                onClose={this.handleMinerClose}
+                            >
+                                <List component="nav">
+                                    <Link to='/mining-stats' className={AppStyle.noDeco}>
+                                        <ListItem button>
+                                            <ListItemIcon>
+                                                <CubeOutline />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Mining Stats" />
+                                        </ListItem>
+                                    </Link>
+                                    <Link to='/convert-dpep' className={AppStyle.noDeco}>
+                                        <ListItem button>
+                                            <ListItemIcon>
+                                                <SwapHorizontal />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Convert DPEP" />
+                                        </ListItem>
+                                    </Link>
+                                </List>
+                            </Popover>
+
                             <Tooltip id="appbar-theme" title={walletBtnText} enterDelay={300}>
                                 <IconButton
                                     className={classes.headerButton}
@@ -308,6 +370,25 @@ class Header extends React.Component {
                                         </Link>
                                         <Divider />
                                     </Hidden>
+
+                                    <Link to='/mining-stats' className={AppStyle.noDeco}>
+                                        <ListItem button>
+                                            <ListItemIcon>
+                                                <CubeOutline />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Mining Stats" />
+                                        </ListItem>
+                                    </Link>
+                                    <Link to='/convert-dpep' className={AppStyle.noDeco}>
+                                        <ListItem button>
+                                            <ListItemIcon>
+                                                <SwapHorizontal />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Convert DPEP" />
+                                        </ListItem>
+                                    </Link>
+
+                                    <Divider />
 
                                     <Link to='/about' className={AppStyle.noDeco}>
                                         <ListItem button>
