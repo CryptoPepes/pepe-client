@@ -51,7 +51,9 @@ class Footer extends React.Component {
 
                         <AdvancedLink to="/my-pepes" className={classes.headerButton}>My Pepes</AdvancedLink>
                         <AdvancedLink to="/marketplace">Marketplace</AdvancedLink>
+                        <AdvancedLink to="/convert-dpep">Convert DPEP</AdvancedLink>
                         <AdvancedLink to="/mining-stats">Mining Stats</AdvancedLink>
+
                         <Hidden smDown>
                             <AdvancedLink to="/faq">FAQ</AdvancedLink>
                             <AdvancedLink to="/about">About us</AdvancedLink>
@@ -78,7 +80,7 @@ class Footer extends React.Component {
                         {/*<AdvancedLink to="/privacy" variant="caption">Privacy policy</AdvancedLink>*/}
 
                         <Hidden smDown>
-                            <AdvancedLink variant="caption">|</AdvancedLink>
+                            {/*<AdvancedLink variant="caption">|</AdvancedLink>*/}
 
                             <AdvancedLink to="/" className={classes.copyrightText} variant="caption">Copyright &copy; 2018 CryptoPepes.io</AdvancedLink>
                         </Hidden>

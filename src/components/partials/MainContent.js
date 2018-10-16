@@ -3,6 +3,7 @@ import PepePage from "../screens/PepePage";
 import React from "react";
 import Portfolio from "../screens/Portfolio";
 import Home from "../screens/Home";
+import ConvertDpep from "../screens/ConvertDpep";
 import MiningStats from "../screens/MiningStats";
 import Market from "../screens/Market";
 import FaqPage from "../screens/FaqPage";
@@ -35,6 +36,8 @@ const MainContent = () => {
                     console.log("Loading portfolio for: "+portfolioAddress);
                     return (<Portfolio portfolioAddress={portfolioAddress} {...remainingProps}/>)
                 }}/>
+
+                <Route exact strict={false} path='/convert-dpep' component={ConvertDpep}/>
                 <Route exact strict={false} path='/mining-stats' component={MiningStats}/>
                 <Route exact strict={false} path='/marketplace' component={Market}/>
                 <Route exact strict={false} path='/faq' component={FaqPage}/>

@@ -84,7 +84,7 @@ class About extends Component {
                               Our Team
                           </Typography>
                       </Grid>
-                      <TeamMember name="Proto" role="Development" image="https://dev.cryptopepes.io/api/getPepeSVG/100"></TeamMember>
+                      <TeamMember name="Programmerror" role="Development" image="https://dev.cryptopepes.io/api/getPepeSVG/100"></TeamMember>
                       <TeamMember name="Pablo" role="Development" image="https://dev.cryptopepes.io/api/getPepeSVG/101"></TeamMember>
                       <TeamMember name="CR-MN" role="Marketing" image="http://botapi.cryptopepes.io/profilepic?size=500&seed=1113&hair-type=thuglife&glasses-type=thug-life&glasses-primary-color=000000&glasses-secondary-color=ffffff&mouth=fake_smile&neck=dollar_necklace&format=svg"></TeamMember>
                       <TeamMember name="Bribu" role="Design" image="https://dev.cryptopepes.io/api/getPepeSVG/103"></TeamMember>
