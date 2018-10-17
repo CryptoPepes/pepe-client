@@ -123,6 +123,8 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 
         const nowTimestamp = Math.floor(Date.now() / 1000);
 
+        const cozyAuctionExpired = isInCozyAuction && pepe.cozy_auction.isExpired();
+
         const isDescending = auctionData.isDescending();
 
         // Suggest price for 5 minutes later, to account for possible minting delay

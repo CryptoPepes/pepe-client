@@ -1,13 +1,9 @@
-
-
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import PropTypes from "prop-types";
 import classNames from 'classnames/bind';
 import Web3Utils from "web3-utils";
 import connect from "react-redux/es/connect/connect";
 import {Typography} from "@material-ui/core";
-import {AuctionData} from "../../../api/model";
 
 const styles = (theme) => ({
     root: {

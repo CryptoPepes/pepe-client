@@ -1,18 +1,12 @@
 import React from "react";
-import {Card, CardContent, CardActions, Typography, Button, Grid} from "@material-ui/core";
+import {Card, CardContent, Typography, Grid} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
-import {TagHeart} from "mdi-material-ui";
-import PropTypes from "prop-types";
 import QueryTextual from "../../../api/query_textual";
 import Separator from "../util/Separator";
 import EthAccount from "../util/EthAccount";
 import PepePicture from "./PepePicture";
-import {findDOMNode} from "react-dom";
 import Moment from 'react-moment';
-import BreederAddMenu from "../actions/breeder/BreederAddMenu";
-import {hasAccount} from "../../../util/web3AccountsUtil";
 import {connect} from "react-redux";
-import {saleAddr, cozyAddr} from "../../../web3Settings";
 
 const styles = (theme) => ({
     root: {

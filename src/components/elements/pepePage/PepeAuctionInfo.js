@@ -1,6 +1,5 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import PropTypes from "prop-types";
 import {Card, CardContent, Typography, Button} from "@material-ui/core";
 import Moment from 'react-moment';
 import PriceText from "../util/PriceText";

@@ -94,6 +94,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
         }
 
         const nowTimestamp = Math.floor(Date.now() / 1000);
+        const saleAuctionExpired = isInSaleAuction && pepe.sale_auction.isExpired();
 
         const isDescending = auctionData.isDescending();
 

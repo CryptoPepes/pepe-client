@@ -1,8 +1,8 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import PropTypes from "prop-types";
-import {Button, CardActions} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import { connect } from 'react-redux';
+import {findDOMNode} from "react-dom";
 import TransferDialog from "../actions/TransferDialog";
 import GiveNameDialog from "../actions/GiveNameDialog";
 import PepeSellDialog from "../actions/auction-maker/PepeSellDialog";
@@ -11,6 +11,8 @@ import {hasAccount} from "../../../util/web3AccountsUtil";
 import SavePepeDialog from "../actions/SavePepeDialog";
 import {TagHeart} from "mdi-material-ui";
 import BreederAddMenu from "../actions/breeder/BreederAddMenu";
+import {AuctionData} from "../../../api/model";
+import ReporterContent from "../reporting/ReporterContent";
 
 const styles = theme => ({
     button : {
@@ -30,7 +32,9 @@ class PepeActions extends React.Component {
             "open_sell": false,
             "open_cozy": false,
             "open_save_pepe_cozy": false,
-            "open_save_pepe_sale": false
+            "open_save_pepe_sale": false,
+            "open_breeding": false,
+            breederMenuAnchorEl: null
         }
     }
 
@@ -40,28 +44,56 @@ class PepeActions extends React.Component {
         });
     };
 
+    breederMenuButton = null;
+
+    handleBreederMenuOpen = () => {
+        this.setState({
+            open_breeding: true,
+            breederMenuAnchorEl: findDOMNode(this.breederMenuButton),
+        });
+    };
+
     render(){
-        const { classes, pepe, pepeId, hasWeb3, wallet, breeder } = this.props;
+        const { classes, pepeData, pepeId, saleAuctionData, cozyAuctionData, hasWeb3, wallet, breeder } = this.props;
 
-        // Check explicitly, "false" doesn't count.
-        const nameable = pepe.name === null || pepe.name === undefined || pepe.name === "";
+        if (saleAuctionData.status === "error") {
+            console.log("Failed to load sale auction data.");
+            // Continue, data will be ignored, as if it was still loading. User can refresh to force new retrieval of data.
+        }
+        if (cozyAuctionData.status === "error") {
+            console.log("Failed to load cozy auction data.");
+            // Continue, data will be ignored, as if it was still loading. User can refresh to force new retrieval of data.
+        }
+        if (pepeData.status === "error") {
+            return <ReporterContent message="Could not load pepe data."/>
+        }
 
+        const isLoadingSaleAuction = saleAuctionData.status !== "ok";
+        const isLoadingCozyAuction = cozyAuctionData.status !== "ok";
+        const isLoadingPepe = pepeData.status !== "ok";
+
+        const pepe = pepeData.pepe;
+
+        const nameable = isLoadingPepe ? false : (!pepe.name);
+
+        const cozyAuction = isLoadingSaleAuction ? null : new AuctionData(saleAuctionData.auction);
+        const saleAuction = isLoadingCozyAuction ? null : new AuctionData(cozyAuctionData.auction);
 
         // Check if the pepe is being auctioned, and format the prices if so.
-        const isInCozyAuction = !!pepe.cozy_auction;
-        const cozyAuctionExpired = isInCozyAuction && pepe.cozy_auction.isExpired();
-        const isInSaleAuction = !!pepe.sale_auction;
-        const saleAuctionExpired = isInSaleAuction && pepe.sale_auction.isExpired();
+        const isInCozyAuction = !!cozyAuction;
+        const cozyAuctionExpired = isInCozyAuction && cozyAuction.isExpired();
+        const isInSaleAuction = !!saleAuction;
+        const saleAuctionExpired = isInSaleAuction && saleAuction.isExpired();
 
         const canStartAuction = !isInSaleAuction && !isInCozyAuction;
 
         // in the literal sense, some actions can only be executed if the pepe is in the main contract.
-        const isOwned = hasWeb3 &&  hasAccount(wallet, pepe.master);
+        const isOwned = !isLoadingPepe && hasWeb3 && hasAccount(wallet, pepe.master);
 
-        const isCozyOwner = isInCozyAuction && hasWeb3 && hasAccount(wallet, pepe.cozy_auction.seller);
-        const isSaleOwner = isInSaleAuction && hasWeb3 && hasAccount(wallet, pepe.sale_auction.seller);
+        const isCozyOwner = isInCozyAuction && hasWeb3 && hasAccount(wallet, cozyAuction.seller);
+        const isSaleOwner = isInSaleAuction && hasWeb3 && hasAccount(wallet, saleAuction.seller);
 
-        const isBreedable = isOwned || (hasWeb3 && isForCozy);
+        const isBreedable = isOwned || (hasWeb3 && isInCozyAuction && !cozyAuctionExpired);
         const alreadySelectedMother = !!breeder.motherPepeId;
         const alreadySelectedFather = !!breeder.fatherPepeId;
         const alreadySelectedSelfAsMother = alreadySelectedMother && (breeder.motherPepeId === pepeId);
@@ -77,7 +109,7 @@ class PepeActions extends React.Component {
                 }
                 {isOwned && <TransferDialog
                     onClose={this.handleDialogBtn("open_transfer", false)}
-                    pepe={pepe} open={this.state["open_transfer"]}/>}
+                    pepeId={pepeId} open={this.state["open_transfer"]}/>}
 
                 {isOwned && (
                     nameable
@@ -91,7 +123,7 @@ class PepeActions extends React.Component {
                 }
                 {isOwned && nameable && <GiveNameDialog
                     onClose={this.handleDialogBtn("open_givename", false)}
-                    pepe={pepe} open={this.state["open_givename"]}/> }
+                    pepeId={pepeId} open={this.state["open_givename"]}/> }
 
 
                 {isOwned && canStartAuction && <Button variant="raised" color="secondary" className={classes.button}
@@ -101,7 +133,7 @@ class PepeActions extends React.Component {
                 }
                 {isOwned && canStartAuction && <PepeSellDialog
                     onClose={this.handleDialogBtn("open_sell", false)}
-                    pepe={pepe} open={this.state["open_sell"]}/>
+                    pepeId={pepeId} open={this.state["open_sell"]}/>
                 }
 
                 {isOwned && canStartAuction &&
@@ -112,7 +144,7 @@ class PepeActions extends React.Component {
                 }
                 {isOwned && canStartAuction && <CozySellDialog
                     onClose={this.handleDialogBtn("open_cozy", false)}
-                    pepe={pepe} open={this.state["open_cozy"]}/>
+                    pepeId={pepeId} open={this.state["open_cozy"]}/>
                 }
 
                 {isInCozyAuction && cozyAuctionExpired && isCozyOwner &&
@@ -124,7 +156,7 @@ class PepeActions extends React.Component {
                 {isInCozyAuction && cozyAuctionExpired && isCozyOwner &&
                     <SavePepeDialog
                         onClose={this.handleDialogBtn("open_save_pepe_cozy", false)}
-                        pepe={pepe} open={this.state["open_save_pepe_cozy"]}
+                        pepeId={pepeId} open={this.state["open_save_pepe_cozy"]}
                         auctionType="cozy"/>
                 }
 
@@ -137,7 +169,7 @@ class PepeActions extends React.Component {
                 {isInSaleAuction && saleAuctionExpired && isSaleOwner &&
                 <SavePepeDialog
                     onClose={this.handleDialogBtn("open_save_pepe_sale", false)}
-                    pepe={pepe} open={this.state["open_save_pepe_sale"]}
+                    pepeId={pepeId} open={this.state["open_save_pepe_sale"]}
                     auctionType="sale"/>
                 }
 
@@ -156,10 +188,10 @@ class PepeActions extends React.Component {
                 }
 
                 { isBreedable &&
-                <BreederAddMenu open={this.state.breederMenuOpen}
-                                onClose={this.closeBreederMenu}
+                <BreederAddMenu open={this.state["open_breeding"]}
+                                onClose={this.handleDialogBtn("open_breeding", false)}
                                 anchorDomEl={this.state.breederMenuAnchorEl}
-                                pepe={pepe}/>
+                                pepeId={pepeId}/>
                 }
             </div>
         )
@@ -167,16 +199,12 @@ class PepeActions extends React.Component {
 
 }
 
-PepeActions.propTypes = {
-    classes: PropTypes.object.isRequired,
-    pepe: PropTypes.object.isRequired,
-};
+const StyledPepeActions = withStyles(styles)(PepeActions);
 
-
-const styledPepeActions = withStyles(styles)(PepeActions);
-
-export default connect(state => ({
+export default connect((state, props) => ({
     breeder: state.breeder,
     hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet
-}))(styledPepeActions);
+    wallet: state.redapp.tracking.accounts.wallet,
+    saleAuctionData: (state.pepe.saleAuctions[props.pepeId] && (state.pepe.saleAuctions[props.pepeId].web3 || state.pepe.saleAuctions[props.pepeId].api)) || {},
+    cozyAuctionData: (state.pepe.cozyAuctions[props.pepeId] && (state.pepe.cozyAuctions[props.pepeId].web3 || state.pepe.cozyAuctions[props.pepeId].api)) || {}
+}))(StyledPepeActions);
