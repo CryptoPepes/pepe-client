@@ -1,7 +1,7 @@
 import pepeAT from './pepeAT';
 
 const initialState = {
-    // trackingIds of ongoing calls fetching pepe data.
+    // callIDs of ongoing calls fetching pepe data.
     web3Calls: {
         pepes: {
 
@@ -30,15 +30,13 @@ function getNowTimestamp() {
 }
 
 const mapping = {
-    [pepeAT.TRACK_WEB3_CALL]: (state, {callType, trackingId, callData}) => ({
+    [pepeAT.TRACK_WEB3_CALL]: (state, {callType, callID, callData}) => ({
         ...state,
         web3Calls: {
             ...state.web3Calls,
             [callType]: {
                 ...state.web3Calls[callType],
-                [trackingId]: {
-                    callData
-                }
+                [callID]: callData
             }
         }
     }),
@@ -89,7 +87,7 @@ const mapping = {
             [pepeId]: {
                 ...state.pepes[pepeId],
                 [dataSrc]: {
-                    ...state.pepes[pepeId][dataSrc],
+                    ...(state.pepes[pepeId] && state.pepes[pepeId][dataSrc]),
                     status: "getting",
                     timestamp
                 }
