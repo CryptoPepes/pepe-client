@@ -119,6 +119,7 @@ function* checkDataResult({callID, value}) {
 function* pepeSaga() {
     yield takeEvery(pepeAT.GET_PEPE, getPepe);
     yield takeEvery(CALL_DECODE_SUCCESS, checkDataResult);
+    // TODO: on Call fail or call decode fail: update pepe status to "error"
 }
 
 export default pepeSaga;

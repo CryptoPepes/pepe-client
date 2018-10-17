@@ -114,9 +114,9 @@ const styles = theme => ({
 class PepePageInner extends React.Component {
 
     render() {
-        const { classes, data, isLoading, error, hasWeb3 } = this.props;
+        const { classes, pepeData, hasWeb3 } = this.props;
 
-        if (error) {
+        if (pepeData.status === "error") {
             console.log("Error while loading pepe: "+error.msg);
             return <div className={classes.loadingError}>
                 { /* TODO some funny error-page art (?) */ }
@@ -124,8 +124,8 @@ class PepePageInner extends React.Component {
             </div>;
         }
 
-        const pepe = data;
-
+        const pepe = pepeData.pepe;
+        const isLoading = pepeData.status === "getting";
 
         let motherEl;
         if (!isLoading && pepe.mother !== "0") {
@@ -137,11 +137,11 @@ class PepePageInner extends React.Component {
             fatherEl = (<PepeGridItemLoadable pepeId={pepe.father}/>)
         }
 
-        // Check if the pepe is being auctioned, and format the prices if so.
-        const isForCozy = !isLoading && !!pepe.cozy_auction && !pepe.cozy_auction.isExpired();
-        const cozyPrice = isForCozy ? pepe.cozy_auction.getCurrentPrice() : undefined;
-        const isForSale = !isLoading && !!pepe.sale_auction && !pepe.sale_auction.isExpired();
-        const salePrice = isForSale ? pepe.sale_auction.getCurrentPrice() : undefined;
+        // // Check if the pepe is being auctioned, and format the prices if so.
+        // const isForCozy = !isLoading && !!pepe.cozy_auction && !pepe.cozy_auction.isExpired();
+        // const cozyPrice = isForCozy ? pepe.cozy_auction.getCurrentPrice() : undefined;
+        // const isForSale = !isLoading && !!pepe.sale_auction && !pepe.sale_auction.isExpired();
+        // const salePrice = isForSale ? pepe.sale_auction.getCurrentPrice() : undefined;
 
         return (
 
@@ -160,9 +160,9 @@ class PepePageInner extends React.Component {
                             { /* quick auction info + share button */ }
                             <div className={classes.header}>
                                 <div>
-
-                                    { isForCozy && <CozyChip auctionPrice={cozyPrice}/> }
-                                    { isForSale && <SaleChip auctionPrice={salePrice}/> }
+                                    {/* TODO */}
+                                    {/*{ isForCozy && <CozyChip auctionPrice={cozyPrice}/> }*/}
+                                    {/*{ isForSale && <SaleChip auctionPrice={salePrice}/> }*/}
                                 </div>
                                 {/*<div>*/}
                                     {/*<Button variant="fab" mini*/}
@@ -176,52 +176,49 @@ class PepePageInner extends React.Component {
 
                         { /* Header */ }
                         <Grid item xs={12}>
-                            <PepeSummary pepe={pepe}/>
+                            <PepeSummary pepeId={pepeId}/>
                         </Grid>
 
                         { !isLoading && hasWeb3 &&
                         <Grid item xs={12}>
-                            <PepeActions pepe={pepe} />
+                            <PepeActions pepeId={pepeId} />
                         </Grid>
                         }
 
                         { /* Price info + charts */ }
 
-                        {(isForSale || isForCozy) && (
-                            <Grid item xs={12} md={4}>
-                                <PepeAuctionInfo auctionType={isForSale ? "sale" : "cozy"} pepe={pepe}/>
-                            </Grid>
-                        )}
+                        {/* TODO */}
+                        {/*{(isForSale || isForCozy) && (*/}
+                            {/*<Grid item xs={12} md={4}>*/}
+                                {/*<PepeAuctionInfo auctionType={isForSale ? "sale" : "cozy"} pepeId={pepeId}/>*/}
+                            {/*</Grid>*/}
+                        {/*)}*/}
 
-                        {isForSale && (
-                            <Grid item xs={12} md={8}>
-                                <Card className={classes.auctionChartCard}>
-                                    <PepeAuctionChart auctionType="sale" auctionData={pepe.sale_auction}/>
-                                </Card>
-                            </Grid>
-                        )}
+                        {/* TODO */}
+                        {/*{isForSale && (*/}
+                            {/*<Grid item xs={12} md={8}>*/}
+                                {/*<Card className={classes.auctionChartCard}>*/}
+                                    {/*<PepeAuctionChart auctionType="sale" auctionData={pepe.sale_auction}/>*/}
+                                {/*</Card>*/}
+                            {/*</Grid>*/}
+                        {/*)}*/}
 
-                        {isForCozy && (
-                            <Grid item xs={12} md={8}>
-                                <Card className={classes.auctionChartCard}>
-                                    <PepeAuctionChart  auctionType="cozy" auctionData={pepe.cozy_auction}/>
-                                </Card>
-                            </Grid>
-                        )}
+                        {/*{isForCozy && (*/}
+                            {/*<Grid item xs={12} md={8}>*/}
+                                {/*<Card className={classes.auctionChartCard}>*/}
+                                    {/*<PepeAuctionChart  auctionType="cozy" auctionData={pepe.cozy_auction}/>*/}
+                                {/*</Card>*/}
+                            {/*</Grid>*/}
+                        {/*)}*/}
 
 
+                        {/* TODO */}
                         { /* Bio-text */ }
                         <Grid className={classes.detailSection}  item xs={12} md={6}>
                             <h3 className={classes.infoHeading}>Bio</h3>
                             <Card className={classes.detailSectionCard}>
                                 <CardContent>
-                                    {isLoading ?
-                                        (
-                                            <Loading variant="bar-tag">Loading Pepe Bio...</Loading>
-                                        ) : (
-                                            <PepeBio pepe={pepe}/>
-                                        )
-                                    }
+                                    <PepeBio pepeId={pepeId}/>
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -231,13 +228,7 @@ class PepePageInner extends React.Component {
                             <h3 className={classes.infoHeading}>Pepe Attributes</h3>
                             <Card className={classes.detailSectionCard}>
                                 <CardContent>
-                                    {isLoading ?
-                                        (
-                                            <Loading variant="bar-tag">Loading Pepe Attributes...</Loading>
-                                        ) : (
-                                            <PepeAttributes look={pepe.look}/>
-                                        )
-                                    }
+                                    <PepeAttributes pepeId={pepeId}/>
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -252,16 +243,15 @@ class PepePageInner extends React.Component {
                                 </div>
                             </Grid>)
                         }
-                        { !isLoading && (
-                            <Grid item xs={12}>
-                                <SimplePepeGrid hideHeaderOnNoResults header={
-                                    <h3 className={classes.infoHeading}>Children</h3>}
-                                                  queries={[
-                                    Query.buildQuery({mother: pepe.pepeId}),
-                                    Query.buildQuery({father: pepe.pepeId})
-                                ]}/>
-                            </Grid>
-                        )}
+
+                        <Grid item xs={12}>
+                            <SimplePepeGrid hideHeaderOnNoResults header={
+                                <h3 className={classes.infoHeading}>Children</h3>}
+                                              queries={[
+                                Query.buildQuery({mother: pepeId}),
+                                Query.buildQuery({father: pepeId})
+                            ]}/>
+                        </Grid>
 
                     </Grid>
                 </div>
@@ -273,17 +263,14 @@ class PepePageInner extends React.Component {
 
 const StyledPepePageInner = withStyles(styles)(PepePageInner);
 
-const LoadingPepePage = withLoading((props) => PepeAPI.getPepeData(props.pepeId))(StyledPepePageInner);
+const ConnectedPepePage = connect((state, props) => ({
+    hasWeb3: state.web3.hasWeb3,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
+}))(StyledPepePageInner);
 
-LoadingPepePage.propTypes = {
+ConnectedPepePage.propTypes = {
     pepeId: PropTypes.string.isRequired
 };
 
-const ConnectedPepePage = connect(state => ({
-    hasWeb3: state.web3.hasWeb3
-}))(LoadingPepePage);
-
-const PepePage = reloadable(ConnectedPepePage);
-
-export default PepePage;
+export default ConnectedPepePage;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
-import {Button} from "@material-ui/core";
+import {Button, CardActions} from "@material-ui/core";
 import { connect } from 'react-redux';
 import TransferDialog from "../actions/TransferDialog";
 import GiveNameDialog from "../actions/GiveNameDialog";
@@ -9,6 +9,8 @@ import PepeSellDialog from "../actions/auction-maker/PepeSellDialog";
 import CozySellDialog from "../actions/auction-maker/CozySellDialog";
 import {hasAccount} from "../../../util/web3AccountsUtil";
 import SavePepeDialog from "../actions/SavePepeDialog";
+import {TagHeart} from "mdi-material-ui";
+import BreederAddMenu from "../actions/breeder/BreederAddMenu";
 
 const styles = theme => ({
     button : {
@@ -39,7 +41,7 @@ class PepeActions extends React.Component {
     };
 
     render(){
-        const { classes, pepe, hasWeb3, wallet } = this.props;
+        const { classes, pepe, pepeId, hasWeb3, wallet, breeder } = this.props;
 
         // Check explicitly, "false" doesn't count.
         const nameable = pepe.name === null || pepe.name === undefined || pepe.name === "";
@@ -58,6 +60,13 @@ class PepeActions extends React.Component {
 
         const isCozyOwner = isInCozyAuction && hasWeb3 && hasAccount(wallet, pepe.cozy_auction.seller);
         const isSaleOwner = isInSaleAuction && hasWeb3 && hasAccount(wallet, pepe.sale_auction.seller);
+
+        const isBreedable = isOwned || (hasWeb3 && isForCozy);
+        const alreadySelectedMother = !!breeder.motherPepeId;
+        const alreadySelectedFather = !!breeder.fatherPepeId;
+        const alreadySelectedSelfAsMother = alreadySelectedMother && (breeder.motherPepeId === pepeId);
+        const alreadySelectedSelftAsFather = alreadySelectedFather && (breeder.fatherPepeId === pepeId);
+        const alreadySelectedSelf = alreadySelectedSelfAsMother || alreadySelectedSelftAsFather;
 
         return (
             <div>
@@ -131,6 +140,27 @@ class PepeActions extends React.Component {
                     pepe={pepe} open={this.state["open_save_pepe_sale"]}
                     auctionType="sale"/>
                 }
+
+                { /* The user must be either the owner,
+                                or have it must be an auction, with web3 on. */ }
+                { isBreedable &&
+                <Button aria-label="Cozy"
+                        onClick={this.handleBreederMenuOpen}
+                        variant={alreadySelectedSelf ? "outlined" : "raised"}
+                        color="secondary"
+                        ref={node => {
+                            this.breederMenuButton = node;
+                        }}>
+                    {isOwned ? "Hop with other pepe" : "Buy cozy auction"} <TagHeart className={classes.cozyBtnIcon}/>
+                </Button>
+                }
+
+                { isBreedable &&
+                <BreederAddMenu open={this.state.breederMenuOpen}
+                                onClose={this.closeBreederMenu}
+                                anchorDomEl={this.state.breederMenuAnchorEl}
+                                pepe={pepe}/>
+                }
             </div>
         )
     }
@@ -146,6 +176,7 @@ PepeActions.propTypes = {
 const styledPepeActions = withStyles(styles)(PepeActions);
 
 export default connect(state => ({
+    breeder: state.breeder,
     hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet
 }))(styledPepeActions);

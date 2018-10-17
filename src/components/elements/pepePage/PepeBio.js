@@ -2,23 +2,27 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import {Typography} from "@material-ui/core";
+import connect from "react-redux/es/connect/connect";
 
 const styles = (theme) => ({
 
 });
 
 const PepeBio = (props) => {
-    const {pepe, classes} = props;
+    const {pepeId, pepeData, bioData, classes} = props;
 
-    const isLoading = pepe === undefined;
+    const pepe = pepeData.pepe;
+    const pepeIsLoading = pepeData.status === "getting";
+    const bio = bioData.bio;
+    const bioIsLoading = bioData.status === "getting";
 
     let nameEl;
-    if (isLoading) {
+    if (pepeIsLoading) {
         nameEl = (<span>Pepe ?</span>)
     } else if (pepe.name !== null) {
         nameEl = (<strong>{pepe.name}</strong>)
     } else {
-        nameEl = (<span>Pepe #{pepe.pepeId}</span>)
+        nameEl = (<span>Pepe #{pepeId}</span>)
     }
 
     return (
@@ -27,25 +31,22 @@ const PepeBio = (props) => {
                 Hello, I'm {nameEl}
             </Typography>
             <Typography color="textSecondary">
-                {pepe.bio_title || "?"}
+                {bioIsLoading ? "..." : bio.title}
             </Typography>
             <br/>
             <Typography component="p">
-                {pepe.bio_description || "???"}
+                {bioIsLoading ? "..." : bio.description}
             </Typography>
         </div>
     );
 
 };
 
-PepeBio.propTypes = {
-    // when pepe is undefined -> loading placeholder is shown
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string,
-        bio_title: PropTypes.string,
-        bio_description: PropTypes.string
-    })
-};
+const StyledPepeBio = withStyles(styles)(PepeBio);
 
-export default withStyles(styles)(PepeBio);
+const ConnectedPepeBio = connect((state, props) => ({
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {},
+    bioData: (state.pepe.bioData[props.pepeId] && (state.pepe.bioData[props.pepeId].web3 || state.pepe.bioData[props.pepeId].api)) || {}
+}))(StyledPepeBio);
+
+export default ConnectedPepeBio;

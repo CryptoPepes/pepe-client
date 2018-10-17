@@ -25,84 +25,30 @@ const styles = (theme) => ({
         ...theme.typography.subheading,
         color: theme.palette.type === 'light' ? "#7a7a7a" : "#939393",
         paddingTop: theme.spacing.unit * 2
-    },
-    cozyBtnIcon: {
-        marginLeft: theme.spacing.unit,
     }
 });
 
 class PepeSummary extends React.Component {
 
-    constructor() {
-        super();
-
-        this.state = {
-            breederMenuOpen: false,
-            breederMenuAnchorEl: null,
-        };
-    }
-
-    breederMenuButton = null;
-
-    closeBreederMenu = () => {
-        this.setState({
-            breederMenuOpen: false
-        });
-    };
-
-    handleBreederMenuOpen = () => {
-        this.setState({
-            breederMenuOpen: true,
-            breederMenuAnchorEl: findDOMNode(this.breederMenuButton),
-        });
-    };
-
     render() {
-        const {pepe, classes, hasWeb3, wallet, breeder} = this.props;
+        const {pepeData, pepeId, classes} = this.props;
 
-        const isLoading = pepe === undefined;
+        const pepe = pepeData.pepe;
+        const isLoading = pepeData.status === "getting";
 
         let nameEl;
         if (isLoading) {
             nameEl = (<span>Pepe ?</span>)
-        } else if (pepe.name !== null) {
+        } else if (pepe.name != null) {
             nameEl = (<strong>{pepe.name}</strong>)
         } else {
             nameEl = (<span>Pepe #{pepe.pepeId}<Typography variant="caption"
                                                            component="i">(Not named)</Typography></span>)
         }
 
-        const pepePicture = isLoading ?
-            (<PepePicture/>) : (<PepePicture pepeId={pepe.pepeId}/>);
-
-
-        // Check if the pepe is being auctioned
-        const isForCozy = !isLoading && pepe.cozy_auction !== undefined && !pepe.cozy_auction.isExpired();
-
-        const isOwned = !isLoading && hasWeb3 && hasAccount(wallet, pepe.master);
-
-        const isBreedable = isOwned || (hasWeb3 && isForCozy);
-
-        const alreadySelectedMother = !!breeder.motherPepeId;
-        const alreadySelectedFather = !!breeder.fatherPepeId;
-        const alreadySelectedSelfAsMother = alreadySelectedMother && (breeder.motherPepeId === pepe.pepeId);
-        const alreadySelectedSelftAsFather = alreadySelectedFather && (breeder.fatherPepeId === pepe.pepeId);
-        const alreadySelectedSelf = alreadySelectedSelfAsMother || alreadySelectedSelftAsFather;
-
         const time = Math.floor(Date.now() / 1000);
 
-        const owner = pepe.cozy_auction !== undefined
-            ? (pepe.cozy_auction.seller)
-            : (pepe.sale_auction !== undefined
-                ? pepe.sale_auction.seller
-                : pepe.master);
-        const addOnTag = pepe.cozy_auction !== undefined
-            ? "[Hop contract]"
-            : (pepe.sale_auction !== undefined
-                ? "[Sale contract]"
-                : null);
-
-        const cozyWhenEl = pepe.can_cozy_again === undefined
+        const cozyWhenEl = (isLoading || !pepe || pepe.can_cozy_again === undefined)
             ? <span>...</span>
             : (pepe.can_cozy_again === 0
                 ? (<span>Never hopped</span>)
@@ -124,51 +70,23 @@ class PepeSummary extends React.Component {
                                 {nameEl}
                             </Typography>
 
-                            {!isLoading && (
-                                <Typography paragraph={true} className={classes.pepeMetaData}>
-                                    <span>Pepe #{pepe.pepeId}</span>
-                                    <Separator/>
-                                    <span>Gen {pepe.gen}</span>
-                                    <Separator/>
-                                    <span>Cooldown of {QueryTextual.getCooldownText(pepe.cool_down_index)}</span>
-                                    <Separator/>
-                                    {cozyWhenEl}
-                                </Typography>
-                            )}
+                            <Typography paragraph={true} className={classes.pepeMetaData}>
+                                <span>Pepe #{pepeId}</span>
+                                <Separator/>
+                                <span>Gen {isLoading ? "..." : pepe.gen}</span>
+                                <Separator/>
+                                <span>Cooldown of {isLoading ? "..." : QueryTextual.getCooldownText(pepe.cool_down_index)}</span>
+                                <Separator/>
+                                {cozyWhenEl}
+                            </Typography>
 
-                            {isLoading ? (
-                                <EthAccount/>
-                            ) : (
-                                <EthAccount address={owner} addOnText={addOnTag}/>
-                            )}
+                            <EthAccount address={isLoading ? null : pepe.master}/>
 
                         </CardContent>
-                        <CardActions>
-                            { /* The user must be either the owner,
-                                or have it must be an auction, with web3 on. */ }
-                            { isBreedable &&
-                            <Button aria-label="Cozy"
-                                        onClick={this.handleBreederMenuOpen}
-                                    variant={alreadySelectedSelf ? "outlined" : "raised"}
-                                    color="secondary"
-                                        ref={node => {
-                                            this.breederMenuButton = node;
-                                        }}>
-                                {isOwned ? "Hop with other pepe" : "Buy cozy auction"} <TagHeart className={classes.cozyBtnIcon}/>
-                            </Button>
-                            }
-
-                            { isBreedable &&
-                            <BreederAddMenu open={this.state.breederMenuOpen}
-                                            onClose={this.closeBreederMenu}
-                                            anchorDomEl={this.state.breederMenuAnchorEl}
-                                            pepe={pepe}/>
-                            }
-                        </CardActions>
                     </Grid>
 
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                        {pepePicture}
+                        <PepePicture pepeId={pepeId}/>
                     </Grid>
                 </Grid>
             </Card>
@@ -176,21 +94,10 @@ class PepeSummary extends React.Component {
     }
 }
 
-PepeSummary.propTypes = {
-    // when pepe is undefined -> loading placeholder is shown
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string,
-        gen: PropTypes.number,
-        cool_down_index: PropTypes.number,
-        master: PropTypes.string,
-    })
-};
-
-const ConnectedPepeSummary = connect(state => ({
-    breeder: state.breeder,
+const ConnectedPepeSummary = connect((state, props) => ({
     hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet
+    wallet: state.redapp.tracking.accounts.wallet,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
 }))(PepeSummary);
 
 export default withStyles(styles)(ConnectedPepeSummary);
