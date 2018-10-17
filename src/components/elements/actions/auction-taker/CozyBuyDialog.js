@@ -123,7 +123,7 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 
         const nowTimestamp = Math.floor(Date.now() / 1000);
 
-        const cozyAuctionExpired = isInCozyAuction && pepe.cozy_auction.isExpired();
+        const cozyAuctionExpired = auctionData.isExpired();
 
         const isDescending = auctionData.isDescending();
 
@@ -142,6 +142,12 @@ class CozyBuyDialogInner extends BidAuctionDialog {
         if (candidate.can_cozy_again > nowTimestamp) {
             errorMsgs.push(<ReporterContent variant="error" message={
                 `Error! The candiate pepe (${candidate.pepeId}) seems to have an active cozy-time cooldown! It can't hop yet!`
+            }/>);
+        }
+
+        if (cozyAuctionExpired) {
+            errorMsgs.push(<ReporterContent variant="error" message={
+                `Error! The auction is expired!`
             }/>);
         }
 

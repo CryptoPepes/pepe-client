@@ -94,7 +94,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
         }
 
         const nowTimestamp = Math.floor(Date.now() / 1000);
-        const saleAuctionExpired = isInSaleAuction && pepe.sale_auction.isExpired();
+        const saleAuctionExpired = auctionData.isExpired();
 
         const isDescending = auctionData.isDescending();
 
@@ -112,6 +112,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
                             disabled={!(hasWeb3
                                 && this.state.validBidPrice
                                 && !!auctionAddress
+                                && !saleAuctionExpired
                             )}
                             variant="raised" color="secondary">
                         Make a bid!
