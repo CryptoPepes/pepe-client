@@ -80,6 +80,8 @@ class GiveNameDialog extends React.Component {
     render() {
         const {open, onClose, pepe, hasWeb3} = this.props;
 
+        const nameable = (!!pepe) && (!pepe.name);
+
         return (
             <TxDialog
                 open={open}
@@ -87,7 +89,7 @@ class GiveNameDialog extends React.Component {
                 dialogTitle={<span>Name Pepe #{pepe.pepeId}</span>}
                 dialogActions={
                     <Button onClick={this.handleTxSend}
-                            disabled={!(hasWeb3 && this.state.validPepeName)}
+                            disabled={!(hasWeb3 && this.state.validPepeName) && nameable}
                             variant="raised" color="secondary">
                         Name Pepe
                     </Button>
@@ -97,7 +99,7 @@ class GiveNameDialog extends React.Component {
             >
                 {/* Preview Pepe with image etc. */}
                 <DialogContentText>
-                    Give a name to Pepe #{pepe.pepeId}. Once the Pepe is named it cannot be renamed!
+                    Give a name to Pepe #{pepe.pepeId}. Once the Pepe is named it can <strong>NOT</strong> be renamed!
                 </DialogContentText>
 
                 <TextField
