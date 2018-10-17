@@ -25,7 +25,23 @@ const initialState = {
     }
 };
 
+function getNowTimestamp() {
+    return Math.round((new Date()).getTime() / 1000);
+}
+
 const mapping = {
+    [pepeAT.TRACK_WEB3_CALL]: (state, {callType, trackingId, callData}) => ({
+        ...state,
+        web3Calls: {
+            ...state.web3Calls,
+            [callType]: {
+                ...state.web3Calls[callType],
+                [trackingId]: {
+                    callData
+                }
+            }
+        }
+    }),
     [pepeAT.ADD_PEPE]: (state, {
         dataSrc="api",
         lcb=0,
@@ -66,7 +82,7 @@ const mapping = {
             }
         }
     }),
-    [pepeAT.GETTING_PEPE]: (state, {pepeId, dataSrc}) => ({
+    [pepeAT.GETTING_PEPE]: (state, {pepeId, dataSrc, timestamp}) => ({
         ...state,
         pepes: {
             ...state.pepes,
@@ -74,7 +90,8 @@ const mapping = {
                 ...state.pepes[pepeId],
                 [dataSrc]: {
                     ...state.pepes[pepeId][dataSrc],
-                    status: "getting"
+                    status: "getting",
+                    timestamp
                 }
             }
         }
