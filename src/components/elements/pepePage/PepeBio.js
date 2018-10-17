@@ -1,6 +1,5 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import PropTypes from "prop-types";
 import {Typography} from "@material-ui/core";
 import connect from "react-redux/es/connect/connect";
 
@@ -10,6 +9,13 @@ const styles = (theme) => ({
 
 const PepeBio = (props) => {
     const {pepeId, pepeData, bioData, classes} = props;
+
+    // TODO: add reload button.
+    if (pepeData.status === "error") {
+        return <div>
+            <Typography variant="headline" component="h2">Failed to load pepe bio.</Typography>
+        </div>;
+    }
 
     const pepe = pepeData.pepe;
     const pepeIsLoading = pepeData.status === "getting";

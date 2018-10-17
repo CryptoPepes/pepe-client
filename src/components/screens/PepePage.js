@@ -19,6 +19,7 @@ import PepeBio from "../elements/pepePage/PepeBio";
 import {hasAccount} from "../../util/web3AccountsUtil";
 import reloadable from "../utils/reloadable";
 import Loading from "../elements/util/Loading";
+import {cozyAddr, saleAddr} from "../../web3Settings";
 
 
 const styles = theme => ({
@@ -114,10 +115,10 @@ const styles = theme => ({
 class PepePageInner extends React.Component {
 
     render() {
-        const { classes, pepeData, hasWeb3 } = this.props;
+        const { pepeId, pepeData, hasWeb3, classes } = this.props;
 
+        // TODO: add reload button.
         if (pepeData.status === "error") {
-            console.log("Error while loading pepe: "+error.msg);
             return <div className={classes.loadingError}>
                 { /* TODO some funny error-page art (?) */ }
                 <Typography variant="title">Failed to load pepe.</Typography>
@@ -137,11 +138,9 @@ class PepePageInner extends React.Component {
             fatherEl = (<PepeGridItemLoadable pepeId={pepe.father}/>)
         }
 
-        // // Check if the pepe is being auctioned, and format the prices if so.
-        // const isForCozy = !isLoading && !!pepe.cozy_auction && !pepe.cozy_auction.isExpired();
-        // const cozyPrice = isForCozy ? pepe.cozy_auction.getCurrentPrice() : undefined;
-        // const isForSale = !isLoading && !!pepe.sale_auction && !pepe.sale_auction.isExpired();
-        // const salePrice = isForSale ? pepe.sale_auction.getCurrentPrice() : undefined;
+        // Check if the pepe is being auctioned, and show extra components if it is.
+        const isForCozy = !isLoading && (pepe.master === cozyAddr);
+        const isForSale = !isLoading && (pepe.master === saleAddr);
 
         return (
 
@@ -160,10 +159,10 @@ class PepePageInner extends React.Component {
                             { /* quick auction info + share button */ }
                             <div className={classes.header}>
                                 <div>
-                                    {/* TODO */}
-                                    {/*{ isForCozy && <CozyChip auctionPrice={cozyPrice}/> }*/}
-                                    {/*{ isForSale && <SaleChip auctionPrice={salePrice}/> }*/}
+                                    { isForCozy && <CozyChip pepeId={pepeId}/> }
+                                    { isForSale && <SaleChip pepeId={pepeId}/> }
                                 </div>
+                                {/* TODO: old share button, re-implement later */}
                                 {/*<div>*/}
                                     {/*<Button variant="fab" mini*/}
                                             {/*aria-label="share">*/}
@@ -185,34 +184,22 @@ class PepePageInner extends React.Component {
                         </Grid>
                         }
 
-                        { /* Price info + charts */ }
+                        { /* Price info */ }
+                        {(isForSale || isForCozy) && (
+                            <Grid item xs={12} md={4}>
+                                <PepeAuctionInfo auctionType={isForSale ? "sale" : "cozy"} pepeId={pepeId}/>
+                            </Grid>
+                        )}
 
-                        {/* TODO */}
-                        {/*{(isForSale || isForCozy) && (*/}
-                            {/*<Grid item xs={12} md={4}>*/}
-                                {/*<PepeAuctionInfo auctionType={isForSale ? "sale" : "cozy"} pepeId={pepeId}/>*/}
-                            {/*</Grid>*/}
-                        {/*)}*/}
+                        { /* Price chart */ }
+                        {(isForSale || isForCozy) && (
+                            <Grid item xs={12} md={8}>
+                                <Card className={classes.auctionChartCard}>
+                                    <PepeAuctionChart auctionType={isForSale ? "sale" : "cozy"} pepeId={pepeId}/>
+                                </Card>
+                            </Grid>
+                        )}
 
-                        {/* TODO */}
-                        {/*{isForSale && (*/}
-                            {/*<Grid item xs={12} md={8}>*/}
-                                {/*<Card className={classes.auctionChartCard}>*/}
-                                    {/*<PepeAuctionChart auctionType="sale" auctionData={pepe.sale_auction}/>*/}
-                                {/*</Card>*/}
-                            {/*</Grid>*/}
-                        {/*)}*/}
-
-                        {/*{isForCozy && (*/}
-                            {/*<Grid item xs={12} md={8}>*/}
-                                {/*<Card className={classes.auctionChartCard}>*/}
-                                    {/*<PepeAuctionChart  auctionType="cozy" auctionData={pepe.cozy_auction}/>*/}
-                                {/*</Card>*/}
-                            {/*</Grid>*/}
-                        {/*)}*/}
-
-
-                        {/* TODO */}
                         { /* Bio-text */ }
                         <Grid className={classes.detailSection}  item xs={12} md={6}>
                             <h3 className={classes.infoHeading}>Bio</h3>
@@ -233,7 +220,7 @@ class PepePageInner extends React.Component {
                             </Card>
                         </Grid>
 
-                        { /* Family */ }
+                        { /* Family: parents */ }
                         { motherEl !== undefined && fatherEl !== undefined && (
                             <Grid item xs={12}>
                                 <h3 className={classes.infoHeading}>Parents</h3>
@@ -244,6 +231,7 @@ class PepePageInner extends React.Component {
                             </Grid>)
                         }
 
+                        { /* Family: children */ }
                         <Grid item xs={12}>
                             <SimplePepeGrid hideHeaderOnNoResults header={
                                 <h3 className={classes.infoHeading}>Children</h3>}

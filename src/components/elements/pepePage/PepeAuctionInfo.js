@@ -5,6 +5,8 @@ import {Card, CardContent, Typography, Button} from "@material-ui/core";
 import Moment from 'react-moment';
 import PriceText from "../util/PriceText";
 import PepeBuyDialog from "../actions/auction-taker/PepeBuyDialog";
+import connect from "react-redux/es/connect/connect";
+import {AuctionData} from "../../../api/model";
 
 const styles = (theme) => ({
     root: {
@@ -36,14 +38,22 @@ class PepeAuctionInfo extends React.Component {
 
     render() {
 
-        const {classes, auctionType, pepe} = this.props;
+        const {classes, pepeId, auctionData, auctionType} = this.props;
 
-        const auctionData = auctionType === "sale" ? pepe.sale_auction : pepe.cozy_auction;
+        // TODO: add reload button.
+        if (auctionData.status === "error") {
+            return <div>
+                <Typography variant="headline" component="h2">Failed to load auction data.</Typography>
+            </div>;
+        }
 
-        const price = auctionData.getCurrentPrice();
+        const isLoading = auctionData.status === "getting";
 
-        if (price === undefined) {
-            // if undefined: auction has not begun, or is already over.
+        const auction = isLoading ? null : new AuctionData(auctionData.auction);
+
+        const price = isLoading ? null : auctionData.getCurrentPrice();
+
+        if (isLoading || price === undefined) {
             return (
             <Card className={classes.root}>
                 <CardContent>
@@ -54,7 +64,7 @@ class PepeAuctionInfo extends React.Component {
             </Card>);
         }
 
-        let auctionAction = (auctionType === "sale")
+        let actionEl = (auctionType === "sale")
             ? (
                 <div>
                     <Button variant="raised" color="secondary" className={classes.buyBtn}
@@ -63,7 +73,7 @@ class PepeAuctionInfo extends React.Component {
                     </Button>
 
                     <PepeBuyDialog open={this.state.buyDialogOpen}
-                                   pepe={pepe}
+                                   pepeId={pepeId}
                                    onClose={this.handleBuyDialog(false)}/>
                 </div>
             )
@@ -80,16 +90,20 @@ class PepeAuctionInfo extends React.Component {
                     {auctionType === "sale" && <Typography variant="title">Pepe for sale!</Typography>}
                     {auctionType === "cozy" && <Typography variant="title">Pepe is hopping!</Typography>}
 
-                    <p>Current price: <PriceText priceWei={price}/></p>
+                    {isLoading ? "Loading..."
+                        : <div>
+                            <p>Current price: <PriceText priceWei={price}/></p>
 
-                    { /* Disable update on interval, price + chart will get out of sync with the time otherwise. */}
-                    <p>Auction started <Moment unix fromNow interval={0}>{auctionData.beginTime}</Moment></p>
-                    <p>Ends <Moment unix fromNow interval={0}>{auctionData.endTime}</Moment></p>
+                            { /* Disable update on interval, price + chart will get out of sync with the time otherwise. */}
+                            <p>Auction started <Moment unix fromNow interval={0}>{auction.beginTime}</Moment></p>
+                            <p>Ends <Moment unix fromNow interval={0}>{auction.endTime}</Moment></p>
 
-                    <p>Started at: <PriceText priceWei={auctionData.beginPrice}/></p>
-                    <p>Price goes to: <PriceText priceWei={auctionData.endPrice}/></p>
+                            <p>Started at: <PriceText priceWei={auction.beginPrice}/></p>
+                            <p>Price goes to: <PriceText priceWei={auction.endPrice}/></p>
 
-                    {auctionAction}
+                            {actionEl}
+                        </div>
+                    }
 
                 </CardContent>
             </Card>
@@ -98,25 +112,16 @@ class PepeAuctionInfo extends React.Component {
     }
 }
 
-PepeAuctionInfo.propTypes = {
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string,
-        // either cozy or sale is required.
-        sale_auction: PropTypes.shape({
-            beginTime: PropTypes.number,
-            endTime: PropTypes.number,
-            beginPrice: PropTypes.string,
-            endPrice: PropTypes.string
-        }),
-        cozy_auction: PropTypes.shape({
-            beginTime: PropTypes.number,
-            endTime: PropTypes.number,
-            beginPrice: PropTypes.string,
-            endPrice: PropTypes.string
-        })
-    }).isRequired,
-    auctionType: PropTypes.string.isRequired
-};
+const StyledPepeAuctionInfo = withStyles(styles)(PepeAuctionInfo);
 
-export default withStyles(styles)(PepeAuctionInfo);
+const ConnectedPepeAuctionInfo = connect((state, props) => {
+    // Get the right auction data
+    const auctionData = props.auctionType === "sale" ? state.pepe.saleAuctions[props.pepeId] : state.pepe.cozyAuctions[props.pepeId];
+    return ({
+        auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {}
+    });
+})(StyledPepeAuctionInfo);
+
+export default ConnectedPepeAuctionInfo;
+
+

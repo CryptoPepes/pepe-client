@@ -85,6 +85,13 @@ function* getPepe({pepeId}) {
     }
 }
 
+/*
+TODO:
+"auction" (2x: saleAuctions, cozyAuctions): beginPrice, endPrice, beginTime, endTime, seller
+"bio" (bioData): title, description
+"look" (lookData): look
+ */
+
 function* checkDataResult({callID, value}) {
     const web3Call = yield select((state) => state.pepe.web3Calls.pepes[callID]);
     // only if it's a pepe, handle like it's a pepe. It could be another type of call being decoded successfully.

@@ -180,10 +180,7 @@ const PepeBuyDialog = connect(state => ({
 
 PepeBuyDialog.propTypes = {
     open: PropTypes.bool,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
+    pepeId: PropTypes.string.isRequired,
     onClose: PropTypes.func,
 };
 

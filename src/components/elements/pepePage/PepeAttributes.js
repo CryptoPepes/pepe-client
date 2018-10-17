@@ -1,5 +1,5 @@
 import React from "react";
-import {List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
+import {List, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import QueryTextual from "../../../api/query_textual";
 import connect from "react-redux/es/connect/connect";
@@ -21,8 +21,16 @@ const styles = (theme) => ({
 const PepeAttributes = (props) => {
     const {lookData, classes} = props;
 
+    // TODO: add reload button.
+    if (lookData.status === "error") {
+        return <div className={classes.root}>
+            <Typography variant="headline" component="h2">Failed to load pepe look.</Typography>
+        </div>;
+    }
+
     const look = lookData.look;
     const lookIsLoading = lookData.status === "getting";
+
 
     // TODO also view the colors (square colored using the hex color in look data)
     return (
@@ -74,10 +82,8 @@ const PepeAttributes = (props) => {
 
 const StyledPepeAttributes = withStyles(styles)(PepeAttributes);
 
-
 const ConnectedPepeAttributes = connect((state, props) => ({
     lookData: (state.pepe.lookData[props.pepeId] && (state.pepe.lookData[props.pepeId].web3 || state.pepe.lookData[props.pepeId].api)) || {}
 }))(StyledPepeAttributes);
-
 
 export default ConnectedPepeAttributes;
