@@ -34,7 +34,7 @@ class PepeSummary extends React.Component {
         const {pepeData, pepeId, classes} = this.props;
 
         const pepe = pepeData.pepe;
-        const isLoading = pepeData.status === "getting";
+        const isLoading = pepeData.status !== "ok";
 
         let nameEl;
         if (isLoading) {

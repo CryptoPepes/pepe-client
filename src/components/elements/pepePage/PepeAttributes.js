@@ -29,7 +29,7 @@ const PepeAttributes = (props) => {
     }
 
     const look = lookData.look;
-    const lookIsLoading = lookData.status === "getting";
+    const lookIsLoading = lookData.status !== "ok";
 
 
     // TODO also view the colors (square colored using the hex color in look data)

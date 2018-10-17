@@ -47,7 +47,7 @@ class PepeAuctionInfo extends React.Component {
             </div>;
         }
 
-        const isLoading = auctionData.status === "getting";
+        const isLoading = auctionData.status !== "ok";
 
         const auction = isLoading ? null : new AuctionData(auctionData.auction);
 

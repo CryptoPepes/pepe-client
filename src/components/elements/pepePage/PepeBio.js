@@ -18,9 +18,9 @@ const PepeBio = (props) => {
     }
 
     const pepe = pepeData.pepe;
-    const pepeIsLoading = pepeData.status === "getting";
+    const pepeIsLoading = pepeData.status !== "ok";
     const bio = bioData.bio;
-    const bioIsLoading = bioData.status === "getting";
+    const bioIsLoading = bioData.status !== "ok";
 
     let nameEl;
     if (pepeIsLoading) {

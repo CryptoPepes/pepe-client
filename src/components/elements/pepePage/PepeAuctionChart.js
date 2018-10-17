@@ -5,6 +5,9 @@ import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import classNames from 'classnames/bind';
 import Web3Utils from "web3-utils";
+import connect from "react-redux/es/connect/connect";
+import {Typography} from "@material-ui/core";
+import {AuctionData} from "../../../api/model";
 
 const styles = (theme) => ({
     root: {
@@ -52,19 +55,33 @@ const chartInnerHeight = chartHeight - chartMarginTop - chartMarginBottom;
 const PepeAuctionChart = (props) => {
     const {auctionData, auctionType, classes} = props;
 
-    // TODO use different color scheme for each auctionType.
+    // TODO: add reload button.
+    if (auctionData.status === "error") {
+        return <div>
+            <Typography variant="headline" component="h2">Failed to load auction data.</Typography>
+        </div>;
+    }
 
-    const startPriceBN = new Web3Utils.BN(auctionData.beginPrice);
-    const endPriceBN = new Web3Utils.BN(auctionData.endPrice);
+    const isLoading = auctionData.status !== "ok";
+    if (isLoading) {
+        return <div>
+            <Typography variant="caption" component="h3">Loading auction data...</Typography>
+        </div>;
+    }
+
+    const auction = auctionData.auction;
+
+    const startPriceBN = new Web3Utils.BN(auction.beginPrice);
+    const endPriceBN = new Web3Utils.BN(auction.endPrice);
     const szaboBN = new Web3Utils.BN(10e12);
     // Convert to Szabo (1 szabo = 10^12 wei, 1 ether = 10^6 szabo)
     // Not having to deal with large numbers makes this graph a lot easier/faster.
     const startPrice = startPriceBN.div(szaboBN).toNumber();
     const endPrice = endPriceBN.div(szaboBN).toNumber();
 
-    const startTime = auctionData.beginTime;
+    const startTime = auction.beginTime;
     let currentTime = Date.now() / 1000;
-    const endTime = auctionData.endTime;
+    const endTime = auction.endTime;
     // check currentTime against auction limits, clip it
     if (currentTime < startTime) currentTime = startTime;
     if (currentTime > endTime) currentTime = endTime - 1;
@@ -161,12 +178,12 @@ const PepeAuctionChart = (props) => {
             { /* Price info */ }
             <text className={classes.chartText} textAnchor="left"
                   x={end[0] + 8} y={start[1] + (fontSize * 0.5)}
-                  fontSize={fontSize}>Ξ {Web3Utils.fromWei(auctionData.beginPrice, "ether")}</text>
+                  fontSize={fontSize}>Ξ {Web3Utils.fromWei(auction.beginPrice, "ether")}</text>
             { /* If different enough from the start price, also show the end price */
                 (Math.abs(start[1] - end[1]) > fontSize * 1.3) &&
                     <text className={classes.chartText} textAnchor="left"
                           x={end[0] + 8} y={end[1] + (fontSize * 0.5)}
-                          fontSize={fontSize}>Ξ {Web3Utils.fromWei(auctionData.endPrice, "ether")}</text>
+                          fontSize={fontSize}>Ξ {Web3Utils.fromWei(auction.endPrice, "ether")}</text>
             }
 
             { /* Time info */ }
@@ -179,18 +196,17 @@ const PepeAuctionChart = (props) => {
 
         </svg>)
 
-
 };
 
-PepeAuctionChart.propTypes = {
-    auctionData: PropTypes.shape({
-        beginTime: PropTypes.number,
-        endTime: PropTypes.number,
-        beginPrice: PropTypes.string,
-        endPrice: PropTypes.string,
-    }).isRequired,
-    auctionType: PropTypes.string.isRequired
-};
+const StyledPepeAuctionChart = withStyles(styles)(PepeAuctionChart);
 
-export default withStyles(styles)(PepeAuctionChart);
+const ConnectedPepeAuctionChart  = connect((state, props) => {
+    // Get the right auction data
+    const auctionData = props.auctionType === "sale" ? state.pepe.saleAuctions[props.pepeId] : state.pepe.cozyAuctions[props.pepeId];
+    return ({
+        auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {}
+    });
+})(StyledPepeAuctionChart);
+
+export default ConnectedPepeAuctionChart;
 

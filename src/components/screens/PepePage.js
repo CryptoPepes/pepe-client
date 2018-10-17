@@ -126,7 +126,7 @@ class PepePageInner extends React.Component {
         }
 
         const pepe = pepeData.pepe;
-        const isLoading = pepeData.status === "getting";
+        const isLoading = pepeData.status !== "ok";
 
         let motherEl;
         if (!isLoading && pepe.mother !== "0") {
