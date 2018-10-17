@@ -9,6 +9,7 @@ import {
 import { connect } from 'react-redux';
 import Web3Utils from "web3-utils";
 import TxDialog from "./TxDialog";
+import ReporterContent from "../reporting/ReporterContent";
 
 const styles = (theme) => ({
 
@@ -42,11 +43,13 @@ class TransferDialog extends React.Component {
     };
 
     handleTransferSend = () => {
-        const { PepeBase, hasWeb3, pepe } = this.props;
+        const { PepeBase, hasWeb3, pepeData, pepeId } = this.props;
 
-        if (hasWeb3) {
+        const pepe = !pepeData ? null : pepeData.pepe;
+
+        if (hasWeb3 && pepe) {
             const {txID, thunk} = PepeBase.methods.transfer.trackedSend(
-                { from: pepe.master }, this.state.transferAddress, pepe.pepeId);
+                { from: pepe.master }, this.state.transferAddress, pepeId);
 
             this.setState({
                 txTrackingId: txID,
@@ -58,17 +61,19 @@ class TransferDialog extends React.Component {
 
 
     render() {
-        const {open, onClose, pepe, hasWeb3} = this.props;
+        const {open, onClose, pepeData, pepeId, hasWeb3} = this.props;
+
+        const isLoadingPepe = pepeData.status !== "ok";
 
         return (
 
             <TxDialog
                 open={open}
                 onClose={onClose}
-                dialogTitle={<span>Transfer Pepe #{pepe.pepeId}</span>}
+                dialogTitle={<span>Transfer Pepe #{pepeId}</span>}
                 dialogActions={
                     <Button onClick={this.handleTransferSend}
-                    disabled={!this.state.validTransferAddress}
+                    disabled={!this.state.validTransferAddress || (isLoadingPepe)}
                     variant="raised" color="secondary">
                     Transfer
                     </Button>
@@ -79,8 +84,12 @@ class TransferDialog extends React.Component {
 
                 {/* TODO Preview Pepe with image etc. */}
                 <DialogContentText>
-                    Transfer pepe #{pepe.pepeId} to another wallet. This cannot be reverted!
+                    Transfer pepe #{pepeId} to another wallet. This cannot be reverted!
                 </DialogContentText>
+
+                {pepeData.status === "error"
+                    ? <ReporterContent variant="error" message="Failed to load pepe data."/>
+                    : (isLoadingPepe && <ReporterContent variant="info" message="Loading pepe data..."/>)}
 
                 <TextField
                     autoFocus
@@ -102,16 +111,14 @@ class TransferDialog extends React.Component {
 TransferDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired
+    pepeId: PropTypes.string
 };
 
 const styledTransferDialog = withStyles(styles)(TransferDialog);
 
 export default connect(state => ({
     hasWeb3: state.web3.hasWeb3,
-    PepeBase: state.redapp.contracts.PepeBase
+    PepeBase: state.redapp.contracts.PepeBase,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
 }))(styledTransferDialog);
 
