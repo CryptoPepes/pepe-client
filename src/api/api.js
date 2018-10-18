@@ -15,12 +15,11 @@ class PepeAPI {
 
     /**
      * Execute a query, asynchronously. Parsed results are returned in a Promise.
-     * @param query {Query} Query object with search constraints. Build this with Query.buildSearchQuery.
+     * @param queryStr {string} Query string with search constraints.
+     *  Build this with (Query.buildSearchQuery(...)).toURLParamStr().
      * @returns {Promise<QueryData|QueryError>} The parsed results, when they are available.
      */
-    static async queryPepes(query) {
-
-        const queryStr = query.toURLParamStr();
+    static async queryPepes(queryStr) {
 
         // console.log("Searching for pepes, query: "+queryStr);
 

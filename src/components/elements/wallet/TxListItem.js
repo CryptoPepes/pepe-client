@@ -22,7 +22,7 @@ import {
 import Web3Utils from "web3-utils";
 import Moment from 'react-moment';
 import EtherscanBtn from "../util/EtherscanBtn";
-import PepeGridItemLoadable from "../grid/PepeGridItemLoadable";
+import PepeGridItem from "../grid/PepeGridItem";
 import PriceText from "../util/PriceText";
 
 const styles = theme => ({
@@ -78,7 +78,7 @@ class TxListItem extends Component {
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>From:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -98,7 +98,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Name:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -126,11 +126,11 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Mother:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.motherPepeId}/>
+                    <PepeGridItem pepeId={txInfo.motherPepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Father:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.fatherPepeId}/>
+                    <PepeGridItem pepeId={txInfo.fatherPepeId}/>
                 </ListItem>
             </List>
         ),
@@ -138,7 +138,7 @@ class TxListItem extends Component {
             <List component="div" disablePadding dense>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Buying account:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -163,11 +163,11 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Hoppin' Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Candidate Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.cozyCandidate}/>
+                    <PepeGridItem pepeId={txInfo.cozyCandidate}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Price:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -188,7 +188,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Start price:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -214,7 +214,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Start price:</ListSubheader>
                 <ListItem className={classes.detailList}>
@@ -240,7 +240,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
             </List>
         ),
@@ -252,7 +252,7 @@ class TxListItem extends Component {
                 </ListItem>
                 <ListSubheader className={classes.detailList}>Pepe:</ListSubheader>
                 <ListItem className={classes.detailList}>
-                    <PepeGridItemLoadable pepeId={txInfo.pepeId}/>
+                    <PepeGridItem pepeId={txInfo.pepeId}/>
                 </ListItem>
                 <ListSubheader className={classes.detailList}>approved to:</ListSubheader>
                 <ListItem className={classes.detailList}>

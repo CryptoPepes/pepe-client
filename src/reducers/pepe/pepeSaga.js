@@ -5,6 +5,7 @@ import {CALL_DECODE_SUCCESS, CALL_DECODE_FAIL} from "redapp/es/tracking/calls/AT
 import Web3Utils from "web3-utils";
 import pepeAT from "./pepeAT";
 import PepeAPI from "../../api/api";
+import {QueryData, QueryError} from "../../api/model";
 
 function getNowTimestamp() {
     return Math.round((new Date()).getTime() / 1000);
@@ -15,6 +16,27 @@ const refetchWeb3DataTime = 20;
 
 // Do not make the same API call again within 20 seconds
 const refetchApiDataTime = 20;
+
+function* addApiPepe(pepeData) {
+    const pepe = {
+        pepeId,
+        name: pepeData.name,
+        cool_down_index: pepeData.cool_down_index,
+        can_cozy_again: pepeData.can_cozy_again,
+        gen: pepeData.gen,
+        father: pepeData.father,
+        mother: pepeData.mother,
+        genotype: pepeData.genotype,
+        master: pepeData.master
+    };
+
+    yield put({
+        type: pepeAT.ADD_PEPE,
+        dataSrc: "api",
+        lcb: pepeData.lcb,
+        ...pepe
+    });
+}
 
 function* getPepe({pepeId}) {
 
@@ -59,25 +81,8 @@ function* getPepe({pepeId}) {
         try {
             // Get the pepe from the API.
             const pepeData = yield PepeAPI.getPepeData(pepeId);
+            yield addApiPepe(pepeData);
 
-            const pepe = {
-                pepeId,
-                name: pepeData.name,
-                cool_down_index: pepeData.cool_down_index,
-                can_cozy_again: pepeData.can_cozy_again,
-                gen: pepeData.gen,
-                father: pepeData.father,
-                mother: pepeData.mother,
-                genotype: pepeData.genotype,
-                master: pepeData.master
-            };
-
-            yield put({
-                type: pepeAT.ADD_PEPE,
-                dataSrc: "api",
-                lcb: pepeData.lcb,
-                ...pepe
-            });
         } catch (err) {
             console.log("failed to load pepe data from API", err);
         }
@@ -123,7 +128,33 @@ function* checkDataResult({callID, value}) {
     }
 }
 
+function* queryPepes({queryStr}) {
+    console.log("Querying pepes! ", queryStr);
+    // TODO: check for previous data.
+    const queryRes = yield PepeAPI.queryPepes(queryStr);
+    if (!(queryRes instanceof QueryData)) {
+        yield put({
+            type: pepeAT.QUERY_FAILURE, err: (queryRes ? queryRes.errStr : "Unknown response type")
+        });
+    } else {
+        const pepeIds = [];
+        if (queryRes.pepes instanceof Array) {
+            // Now insert all pepes into the store:
+            for (let i = 0; i < queryRes.pepes.length; i++) {
+                const pepeData = queryRes.pepes[i];
+                yield addApiPepe(pepeData);
+                pepeIds.push(pepeData.pepeId);
+            }
+        }
+        // Add the query to the store
+        yield put({
+            type: pepeAT.QUERY_SUCCESS, pepeIds, cursor: queryRes.hasMore ? queryRes.cursor : null
+        })
+    }
+}
+
 function* pepeSaga() {
+    yield takeEvery(pepeAT.QUERY_PEPES, queryPepes);
     yield takeEvery(pepeAT.GET_PEPE, getPepe);
     yield takeEvery(CALL_DECODE_SUCCESS, checkDataResult);
     // TODO: on Call fail or call decode fail: update pepe status to "error"

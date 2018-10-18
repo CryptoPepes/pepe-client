@@ -1,11 +1,8 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import {Button, Card, CardContent, Grid, Typography} from "@material-ui/core";
+import {Card, CardContent, Grid, Typography} from "@material-ui/core";
 import PropTypes from "prop-types";
-import {withLoading} from "../utils/WithFetching";
-import PepeAPI from "../../api/api";
-import PepeGridItemLoadable from "../elements/grid/PepeGridItemLoadable";
-import SimplePepeGrid from "../elements/grid/SimplePepeGrid";
+import PepeGridItem from "../elements/grid/PepeGridItem";
 import PepeActions from "../elements/pepePage/PepeActions";
 import {Query} from "../../api/query_helper";
 import { connect } from 'react-redux';
@@ -16,10 +13,8 @@ import SaleChip from "../elements/status/SaleChip";
 import PepeSummary from "../elements/pepePage/PepeSummary";
 import PepeAuctionChart from "../elements/pepePage/PepeAuctionChart";
 import PepeBio from "../elements/pepePage/PepeBio";
-import {hasAccount} from "../../util/web3AccountsUtil";
-import reloadable from "../utils/reloadable";
-import Loading from "../elements/util/Loading";
 import {cozyAddr, saleAddr} from "../../web3Settings";
+import QueriedPepes from "../elements/grid/QueriedPepes";
 
 
 const styles = theme => ({
@@ -130,12 +125,12 @@ class PepePageInner extends React.Component {
 
         let motherEl;
         if (!isLoading && pepe.mother !== "0") {
-            motherEl = (<PepeGridItemLoadable pepeId={pepe.mother}/>)
+            motherEl = (<PepeGridItem pepeId={pepe.mother}/>)
         }
 
         let fatherEl;
         if (!isLoading && pepe.father !== "0") {
-            fatherEl = (<PepeGridItemLoadable pepeId={pepe.father}/>)
+            fatherEl = (<PepeGridItem pepeId={pepe.father}/>)
         }
 
         // Check if the pepe is being auctioned, and show extra components if it is.
@@ -233,12 +228,12 @@ class PepePageInner extends React.Component {
 
                         { /* Family: children */ }
                         <Grid item xs={12}>
-                            <SimplePepeGrid hideHeaderOnNoResults header={
-                                <h3 className={classes.infoHeading}>Children</h3>}
-                                              queries={[
+                            <QueriedPepes queries={[
                                 Query.buildQuery({mother: pepeId}),
                                 Query.buildQuery({father: pepeId})
-                            ]}/>
+                            ]}>
+                                <h3 className={classes.infoHeading}>Children</h3>
+                            </QueriedPepes>
                         </Grid>
 
                     </Grid>

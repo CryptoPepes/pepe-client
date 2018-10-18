@@ -3,7 +3,7 @@ import {Grid, Button} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles/index";
 import {Link} from "react-router-dom";
 import {Query} from "../../../api/query_helper";
-import SimplePepeGrid from "../grid/SimplePepeGrid";
+import QueriedPepes from "../grid/QueriedPepes";
 
 
 const styles = theme => ({
@@ -51,7 +51,7 @@ const CollectingSection = ({classes}) => (
 
 
             <Grid item xs={12}>
-                <SimplePepeGrid justify="center" queries={[
+                <QueriedPepes justify="center" queries={[
                     Query.buildQuery({sort: "newest-first", limit: 4})]}/>
             </Grid>
 

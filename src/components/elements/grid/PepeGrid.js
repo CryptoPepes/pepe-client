@@ -14,15 +14,14 @@ const styles = theme => ({
 class PepeGrid extends Component {
 
     render() {
-
         const { classes, items, ...otherProps } = this.props;
 
         return (
             <div className={classes.root}>
                 <Grid container spacing={40} {...otherProps}>
                     {(items || []).map(v => (
-                        <Grid key={v.pepeId || "pepe"} item>
-                            <PepeGridItem pepe={v}/>
+                        <Grid key={v || "pepe"} item>
+                            <PepeGridItem pepeId={v}/>
                         </Grid>
                     ))}
                 </Grid>
@@ -34,7 +33,8 @@ class PepeGrid extends Component {
 
 PepeGrid.propTypes = {
     classes: PropTypes.object.isRequired,
-    items: PropTypes.arrayOf(PropTypes.object)
+    // Array of pepeIds
+    items: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default withStyles(styles)(PepeGrid);

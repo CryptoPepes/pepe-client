@@ -6,6 +6,12 @@ const pepeAT = {
     // When a pepe is being fetched
     GETTING_PEPE: "GETTING_PEPE",
     GET_PEPE: "GET_PEPE",
+    // Query pepes
+    QUERY_PEPES: "QUERY_PEPES",
+    // When query is complete
+    QUERY_SUCCESS: "QUERY_SUCCESS",
+    // When query failed
+    QUERY_FAILURE: "QUERY_FAILURE",
     // Clear everything that was updated last before the given block-number
     CLEANUP: "CLEANUP"
 };

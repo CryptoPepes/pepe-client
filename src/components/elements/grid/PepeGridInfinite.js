@@ -4,10 +4,10 @@ import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import PepeGridItem from "./PepeGridItem";
 import {Button, Grid} from "@material-ui/core";
-import {QueryData, QueryError} from "../../../api/model";
-import PepeAPI from "../../../api/api";
 import {Query} from "../../../api/query_helper";
 import Loading from "../util/Loading";
+import connect from "react-redux/es/connect/connect";
+import pepeAT from "../../../reducers/pepe/pepeAT";
 
 const styles = theme => ({
     root: {
@@ -28,94 +28,60 @@ class PepeGridInfinite extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            hasMore: true,
-            elements: [],
-            loading: true,
-            failed: false
-        };
-
-        this.currentQuery = undefined;
-        this.contentCursor = undefined;
+        // Not using state var here, it has to be instant, and may be dropped without problem if the component changes.
+        this.currentQuery = null;
     }
 
-    async loadMoreContent() {
-        console.log("Loading pepes...");
-        const oldPepes = [];
-        let q = this.props.getQuery();
+    makeContentLoader = (force) => (
+        async function loadMoreContent() {
+            const { hasMore, cursor, getQuery, dispatch } = this.props;
 
-        //get the query string (without cursor), to use as identity.
-        const qId = q.toURLParamStr();
+            // Do not load anything if there is no more data to be loaded.
+            if (!hasMore) return;
 
-        //If this is a different query, then reset the state.
-        if (this.currentQuery !== qId) {
-            this.currentQuery = qId;
-            this.contentCursor = undefined;
-        } else {
-            //Query identities match, are we already loading?
-            // If yes, this is the same exact query, and we shouldn't call the api twice.
-            if (this.state.loading) {
-                console.log("Avoiding unnecessary double API call.");
+            console.log("Loading pepes...");
+
+            let q = getQuery();
+
+            //Get a copy of the query, to modify the cursor on.
+            if (q === undefined) q = Query.buildQuery({});
+            else q = q.getCopy();
+
+            //set the cursor if necessary
+            if(cursor !== undefined) q.changeCursor(this.contentCursor);
+
+            //get the query string
+            const qStr = q.toURLParamStr();
+
+            //If this is a different query, then reset the state.
+            if (!force && this.currentQuery !== qStr) {
+                this.currentQuery = qStr;
+            } else {
+                //Query identities match, we are already loading
+                console.log("Avoiding double API query.");
                 return;
             }
 
-            //keep old pepes in view if we're only expanding the list.
-            // (scrolling down without changing filters)
-            oldPepes.push(...this.state.elements);
-        }
-
-        //Get a copy of the query, to modify the cursor on.
-        if (q === undefined) q = Query.buildQuery({});
-        else q = q.getCopy();
-
-        //set the cursor if necessary
-        if(this.contentCursor !== undefined) q.changeCursor(this.contentCursor);
-
-        //Do the query, wait for the results.
-        const queryRes = await PepeAPI.queryPepes(q);
-
-
-        if (!(queryRes instanceof QueryData)) {
-            if (queryRes instanceof QueryError) {
-                console.log(queryRes.errStr);
-            } else {
-                console.log("Failed to retrieve more content for infinite scrolling. Unknown response type.");
-            }
-            this.setState({hasMore: false, loading: false, failed: true});
-            return;
-        }
-
-        // O(n^2), not really important however.
-        // We don't expect more than 200 on one page, and 20 from api.
-        // This guarantees that React will not get duplicates. (results in an error)
-        const nonDuplicates = queryRes.pepes.filter((item) => oldPepes.find((other) => other.pepeId === item.pepeId) === undefined);
-
-        this.contentCursor = queryRes.cursor;
-        this.setState({
-            hasMore: queryRes.hasMore,
-            loading: false,
-            failed: false,
-            elements: [...oldPepes, ...nonDuplicates]})
-    }
+            // Make redux do the hard work of fetching and updating data.
+            dispatch({
+                type: pepeAT.QUERY_PEPES, queryStr: qStr, force
+            });
+        });
 
     render() {
 
-        const { classes } = this.props;
+        const { items, error, hasMore, classes } = this.props;
 
         let statusEl = (<div/>);
-        if (this.state.failed) {
+        if (error) {
             statusEl = (<div>Failed...
-                <Button variant="raised" color="secondary" onClick={this.loadMoreContent.bind(this)}>
+                <Button variant="raised" color="secondary" onClick={this.makeContentLoader(true)}>
                     Reload?
                 </Button>
             </div>)
-        } else {
-            if (this.state.loading) {
-                statusEl = (<Loading variant="circle-tag" className={classes.endStatusIndicator}>Loading...</Loading>)
-            } else if (this.state.hasMore) {
-                // Just hint that there is more.
-                statusEl = (<Loading variant="circle" className={classes.endStatusIndicator}/>)
-            }
+        } else if (hasMore) {
+            // Just hint that there is more.
+            statusEl = (<Loading variant="circle" className={classes.endStatusIndicator}/>);
         }
 
         return (
@@ -124,8 +90,8 @@ class PepeGridInfinite extends Component {
                 <Grid container justify="center" spacing={40}>
                         <Grid item>
                             <MasonryInfiniteScroller
-                                hasMore={this.state.hasMore}
-                                loadMore={this.loadMoreContent.bind(this)}
+                                hasMore={hasMore}
+                                loadMore={this.makeContentLoader(false)}
                                 position={true}
                                 sizes={[
                                     // Use the same breakpoints as Material UI
@@ -138,9 +104,9 @@ class PepeGridInfinite extends Component {
                                     ]}
                             >
                                 {
-                                    this.state.elements.map(pepe => (
-                                        <div key={pepe.pepeId} className={classes.itemContainer}>
-                                            <PepeGridItem pepe={pepe}/>
+                                    items.map(pepeId => (
+                                        <div key={pepeId} className={classes.itemContainer}>
+                                            <PepeGridItem pepeId={pepeId}/>
                                         </div>
                                     ))
                                 }
@@ -155,10 +121,63 @@ class PepeGridInfinite extends Component {
     }
 }
 
+const StyledPepeGridInfinite = withStyles(styles)(PepeGridInfinite);
 
-PepeGridInfinite.propTypes = {
+const ConnectedPepeGridInfinite = connect((state, props) => {
+    const query = props.getQuery();
+    let queryStr = "";
+    let cursor = null;
+    let queryErr = null;
+    const results = [];
+    let hasMore = true;
+    // If we have a query...
+    if (query) {
+        // Then keep looking in the store for data...
+        while (hasMore) {
+            // Get the next query
+            if (cursor) query.changeCursor(cursor);
+            const nextQueryStr = query.toURLParamStr();
+
+            // Get the data of the query
+            const nextQueryResults = state.pepe.pepeQueries[nextQueryStr];
+
+            // Check if we have it
+            if (nextQueryResults) {
+                queryStr = nextQueryStr;
+                // We have data for this query
+                // Check if the query resulted in an error
+                if (nextQueryResults.error) {
+                    // Error, stop looking for new data
+                    queryErr = nextQueryResults.error;
+                    // We know there is more data however.
+                    hasMore = true;
+                    break;
+                } else {
+                    // No error, great, add the data to the collection,
+                    // then continue looking for more data using the next cursor.
+                    results.push(nextQueryResults.pepeIds);
+                    cursor = nextQueryResults.cursor;
+                    // If we do not have a cursor, there is no more data.
+                    hasMore = !cursor;
+                }
+            } else {
+                // Stop when we cannot find new results anymore
+                break;
+            }
+        }
+    }
+    return ({
+        items: results,
+        error: queryErr,
+        lastQueryStr: queryStr,
+        cursor,
+        hasMore
+    })
+})(StyledPepeGridInfinite);
+
+ConnectedPepeGridInfinite.propTypes = {
     classes: PropTypes.object.isRequired,
     getQuery: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(PepeGridInfinite);
+export default ConnectedPepeGridInfinite;

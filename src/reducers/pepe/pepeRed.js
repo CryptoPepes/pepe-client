@@ -7,6 +7,10 @@ const initialState = {
 
         }
     },
+    // Store queries, key = query string. value = {pepeIds: [1, 2, 3, ... pepeIds], err: null | string}
+    pepeQueries: {
+
+    },
     pepes: {
     },
     // TODO
