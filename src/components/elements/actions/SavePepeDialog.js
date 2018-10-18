@@ -26,17 +26,17 @@ class SavePepeDialog extends React.Component {
 
 
     handleTxSend = () => {
-        const { auctionContract, hasWeb3, pepe, auctionType } = this.props;
+        const { auctionContract, hasWeb3, pepeId, auctionData } = this.props;
 
-        if (hasWeb3) {
+        const auction = !auctionData ? null : auctionData.auction;
+
+        if (hasWeb3 && auction) {
 
             // Use the original pepe-owner address, the seller, to retrieve it back.
             // The pepe.master is set to the auction contract currently.
-            const pepeOwner = auctionType === "cozy"
-                ? pepe.cozy_auction.seller
-                : pepe.sale_auction.seller;
+            const pepeOwner = auction.seller;
 
-            const {txID, thunk} = auctionContract.methods.savePepe.trackedSend({from: pepeOwner}, pepe.pepeId);
+            const {txID, thunk} = auctionContract.methods.savePepe.trackedSend({from: pepeOwner}, pepeId);
 
             this.setState({
                 txTrackingId: txID,
@@ -48,16 +48,18 @@ class SavePepeDialog extends React.Component {
 
 
     render() {
-        const {open, onClose, pepe, hasWeb3, auctionAddress, auctionType} = this.props;
+        const {open, onClose, pepeId, hasWeb3, auctionData, auctionAddress, auctionType} = this.props;
+
+        const isLoadingAuction = auctionData.status !== "ok";
 
         return (
             <TxDialog
                 open={open}
                 onClose={onClose}
-                dialogTitle={<span>Retrieve Pepe #{pepe.pepeId} from {auctionType === "cozy" ? "cozy" : "sale"} contract.</span>}
+                dialogTitle={<span>Retrieve Pepe #{pepeId} from {auctionType === "cozy" ? "cozy" : "sale"} contract.</span>}
                 dialogActions={
                     <Button onClick={this.handleTxSend}
-                            disabled={!hasWeb3}
+                            disabled={!hasWeb3 || isLoadingAuction}
                             variant="raised" color="secondary">
                         Retrieve pepe
                     </Button>
@@ -67,7 +69,7 @@ class SavePepeDialog extends React.Component {
             >
                 {/* Preview Pepe with image etc. */}
                 <DialogContentText>
-                    Retrieve Pepe #{pepe.pepeId} back from auction contract.
+                    Retrieve Pepe #{pepeId} back from auction contract.
                     <br/>
                     Auction address: {auctionAddress}
                 </DialogContentText>
@@ -80,10 +82,7 @@ class SavePepeDialog extends React.Component {
 SavePepeDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
+    pepeId: PropTypes.string,
     auctionType: PropTypes.string
 };
 
@@ -93,12 +92,15 @@ export default connect((state, props) => {
     const auctionContract = props.auctionType === "sale"
         ? state.redapp.contracts.PepeAuctionSale
         : state.redapp.contracts.CozyTimeAuction;
+    // Get the right auction data
+    const auctionData = props.auctionType === "sale" ? state.pepe.saleAuctions[props.pepeId] : state.pepe.cozyAuctions[props.pepeId];
     const auctionAddr = props.auctionType === "sale"
         ? saleAddr
         : cozyAddr;
     return ({
-            hasWeb3: state.web3.hasWeb3,
-            auctionContract: auctionContract,
-            auctionAddress: auctionAddr
-    })
+        hasWeb3: state.web3.hasWeb3,
+        auctionContract: auctionContract,
+        auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {},
+        auctionAddress: auctionAddr
+    });
 })(styledSavePepeDialog);

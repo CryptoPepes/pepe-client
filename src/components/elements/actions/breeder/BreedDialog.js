@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import {
     Button,
     DialogContentText,
-    Typography,
     Grid
 } from "@material-ui/core";
 import {connect} from "react-redux";

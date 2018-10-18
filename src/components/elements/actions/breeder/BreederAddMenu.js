@@ -16,7 +16,7 @@ class BreederAddMenu extends Closeable {
             type: selectType === "mother"
                 ? breederActionTypes.BREEDER_CHANGE_MOTHER
                 : breederActionTypes.BREEDER_CHANGE_FATHER,
-            pepeId: deselect ? null : this.props.pepe.pepeId
+            pepeId: deselect ? null : this.props.pepeId
         });
         // Check if this is the 2nd selected pepe, to automatically open the breeder menu
         if ((!!this.props.breeder.motherPepeId && selectType === "father" && !deselect)
@@ -33,28 +33,24 @@ class BreederAddMenu extends Closeable {
 
     render() {
         const {
-            pepe,
+            pepeId,
             breeder,
             anchorDomEl
         } = this.props;
 
-
         const alreadySelectedMother = !!breeder.motherPepeId;
         const alreadySelectedFather = !!breeder.fatherPepeId;
-        const alreadySelectedSelfAsMother = alreadySelectedMother && (breeder.motherPepeId === pepe.pepeId);
-        const alreadySelectedSelftAsFather = alreadySelectedFather && (breeder.fatherPepeId === pepe.pepeId);
+        const alreadySelectedSelfAsMother = alreadySelectedMother && (breeder.motherPepeId === pepeId);
+        const alreadySelectedSelftAsFather = alreadySelectedFather && (breeder.fatherPepeId === pepeId);
         const alreadySelectedSelf = alreadySelectedSelfAsMother || alreadySelectedSelftAsFather;
 
-        const isOnCozyAuctionBasis = !!pepe.cozy_auction;
         let motherText = null;
         let fatherText = null;
         if (alreadySelectedSelf) motherText = "(pepe was already selected)";
         else if (alreadySelectedMother) motherText = "(Replace selected mother)";
-        else if (isOnCozyAuctionBasis) motherText = "(This is a cozy time auction; paid hopping)";
 
         if (alreadySelectedSelf) fatherText = "(pepe was already selected)";
         else if (alreadySelectedFather) fatherText = "(Replace selected father)";
-        else if (isOnCozyAuctionBasis) fatherText = "(This is a cozy time auction; paid hopping)";
 
         return (
             <Popover
@@ -123,11 +119,7 @@ class BreederAddMenu extends Closeable {
 
 BreederAddMenu.propTypes = {
     open: PropTypes.bool,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string,
-        cozy_auction: PropTypes.object
-    }).isRequired,
+    pepeId: PropTypes.string,
     onClose: PropTypes.func,
     anchorDomEl: PropTypes.object,
 };

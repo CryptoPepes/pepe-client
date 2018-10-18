@@ -18,6 +18,7 @@ import {withStyles} from "@material-ui/core/styles/index";
 import TxDialog from "../TxDialog";
 import ReporterContent from "../../reporting/ReporterContent";
 import {cozyAddr} from "../../../../web3Settings";
+import {AuctionData} from "../../../../api/model";
 
 
 const styles = (theme) => ({
@@ -42,7 +43,7 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 
 
     handleTxSend = () => {
-        const { PepeBase, auctionAddress, motherPepe, fatherPepe, cozyCandidateAsFather, wallet, hasWeb3, affiliate } = this.props;
+        const { PepeBase, auctionAddress, auctionSubjectId, candidateId, cozyCandidateAsFather, wallet, hasWeb3, affiliate } = this.props;
         const { bidPrice, validBidPrice } = this.state;
 
         if (!hasWeb3) {
@@ -61,29 +62,24 @@ class CozyBuyDialogInner extends BidAuctionDialog {
             return;
         }
 
-
-        const auctionSubject = cozyCandidateAsFather ? motherPepe : fatherPepe;
-        // the other pepe
-        const candidate = cozyCandidateAsFather ? fatherPepe : motherPepe;
-
         if (hasWeb3 && validBidPrice && !!auctionAddress) {
             let call;
             //if affiliate is set
             if (affiliate && Web3Utils.isAddress(affiliate)) {
                 call = PepeBase.methods.approveAndBuyAffiliated.trackedSend(
                     {from: buyerAccount, value: bidPrice},
-                    auctionSubject.pepeId,
+                    auctionSubjectId,
                     auctionAddress,
-                    candidate.pepeId,
+                    candidateId,
                     cozyCandidateAsFather,
                     affiliate
                 );
             } else {
                 call = PepeBase.methods.approveAndBuy.trackedSend(
                     {from: buyerAccount, value: bidPrice},
-                    auctionSubject.pepeId,
+                    auctionSubjectId,
                     auctionAddress,
-                    candidate.pepeId,
+                    candidateId,
                     cozyCandidateAsFather
                 );
             }
@@ -97,51 +93,49 @@ class CozyBuyDialogInner extends BidAuctionDialog {
     };
 
     render() {
-        const {open, onClose, classes, hasWeb3, auctionAddress, motherPepe, fatherPepe, cozyCandidateAsFather} = this.props;
+        const {open, onClose, classes, hasWeb3, auctionAddress, auctionData,
+            motherPepeId, fatherPepeId, auctionSubjectId, candidateId, cozyCandidateAsFather} = this.props;
 
-        const auctionSubject = cozyCandidateAsFather ? motherPepe : fatherPepe;
-        // the other pepe
-        const candidate = cozyCandidateAsFather ? fatherPepe : motherPepe;
 
-        const auctionData = auctionSubject.cozy_auction;
-
-        if (!auctionData) {
+        if (auctionData.status !== "ok") {
             return (
                 <TxDialog
                     open={open}
                     onClose={onClose}
-                    dialogTitle={<span>Bid on Pepe auction</span>}
+                    dialogTitle={<span>Bid on Pepe hop auction</span>}
                     txTrackingId={this.state.txTrackingId}
                     loadingWeb3={!hasWeb3}
                 >
                     <DialogContentText>
-                        No auction data found.
+                        {auctionData.status === "getting" ? "Loading auction data." : "No auction data found."}
                     </DialogContentText>
                 </TxDialog>
             );
         }
 
+        const auction = new AuctionData(auctionData.auction);
+
         const nowTimestamp = Math.floor(Date.now() / 1000);
 
-        const cozyAuctionExpired = auctionData.isExpired();
+        const cozyAuctionExpired = auction.isExpired();
 
-        const isDescending = auctionData.isDescending();
+        const isDescending = auction.isDescending();
 
         // Suggest price for 5 minutes later, to account for possible minting delay
         // If the price is descending, recommend the current price.
-        const suggestedPrice = isDescending ? auctionData.getCurrentPrice() : auctionData.getPriceAt(nowTimestamp + (5 * 60), true);
+        const suggestedPrice = isDescending ? auction.getCurrentPrice() : auction.getPriceAt(nowTimestamp + (5 * 60), true);
 
         const errorMsgs = [];
 
         if (auctionSubject.can_cozy_again > nowTimestamp) {
             errorMsgs.push(<ReporterContent variant="error" message={
-                `Error! Corrupt data! Auctioned pepe (${auctionSubject.pepeId}) seems to have an active cozy-time cooldown!`
+                `Error! Corrupt data! Auctioned pepe (${auctionSubjectId}) seems to have an active cozy-time cooldown!`
             }/>);
         }
 
         if (candidate.can_cozy_again > nowTimestamp) {
             errorMsgs.push(<ReporterContent variant="error" message={
-                `Error! The candiate pepe (${candidate.pepeId}) seems to have an active cozy-time cooldown! It can't hop yet!`
+                `Error! The candiate pepe (${candidateId}) seems to have an active cozy-time cooldown! It can't hop yet!`
             }/>);
         }
 
@@ -178,9 +172,9 @@ class CozyBuyDialogInner extends BidAuctionDialog {
                 loadingWeb3={!hasWeb3}
             >
                 <DialogContentText>
-                    Bid for cozy-time with pepe #{auctionSubject.pepeId}, with pepe #{candidate.pepeId} as hop' candidate.
-                    Pepe #{auctionSubject.pepeId} will be the {cozyCandidateAsFather ? "mother" : "father"}.
-                    And pepe #{candidate.pepeId} will be the {cozyCandidateAsFather ? "father" : "mother"}.
+                    Bid for cozy-time with pepe #{auctionSubjectId}, with pepe #{candidateId} as hop' candidate.
+                    Pepe #{auctionSubjectId} will be the {cozyCandidateAsFather ? "mother" : "father"}.
+                    And pepe #{candidateId} will be the {cozyCandidateAsFather ? "father" : "mother"}.
                     An auction cannot be reverted. In case they hop',
                     the resulting pepe is transferred to the address used to bid.
                     <br/>
@@ -195,10 +189,10 @@ class CozyBuyDialogInner extends BidAuctionDialog {
                 <div className={classes.pepeGridContainer}>
                     <Grid container justify="center" spacing={40}>
                         <Grid xs={12} sm={6} item>
-                            <PepeGridItem pepe={motherPepe}/>
+                            <PepeGridItem pepeId={motherPepeId}/>
                         </Grid>
                         <Grid xs={12} sm={6} item>
-                            <PepeGridItem pepe={fatherPepe}/>
+                            <PepeGridItem pepeId={fatherPepeId}/>
                         </Grid>
                     </Grid>
                 </div>
@@ -228,7 +222,7 @@ class CozyBuyDialogInner extends BidAuctionDialog {
                 />
 
                 <div className={classes.auctionChart}>
-                    <PepeAuctionChart auctionData={auctionData} auctionType="cozy"/>
+                    <PepeAuctionChart pepeId={auctionSubjectId} auctionType="cozy"/>
                 </div>
             </TxDialog>
         );
@@ -237,25 +231,30 @@ class CozyBuyDialogInner extends BidAuctionDialog {
 
 const styledCozyBuyDialog = withStyles(styles)(CozyBuyDialogInner);
 
-const CozyBuyDialog = connect(state => ({
-    hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet,
-    auctionAddress: cozyAddr,
-    PepeBase: state.redapp.contracts.PepeBase,
-    affiliate: state.affiliate.affiliate
-}))(styledCozyBuyDialog);
+const CozyBuyDialog = connect((state, props) => {
+
+    const auctionSubjectId = props.cozyCandidateAsFather ? props.motherPepeId : props.fatherPepeId;
+    // the other pepe
+    const candidateId = props.cozyCandidateAsFather ? props.fatherPepeId : props.motherPepeId;
+
+    const auctionData = state.pepe.cozyAuctions[auctionSubjectId];
+    return ({
+        hasWeb3: state.web3.hasWeb3,
+        wallet: state.redapp.tracking.accounts.wallet,
+        auctionAddress: cozyAddr,
+        auctionSubjectId: auctionSubjectId,
+        candidateId: candidateId,
+        auctionData: auctionData,
+        PepeBase: state.redapp.contracts.PepeBase,
+        affiliate: state.affiliate.affiliate
+    })
+})(styledCozyBuyDialog);
 
 
 CozyBuyDialog.propTypes = {
     open: PropTypes.bool,
-    motherPepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
-    fatherPepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
+    motherPepeId: PropTypes.string.isRequired,
+    fatherPepeId: PropTypes.string.isRequired,
     cozyCandidateAsFather: PropTypes.bool.isRequired,
     onClose: PropTypes.func,
 };

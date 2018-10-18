@@ -40,7 +40,7 @@ class GiveNameDialog extends React.Component {
         if (name === this.state.lastName) return;
 
         if (name === undefined || name === null || name.length === 0 || name.length > 32) {
-            // note that some "falsy" values are valid name (e.g. "0", or "false").
+            // note that some some special values (e.g. "") are invalid.
             this.setState({
                 pepeNameHexStr: "",
                 validPepeName: false,
@@ -61,12 +61,14 @@ class GiveNameDialog extends React.Component {
 
 
     handleTxSend = () => {
-        const { PepeBase, hasWeb3, pepe } = this.props;
+        const { PepeBase, hasWeb3, pepeData, pepeId } = this.props;
 
-        if (hasWeb3 && this.state.validPepeName) {
+        const pepe = !pepeData ? null : pepeData.pepe;
+
+        if (hasWeb3 && pepe && this.state.validPepeName) {
 
             const {txID, thunk} = PepeBase.methods.setPepeName.trackedSend(
-                {from: pepe.master}, pepe.pepeId, this.state.pepeNameHexStr);
+                {from: pepe.master}, pepeId, this.state.pepeNameHexStr);
 
             this.setState({
                 txTrackingId: txID,
@@ -78,15 +80,17 @@ class GiveNameDialog extends React.Component {
 
 
     render() {
-        const {open, onClose, pepe, hasWeb3} = this.props;
+        const {open, onClose, pepeData, pepeId, hasWeb3} = this.props;
 
-        const nameable = (!!pepe) && (!pepe.name);
+        const isLoadingPepe = pepeData.status !== "ok";
+
+        const nameable = !isLoadingPepe && (!pepeData.pepe.name);
 
         return (
             <TxDialog
                 open={open}
                 onClose={onClose}
-                dialogTitle={<span>Name Pepe #{pepe.pepeId}</span>}
+                dialogTitle={<span>Name Pepe #{pepeId}</span>}
                 dialogActions={
                     <Button onClick={this.handleTxSend}
                             disabled={!(hasWeb3 && this.state.validPepeName) && nameable}
@@ -99,7 +103,7 @@ class GiveNameDialog extends React.Component {
             >
                 {/* Preview Pepe with image etc. */}
                 <DialogContentText>
-                    Give a name to Pepe #{pepe.pepeId}. Once the Pepe is named it can <strong>NOT</strong> be renamed!
+                    Give a name to Pepe #{pepeId}. Once the Pepe is named it can <strong>NOT</strong> be renamed!
                 </DialogContentText>
 
                 <TextField
@@ -120,15 +124,13 @@ class GiveNameDialog extends React.Component {
 GiveNameDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired
+    pepeId: PropTypes.string
 };
 
 const styledGiveNameDialog = withStyles(styles)(GiveNameDialog);
 
 export default connect(state => ({
     hasWeb3: state.web3.hasWeb3,
-    PepeBase: state.redapp.contracts.PepeBase
+    PepeBase: state.redapp.contracts.PepeBase,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
 }))(styledGiveNameDialog);

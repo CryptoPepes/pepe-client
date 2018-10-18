@@ -17,6 +17,7 @@ import PepeGridItem from "../../grid/PepeGridItem";
 import {withStyles} from "@material-ui/core/styles/index";
 import TxDialog from "../TxDialog";
 import {saleAddr} from "../../../../web3Settings";
+import {AuctionData} from "../../../../api/model";
 
 
 const styles = (theme) => ({
@@ -31,7 +32,7 @@ const styles = (theme) => ({
 class PepeBuyDialogInner extends BidAuctionDialog {
 
     handleTxSend = () => {
-        const { auctionContract, auctionAddress, wallet, hasWeb3, pepe, affiliate } = this.props;
+        const { auctionContract, auctionAddress, wallet, hasWeb3, pepeId, affiliate } = this.props;
         const { bidPrice, validBidPrice } = this.state;
 
         if (!hasWeb3) {
@@ -56,11 +57,11 @@ class PepeBuyDialogInner extends BidAuctionDialog {
 
             if (affiliate && Web3Utils.isAddress(affiliate)) {
                 call = auctionContract.methods.buyPepeAffiliated.trackedSend(
-                    {from: buyerAccount, value: bidPrice}, pepe.pepeId, affiliate
+                    {from: buyerAccount, value: bidPrice}, pepeId, affiliate
                 );
             } else {
                 call = auctionContract.methods.buyPepe.trackedSend(
-                    {from: buyerAccount, value: bidPrice}, pepe.pepeId
+                    {from: buyerAccount, value: bidPrice}, pepeId
                 );
             }
 
@@ -73,11 +74,10 @@ class PepeBuyDialogInner extends BidAuctionDialog {
     };
 
     render() {
-        const {open, onClose, pepe, hasWeb3, auctionAddress, classes} = this.props;
+        const {open, onClose, auctionData, pepeId, hasWeb3, auctionAddress, classes} = this.props;
 
-        const auctionData = pepe.sale_auction;
 
-        if (!auctionData) {
+        if (auctionData.status !== "ok") {
             return (
                 <TxDialog
                     open={open}
@@ -87,20 +87,22 @@ class PepeBuyDialogInner extends BidAuctionDialog {
                     loadingWeb3={!hasWeb3}
                 >
                     <DialogContentText>
-                        No auction data found.
+                        {auctionData.status === "getting" ? "Loading auction data." : "No auction data found."}
                     </DialogContentText>
                 </TxDialog>
             );
         }
 
-        const nowTimestamp = Math.floor(Date.now() / 1000);
-        const saleAuctionExpired = auctionData.isExpired();
+        const auction = new AuctionData(auctionData.auction);
 
-        const isDescending = auctionData.isDescending();
+        const nowTimestamp = Math.floor(Date.now() / 1000);
+        const saleAuctionExpired = auction.isExpired();
+
+        const isDescending = auction.isDescending();
 
         // Suggest price for 5 minutes later, to account for possible minting delay
         // If the price is descending, recommend the current price.
-        const suggestedPrice = isDescending ? auctionData.getCurrentPrice() : auctionData.getPriceAt(nowTimestamp + (5 * 60), true);
+        const suggestedPrice = isDescending ? auction.getCurrentPrice() : auction.getPriceAt(nowTimestamp + (5 * 60), true);
 
         return (
             <TxDialog
@@ -122,7 +124,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
                 loadingWeb3={!hasWeb3}
             >
                 <DialogContentText>
-                    Bid pepe #{pepe.pepeId}. An auction bid cannot be reverted
+                    Bid pepe #{pepeId}. An auction bid cannot be reverted
                      (you could try to invalidate the TX with a higher gas fee, but this is not advisable).
                     In case the pepe is bought, the pepe is transferred to the address used to bid on the pepe.
                     <br/>
@@ -134,7 +136,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
 
                 <br/>
 
-                <PepeGridItem pepe={pepe}/>
+                <PepeGridItem pepeId={pepeId}/>
 
                 <br/>
 
@@ -161,7 +163,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
                 />
 
                 <div className={classes.auctionChart}>
-                    <PepeAuctionChart auctionData={auctionData} auctionType="sale"/>
+                    <PepeAuctionChart pepeId={pepeId} auctionType="sale"/>
                 </div>
 
             </TxDialog>
@@ -171,13 +173,17 @@ class PepeBuyDialogInner extends BidAuctionDialog {
 
 const styledSaleBuyDialog = withStyles(styles)(PepeBuyDialogInner);
 
-const PepeBuyDialog = connect(state => ({
-    hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet,
-    auctionAddress: saleAddr,
-    auctionContract: state.redapp.contracts.PepeAuctionSale,
-    affiliate: state.affiliate.affiliate,
-}))(styledSaleBuyDialog);
+const PepeBuyDialog = connect(state => {
+    const auctionData = state.pepe.saleAuctions[props.pepeId];
+    return ({
+        hasWeb3: state.web3.hasWeb3,
+        wallet: state.redapp.tracking.accounts.wallet,
+        auctionAddress: saleAddr,
+        auctionContract: state.redapp.contracts.PepeAuctionSale,
+        auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {},
+        affiliate: state.affiliate.affiliate,
+    })
+})(styledSaleBuyDialog);
 
 
 PepeBuyDialog.propTypes = {
