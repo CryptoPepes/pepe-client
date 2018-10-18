@@ -9,7 +9,7 @@ import {
 import Web3Utils from "web3-utils";
 import {connect} from "react-redux";
 import DurationInput from "../../util/DurationInput";
-import PepeAuctionChart from "../../pepePage/PepeAuctionChart";
+import PepeAuctionChartInner from "../../pepePage/PepeAuctionChartInner";
 import TxDialog from "../TxDialog";
 
 const styles = (theme) => ({
@@ -23,8 +23,8 @@ const styles = (theme) => ({
 
 class StartAuctionDialog extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             ...this.state,
@@ -83,12 +83,14 @@ class StartAuctionDialog extends React.Component {
     };
 
     handleTxSend = () => {
-        const { PepeBase, auctionAddress, auctionType, hasWeb3, pepe } = this.props;
+        const { PepeBase, auctionAddress, hasWeb3, pepeData, pepeId } = this.props;
         const { startPrice, endPrice, validStartPrice, validEndPrice, auctionDuration } = this.state;
 
-        if (hasWeb3 && validStartPrice && validEndPrice && !!auctionAddress) {
+        const pepe = !pepeData ? null : pepeData.pepe;
+
+        if (hasWeb3 && pepe && validStartPrice && validEndPrice && !!auctionAddress) {
             const {txID, thunk} = PepeBase.methods.transferAndAuction.trackedSend(
-                {from: pepe.master}, pepe.pepeId,
+                {from: pepe.master}, pepeId,
                 auctionAddress, startPrice, endPrice, auctionDuration);
 
             this.setState({
@@ -153,7 +155,7 @@ class StartAuctionDialog extends React.Component {
                 <DurationInput initialHours={3} onDurationChange={this.handleDurationChange}/>
 
                 <div className={classes.auctionChart}>
-                    <PepeAuctionChart auctionData={{
+                    <PepeAuctionChartInner auction={{
                         beginTime: nowTimestamp,
                         endTime: nowTimestamp + (this.state.validAuctionDuration ? this.state.auctionDuration : (3 * 60 * 60)),
                         beginPrice: this.state.validStartPrice ? this.state.startPrice : "1000000000000000000",
@@ -170,10 +172,7 @@ class StartAuctionDialog extends React.Component {
 StartAuctionDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
+    pepeId: PropTypes.string,
     dialogTitle: PropTypes.string,
     auctionAddress: PropTypes.string.isRequired,
     // "sale" or "cozy"
@@ -184,5 +183,6 @@ const styledStartAuctionDialog = withStyles(styles)(StartAuctionDialog);
 
 export default connect(state => ({
     hasWeb3: state.web3.hasWeb3,
-    PepeBase: state.redapp.contracts.PepeBase
+    PepeBase: state.redapp.contracts.PepeBase,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
 }))(styledStartAuctionDialog);
