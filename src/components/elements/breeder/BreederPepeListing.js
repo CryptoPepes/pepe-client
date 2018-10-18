@@ -3,9 +3,7 @@ import {withStyles} from "@material-ui/core/styles";
 import {IconButton} from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import PepeGridItem from "../grid/PepeGridItem";
-import ReporterContent from "../reporting/ReporterContent";
 import PropTypes from "prop-types";
-import Loading from "../util/Loading";
 
 const styles = theme => ({
     noSelectionText: {
@@ -45,7 +43,7 @@ const styles = theme => ({
 class BreederPepeListing extends React.Component {
 
     render() {
-        const {pepe, title, textName, isLoading, isError, handleRemovePepe, classes} = this.props;
+        const {pepeId, title, textName, handleRemovePepe, classes} = this.props;
 
         return (
             <div>
@@ -55,19 +53,10 @@ class BreederPepeListing extends React.Component {
                         <CloseIcon className={classes.removeBtnIcon}/>
                     </IconButton>
                 </div>
-                {isError ?
-                    <ReporterContent message={
-                        <span>Failed to load data for {textName} pepe.</span>
-                    } variant="error"/>
-                    : (
-                        isLoading
-                            ? <Loading variant="circle-tag">Loading...</Loading>
-                            : (
-                                pepe
-                                    ? <PepeGridItem pepe={pepe}/>
-                                    : <span className={classes.noSelectionText}>No {textName} selected.</span>
-                            )
-                    )
+                {
+                    pepeId
+                    ? <PepeGridItem pepeId={pepeId}/>
+                    : <span className={classes.noSelectionText}>No {textName} selected.</span>
                 }
             </div>
         )
@@ -75,15 +64,7 @@ class BreederPepeListing extends React.Component {
 }
 
 BreederPepeListing.propTypes = {
-    pepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string.isRequired,
-        cozy_auction: PropTypes.object,
-        mother: PropTypes.string,
-        father: PropTypes.string
-    }),
-    isError: PropTypes.bool,
-    isLoading: PropTypes.bool,
+    pepId: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     textName: PropTypes.string.isRequired,
     handleRemovePepe: PropTypes.func.isRequired

@@ -62,17 +62,29 @@ class BreedDialog extends React.Component {
     };
 
     render() {
-        const {open, onClose, classes, motherPepe, fatherPepe, hasWeb3} = this.props;
+        const {open, onClose, classes, motherPepeId, fatherPepeId, motherPepeData, fatherPepeData, hasWeb3} = this.props;
 
-        const nowTimestamp = Math.floor(Date.now() / 1000);
-        const motherCanCozy = motherPepe.can_cozy_again <= nowTimestamp;
-        const fatherCanCozy = fatherPepe.can_cozy_again <= nowTimestamp;
-
-        const sameOwner = motherPepe.master === fatherPepe.master;
+        const fatherPepe = fatherPepeData.pepe;
+        const motherPepe = motherPepeData.pepe;
 
         const errorMsgs = [];
 
-        if (!sameOwner) {
+        const isLoadingFatherPepe = fatherPepeData.status !== "ok";
+        const isLoadingMotherPepe = motherPepeData.status !== "ok";
+
+        if (isLoadingFatherPepe || isLoadingMotherPepe) {
+            errorMsgs.push(<ReporterContent variant="info" message={
+                `Loading pepe data...`
+            }/>);
+        }
+
+        const nowTimestamp = Math.floor(Date.now() / 1000);
+        const motherCanCozy = !!motherPepe && motherPepe.can_cozy_again <= nowTimestamp;
+        const fatherCanCozy = !!fatherPepe && fatherPepe.can_cozy_again <= nowTimestamp;
+
+        const sameOwner = !!motherPepe && !!fatherPepe && motherPepe.master === fatherPepe.master;
+
+        if (!isLoadingMotherPepe && !isLoadingFatherPepe && !sameOwner) {
             errorMsgs.push(
                 <ReporterContent variant="error" message={
                     <p>Pepes are not owned by the same address.
@@ -89,13 +101,13 @@ class BreedDialog extends React.Component {
             );
         }
 
-        if (!motherCanCozy) {
+        if (!isLoadingMotherPepe && !motherCanCozy) {
             errorMsgs.push(<ReporterContent variant="error" message={
                 `Mother pepe (#${motherPepe.pepeId}) has to rest before hopping again.`
             }/>);
         }
 
-        if (!fatherCanCozy) {
+        if (!isLoadingFatherPepe && !fatherCanCozy) {
             errorMsgs.push(<ReporterContent variant="error" message={
                 `Father pepe (#${fatherPepe.pepeId}) has to rest before hopping again.`
             }/>);
@@ -108,7 +120,8 @@ class BreedDialog extends React.Component {
                 dialogTitle={<span>Hop'</span>}
                 dialogActions={
                     <Button onClick={this.handleTxSend}
-                            disabled={!hasWeb3 || !motherCanCozy || !fatherCanCozy || !sameOwner}
+                            disabled={!hasWeb3 || !motherCanCozy || !fatherCanCozy || !sameOwner
+                            || isLoadingMotherPepe || isLoadingFatherPepe}
                             variant="raised" color="secondary">
                         Hop!
                     </Button>
@@ -127,15 +140,15 @@ class BreedDialog extends React.Component {
                 }
             >
                 <DialogContentText>
-                    Make pepe #{motherPepe.pepeId} have a cozy time with pepe #{fatherPepe.pepeId}.
+                    Make pepe #{motherPepeId} have a cozy time with pepe #{fatherPepeId}.
                 </DialogContentText>
                 <div className={classes.pepeGridContainer}>
                     <Grid container justify="center" spacing={40}>
                         <Grid xs={12} sm={6} item>
-                            <PepeGridItem pepe={motherPepe}/>
+                            <PepeGridItem pepeId={motherPepeId}/>
                         </Grid>
                         <Grid xs={12} sm={6} item>
-                            <PepeGridItem pepe={fatherPepe}/>
+                            <PepeGridItem pepeId={fatherPepeId}/>
                         </Grid>
                     </Grid>
                 </div>
@@ -144,24 +157,24 @@ class BreedDialog extends React.Component {
     }
 
 }
-
-BreedDialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-
-    motherPepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired,
-    fatherPepe: PropTypes.shape({
-        name: PropTypes.string,
-        pepeId: PropTypes.string
-    }).isRequired
-};
-
 const styledBreedDialog = withStyles(styles)(BreedDialog);
 
-export default connect(state => ({
-    hasWeb3: state.web3.hasWeb3,
-    PepeBase: state.redapp.contracts.PepeBase
-}))(styledBreedDialog);
+const ConnectedBreederDialog = connect(state => {
+    const fatherPepeData = state.pepe.pepes[props.fatherPepeId];
+    const motherPepeData = state.pepe.pepes[props.motherPepeId];
+    return ({
+        hasWeb3: state.web3.hasWeb3,
+        PepeBase: state.redapp.contracts.PepeBase,
+        fatherPepeData: (fatherPepeData && (fatherPepeData.web3 || fatherPepeData.api)) || {},
+        motherPepeData: (motherPepeData && (motherPepeData.web3 || motherPepeData.api)) || {}
+    });
+})(styledBreedDialog);
+
+ConnectedBreederDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    fatherPepeId: PropTypes.string.isRequired,
+    motherPepeId: PropTypes.string.isRequired
+};
+
+export default ConnectedBreederDialog;

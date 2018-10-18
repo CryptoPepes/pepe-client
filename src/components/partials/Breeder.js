@@ -7,8 +7,6 @@ import {connect} from 'react-redux';
 import breederActionTypes from "../../reducers/breeder/breederActionTypes";
 import CloseIcon from '@material-ui/icons/Close';
 import {SwapHorizontal, SwapVertical} from "mdi-material-ui";
-import PepeAPI from "../../api/api";
-import makeCancelable from "makecancelable";
 import BreederPepeListing from "../elements/breeder/BreederPepeListing";
 import BreederFinal from "../elements/breeder/BreederFinal";
 
@@ -32,96 +30,6 @@ const styles = theme => ({
 
 class Breeder extends React.Component {
 
-    constructor(props) {
-        super();
-
-        this.state = {
-            fatherPepe: undefined,
-            motherPepe: undefined,
-            isLoadingFather: !!props.fatherPepeId,
-            isLoadingMother: !!props.motherPepeId,
-            errorFather: null,
-            errorMother: null,
-        }
-    }
-
-    loader = (pepeId) => PepeAPI.getPepeData(pepeId);
-
-    componentDidMount() {
-
-        if (!!this.props.fatherPepeId) {
-            this.reloadFather();
-        }
-
-        if (!!this.props.motherPepeId) {
-            this.reloadMother();
-        }
-    }
-
-    reloadFather() {
-        if (!this.props.fatherPepeId) {
-            this.setState({
-                fatherPepe: undefined,
-                isLoadingFather: false,
-                errorFather: null
-            });
-        } else {
-            this.cancelLoadingFather = makeCancelable(
-                    this.loader(this.props.fatherPepeId),
-                data => this.setState({
-                    fatherPepe: data,
-                    errorFather: undefined,
-                    isLoadingFather: false
-                }),
-                error => this.setState({
-                    fatherPepe: undefined,
-                    errorFather: error,
-                    isLoadingFather: false
-                })
-            );
-        }
-    }
-
-    reloadMother() {
-        if (!this.props.motherPepeId) {
-            this.setState({
-                motherPepe: undefined,
-                isLoadingMother: false,
-                errorMother: null
-            });
-        } else {
-            this.cancelLoadingMother = makeCancelable(
-                    this.loader(this.props.motherPepeId),
-                data => this.setState({
-                    motherPepe: data,
-                    errorMother: undefined,
-                    isLoadingMother: false
-                }),
-                error => this.setState({
-                    motherPepe: undefined,
-                    errorMother: error,
-                    isLoadingMother: false
-                })
-            );
-        }
-    };
-
-    componentDidUpdate(prevProps, prevState, snap) {
-        if (prevProps.motherPepeId !== this.props.motherPepeId) {
-            if (!!this.cancelLoadingMother) this.cancelLoadingMother();
-            this.reloadMother();
-        }
-        if (prevProps.fatherPepeId !== this.props.fatherPepeId) {
-            if (!!this.cancelLoadingFather) this.cancelLoadingFather();
-            this.reloadFather();
-        }
-    }
-
-    componentWillUnmount() {
-        if(!!this.cancelLoadingFather) this.cancelLoadingFather();
-        if(!!this.cancelLoadingMother) this.cancelLoadingMother();
-    }
-
     handleBreederToggle = () => {
         this.props.dispatch({
             type: breederActionTypes.BREEDER_TOGGLE_DRAWER
@@ -144,9 +52,7 @@ class Breeder extends React.Component {
     };
 
     render() {
-        const {classes, openDrawer} = this.props;
-
-        const {motherPepe, fatherPepe, isLoadingFather, isLoadingMother, errorMother, errorFather} = this.state;
+        const {classes, openDrawer, motherPepeId, fatherPepeId} = this.props;
 
         return (
             <Drawer anchor="bottom" open={openDrawer}
@@ -167,11 +73,9 @@ class Breeder extends React.Component {
                         <div className={classes.pepeGridContainer}>
                             <Grid container justify="center" spacing={40}>
                                 <Grid xs={12} sm={5} className={classes.columnCenterAlign} item>
-                                    <BreederPepeListing pepe={motherPepe}
+                                    <BreederPepeListing pepeId={motherPepeId}
                                                         title="Mother"
                                                         textName="mother"
-                                                        isError={!!errorMother}
-                                                        isLoading={isLoadingMother}
                                                         handleRemovePepe={this.handleRemovePepe("mother")}/>
                                 </Grid>
 
@@ -188,16 +92,14 @@ class Breeder extends React.Component {
                                 </Grid>
 
                                 <Grid xs={12} sm={5} className={classes.columnCenterAlign} item>
-                                    <BreederPepeListing pepe={fatherPepe}
+                                    <BreederPepeListing pepeId={fatherPepeId}
                                                         title="Father"
                                                         textName="father"
-                                                        isError={!!errorFather}
-                                                        isLoading={isLoadingFather}
                                                         handleRemovePepe={this.handleRemovePepe("father")}/>
                                 </Grid>
 
                                 <Grid xs={12} className={classes.columnCenterAlign} item>
-                                    <BreederFinal motherPepe={motherPepe} fatherPepe={fatherPepe}/>
+                                    <BreederFinal motherPepeId={motherPepeId} fatherPepeId={fatherPepeId}/>
                                 </Grid>
                             </Grid>
                         </div>
