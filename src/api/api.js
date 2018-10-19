@@ -1,5 +1,5 @@
 import request from "./request";
-import {QueryError, QueryData, PepeData, UserData} from "./model";
+import {QueryError, QueryData, PepeData, UserData, AuctionData} from "./model";
 import {isValidAccountAddress} from "../util/web3AccountsUtil";
 //TODO API backoffs + retry.
 //import backoff from "backoff";
@@ -40,10 +40,28 @@ class PepeAPI {
                 ? new QueryData(v) : ((v instanceof Object && v.look) ? new PepeData(v) : v));
     }
 
+    static async getCozyAuctionData(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/getCozyAuction/"+pepeId);
+        // console.log("retrieved cozy data: ", resp);
+        return PepeAPI.parseAuctionJSON(resp)
+    }
+
+    static async getSaleAuctionData(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/getSaleAuction/"+pepeId);
+        // console.log("retrieved sale data: ", resp);
+        return PepeAPI.parseAuctionJSON(resp)
+    }
+
     static async getPepeData(pepeId="0") {
         const resp = await request(PepeAPI.apiRoot+"/api/getPepe/"+pepeId);
         // console.log("retrieved pepe data: ", resp);
         return PepeAPI.parsePepeJSON(resp)
+    }
+
+    static parseAuctionJSON(pepeDataJson) {
+        //reviver checks for response key being a valid object with a "seller"
+        return JSON.parse(pepeDataJson,
+            (k, v) => (v instanceof Object && v.seller) ? new AuctionData(v) : v);
     }
 
     static parsePepeJSON(pepeDataJson) {

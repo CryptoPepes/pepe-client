@@ -1,11 +1,11 @@
 import {
     put, takeEvery, select
 } from 'redux-saga/effects';
-import {CALL_DECODE_SUCCESS, CALL_DECODE_FAIL} from "redapp/es/tracking/calls/AT";
+import {CALL_DECODE_SUCCESS, CALL_DECODE_FAIL, CALL_FAILED} from "redapp/es/tracking/calls/AT";
 import Web3Utils from "web3-utils";
 import pepeAT from "./pepeAT";
 import PepeAPI from "../../api/api";
-import {QueryData, QueryError} from "../../api/model";
+import {QueryData} from "../../api/model";
 
 function getNowTimestamp() {
     return Math.round((new Date()).getTime() / 1000);
@@ -17,7 +17,7 @@ const refetchWeb3DataTime = 20;
 // Do not make the same API call again within 20 seconds
 const refetchApiDataTime = 20;
 
-function* addApiPepe(pepeData) {
+function* addApiPepe(pepeData, lcb) {
     const pepe = {
         pepeId,
         name: pepeData.name,
@@ -33,8 +33,62 @@ function* addApiPepe(pepeData) {
     yield put({
         type: pepeAT.ADD_PEPE,
         dataSrc: "api",
-        lcb: pepeData.lcb,
-        ...pepe
+        lcb,
+        pepe
+    });
+}
+
+function* addApiCozyData(cozyData, lcb) {
+    if (cozyData === null) {
+        yield put({
+            type: pepeAT.ADD_COZY_AUCTION,
+            dataSrc: "api",
+            lcb,
+            auction: null
+        });
+        return;
+    }
+
+    const auction = {
+        beginPrice: cozyData.beginPrice,
+        endPrice: cozyData.endPrice,
+        beginTime: cozyData.beginTime,
+        endTime: cozyData.endTime,
+        seller: cozyData.seller
+    };
+
+    yield put({
+        type: pepeAT.ADD_COZY_AUCTION,
+        dataSrc: "api",
+        lcb,
+        auction
+    });
+}
+
+function* addApiSaleData(saleData, lcb) {
+    if (saleData === null) {
+        yield put({
+            type: pepeAT.ADD_SALE_AUCTION,
+            dataSrc: "api",
+            lcb,
+            auction: null
+        });
+        return;
+    }
+
+    const auction = {
+        beginPrice: saleData.beginPrice,
+        endPrice: saleData.endPrice,
+        beginTime: saleData.beginTime,
+        endTime: saleData.endTime,
+        seller: saleData.seller
+    };
+
+    yield put({
+        type: pepeAT.ADD_SALE_AUCTION,
+        dataSrc: "api",
+        lcb,
+        auction
     });
 }
 
@@ -59,9 +113,9 @@ function* getPepe({pepeId}) {
         const {callID, thunk} = PepeBaseContract.methods.getPepe.cacheCall({blockNr: lcb}, pepeId);
         console.log("making pepe web3 call", callID);
         // First, save the context of the call, so we can track progress.
-        yield put({type: pepeAT.TRACK_WEB3_CALL, callType: "pepes", callID, callData: {pepeId, lcb}});
+        yield put({type: pepeAT.TRACK_WEB3_CALL, dataType: "pepes", callID, callData: {pepeId, lcb}});
         // Second, tell the store we are getting the pepe, no need to get it again while this is still in-progress.
-        yield put({type: pepeAT.GETTING_PEPE, pepeId, dataSrc: "web3", timestamp: getNowTimestamp()});
+        yield put({type: pepeAT.GETTING_DATA, dataType: "pepes", pepeId, dataSrc: "web3", timestamp: getNowTimestamp()});
         // Third, make the call.
         yield put(thunk);
     } else {
@@ -76,40 +130,168 @@ function* getPepe({pepeId}) {
         if (pepeApiData && pepeApiData.status === "getting" && (pepeApiData.timestamp < getNowTimestamp() - refetchApiDataTime)) return;
 
         // tell the store we are getting the pepe, no need to get it again while this is still in-progress.
-        yield put({type: pepeAT.GETTING_PEPE, pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
+        yield put({type: pepeAT.GETTING_DATA, dataType: "pepes", pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
 
         try {
             // Get the pepe from the API.
             const pepeData = yield PepeAPI.getPepeData(pepeId);
-            yield addApiPepe(pepeData);
+            yield addApiPepe(pepeData, pepeData.lcb);
 
         } catch (err) {
             console.log("failed to load pepe data from API", err);
+            yield put({
+                type: pepeAT.GETTING_DATA_FAIL,
+                dataSrc: "api",
+                dataType: "pepes",
+                lcb: 0,
+                pepeId,
+                err
+            });
         }
 
     }
 }
 
+function* getCozyAuction({pepeId}) {
+
+    // Do we have web3 available? If so, use it!
+    if (window.pepeWeb3v1) {
+        // Fetch it with web3
+
+        const auctionWeb3Data = yield select(state => {
+            const auctionData = state.pepe.cozyAuctions[pepeId];
+            if (auctionData && auctionData.web3) return auctionData.web3;
+            else return null;
+        });
+        // If we are already getting the pepe, and it's not too long ago, then stop.
+        if (auctionWeb3Data && auctionWeb3Data.status === "getting" && (auctionWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
+
+        const CozyTimeAuctionContract = yield select(state => state.redapp.contracts.CozyTimeAuction);
+        // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
+        const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
+        // Create the call thunk and get our callID
+        const {callID, thunk} = CozyTimeAuctionContract.methods.auctions.cacheCall({blockNr: lcb}, pepeId);
+        console.log("making cozy auction web3 call", callID);
+        // First, save the context of the call, so we can track progress.
+        yield put({type: pepeAT.TRACK_WEB3_CALL, dataType: "cozyAuctions", callID, callData: {pepeId, lcb}});
+        // Second, tell the store we are getting the pepe, no need to get it again while this is still in-progress.
+        yield put({type: pepeAT.GETTING_DATA, dataType: "cozyAuctions", pepeId, dataSrc: "web3", timestamp: getNowTimestamp()});
+        // Third, make the call.
+        yield put(thunk);
+    } else {
+        // Fetch it with the API
+
+        const auctionApiData = yield select(state => {
+            const auctionData = state.pepe.cozyAuctions[pepeId];
+            if (auctionData && auctionData.api) return auctionData.api;
+            else return null;
+        });
+        // If we are already getting the pepe, and it's not too long ago, then stop.
+        if (auctionApiData && auctionApiData.status === "getting" && (auctionApiData.timestamp < getNowTimestamp() - refetchApiDataTime)) return;
+
+        // tell the store we are getting the pepe, no need to get it again while this is still in-progress.
+        yield put({type: pepeAT.GETTING_DATA, dataType: "cozyAuctions", pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
+
+        try {
+            // Get the pepe from the API.
+            const auctionData = yield PepeAPI.getCozyAuctionData(pepeId);
+            yield addApiCozyData(auctionData, auctionData.lcb);
+
+        } catch (err) {
+            console.log("failed to load cozy auction data from API", err);
+            yield put({
+                type: pepeAT.GETTING_DATA_FAIL,
+                dataSrc: "api",
+                dataType: "cozyAuctions",
+                lcb: 0,
+                pepeId,
+                err
+            });
+        }
+
+    }
+}
+
+function* getSaleAuction({pepeId}) {
+
+    // Do we have web3 available? If so, use it!
+    if (window.pepeWeb3v1) {
+        // Fetch it with web3
+
+        const auctionWeb3Data = yield select(state => {
+            const auctionData = state.pepe.saleAuctions[pepeId];
+            if (auctionData && auctionData.web3) return auctionData.web3;
+            else return null;
+        });
+        // If we are already getting the pepe, and it's not too long ago, then stop.
+        if (auctionWeb3Data && auctionWeb3Data.status === "getting" && (auctionWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
+
+        const PepeAuctionSaleContract = yield select(state => state.redapp.contracts.PepeAuctionSale);
+        // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
+        const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
+        // Create the call thunk and get our callID
+        const {callID, thunk} = PepeAuctionSaleContract.methods.auctions.cacheCall({blockNr: lcb}, pepeId);
+        console.log("making sale auction web3 call", callID);
+        // First, save the context of the call, so we can track progress.
+        yield put({type: pepeAT.TRACK_WEB3_CALL, dataType: "saleAuctions", callID, callData: {pepeId, lcb}});
+        // Second, tell the store we are getting the pepe, no need to get it again while this is still in-progress.
+        yield put({type: pepeAT.GETTING_DATA, dataType: "saleAuctions", pepeId, dataSrc: "web3", timestamp: getNowTimestamp()});
+        // Third, make the call.
+        yield put(thunk);
+    } else {
+        // Fetch it with the API
+
+        const auctionApiData = yield select(state => {
+            const auctionData = state.pepe.saleAuctions[pepeId];
+            if (auctionData && auctionData.api) return auctionData.api;
+            else return null;
+        });
+        // If we are already getting the pepe, and it's not too long ago, then stop.
+        if (auctionApiData && auctionApiData.status === "getting" && (auctionApiData.timestamp < getNowTimestamp() - refetchApiDataTime)) return;
+
+        // tell the store we are getting the pepe, no need to get it again while this is still in-progress.
+        yield put({type: pepeAT.GETTING_DATA, dataType: "saleAuctions", pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
+
+        try {
+            // Get the pepe from the API.
+            const auctionData = yield PepeAPI.getSaleAuctionData(pepeId);
+            yield addApiSaleData(auctionData, auctionData.lcb);
+
+        } catch (err) {
+            console.log("failed to load sale auction data from API", err);
+            yield put({
+                type: pepeAT.GETTING_DATA_FAIL,
+                dataSrc: "api",
+                dataType: "saleAuctions",
+                lcb: 0,
+                pepeId,
+                err
+            });
+        }
+
+    }
+}
+
+
 /*
 TODO:
-"auction" (2x: saleAuctions, cozyAuctions): beginPrice, endPrice, beginTime, endTime, seller
 "bio" (bioData): title, description
 "look" (lookData): look
  */
 
-function* checkDataResult({callID, value}) {
-    const web3Call = yield select((state) => state.pepe.web3Calls.pepes[callID]);
+function* checkDataCallSuccess({callID, value}) {
+    const pepeWeb3Call = yield select((state) => state.pepe.web3Calls.pepes[callID]);
     // only if it's a pepe, handle like it's a pepe. It could be another type of call being decoded successfully.
-    if (!!web3Call) {
+    if (!!pepeWeb3Call) {
         // Yeah, we retrieved pepe data successfully from web3. Now we need to forward it to the pepe reducer.
         // Get the number of the block when the call was made, this is our LCB reference
-        const lcb = web3Call.lcb;
+        const lcb = pepeWeb3Call.lcb;
         // Convert decimal values to hex.
         const genotypeSide0 = Web3Utils.toBN(value.genotype[0]).toString(16, 64);
         const genotypeSide1 = Web3Utils.toBN(value.genotype[1]).toString(16, 64);
         // Transform the data to what we expect, remove all web3 extras.
         const pepe = {
-            pepeId: web3Call.pepeId,
+            pepeId: pepeWeb3Call.pepeId,
             name: value.pepeName,
             cool_down_index: value.coolDownIndex,
             can_cozy_again: value.canCozyAgain,
@@ -123,9 +305,98 @@ function* checkDataResult({callID, value}) {
             type: pepeAT.ADD_PEPE,
             dataSrc: "web3",
             lcb,
-            ...pepe
+            pepe
+        });
+        return;
+    }
+
+    const cozyAuctionWeb3Call = yield select((state) => state.pepe.web3Calls.cozyAuctions[callID]);
+    if (!!cozyAuctionWeb3Call) {
+        // Get the number of the block when the call was made, this is our LCB reference
+        const lcb = cozyAuctionWeb3Call.lcb;
+        // Transform the data to what we expect, remove all web3 extras.
+        const auction = {
+            beginPrice: value.beginPrice,
+            endPrice: value.endPrice,
+            beginTime: value.auctionBegin,
+            endTime: value.auctionEnd,
+            seller: value.seller
+        };
+        yield put({
+            type: pepeAT.ADD_COZY_AUCTION,
+            dataSrc: "web3",
+            lcb,
+            auction
+        });
+
+        return;
+    }
+
+    const saleAuctionWeb3Call = yield select((state) => state.pepe.web3Calls.saleAuctions[callID]);
+    if (!!saleAuctionWeb3Call) {
+        // Get the number of the block when the call was made, this is our LCB reference
+        const lcb = saleAuctionWeb3Call.lcb;
+        // Transform the data to what we expect, remove all web3 extras.
+        const auction = {
+            beginPrice: value.beginPrice,
+            endPrice: value.endPrice,
+            beginTime: value.auctionBegin,
+            endTime: value.auctionEnd,
+            seller: value.seller
+        };
+        yield put({
+            type: pepeAT.ADD_SALE_AUCTION,
+            dataSrc: "web3",
+            lcb,
+            auction
         });
     }
+
+    // Add more web3 calls to decode here (do not forget to add return to statement above)
+}
+
+
+function* checkDataCallFailure({callID, err}) {
+    const pepeWeb3Call = yield select((state) => state.pepe.web3Calls.pepes[callID]);
+    // only if it's a pepe, handle like it's a pepe. It could be another type of call being decoded successfully.
+    if (!!pepeWeb3Call) {
+        yield put({
+            type: pepeAT.GETTING_DATA_FAIL,
+            dataSrc: "web3",
+            dataType: "pepes",
+            lcb: pepeWeb3Call.lcb,
+            pepeId,
+            err
+        });
+        return;
+    }
+
+    const cozyAuctionWeb3Call = yield select((state) => state.pepe.web3Calls.cozyAuctions[callID]);
+    if (!!cozyAuctionWeb3Call) {
+        yield put({
+            type: pepeAT.GETTING_DATA_FAIL,
+            dataSrc: "web3",
+            dataType: "cozyAuctions",
+            lcb: cozyAuctionWeb3Call.lcb,
+            pepeId,
+            err
+        });
+        return;
+    }
+
+    const saleAuctionWeb3Call = yield select((state) => state.pepe.web3Calls.saleAuctions[callID]);
+    if (!!saleAuctionWeb3Call) {
+        yield put({
+            type: pepeAT.GETTING_DATA_FAIL,
+            dataSrc: "web3",
+            dataType: "saleAuctions",
+            lcb: saleAuctionWeb3Call.lcb,
+            pepeId,
+            err
+        });
+    }
+
+    // Add more web3 calls here (do not forget to add return to statement above)
 }
 
 function* queryPepes({queryStr}) {
@@ -142,7 +413,12 @@ function* queryPepes({queryStr}) {
             // Now insert all pepes into the store:
             for (let i = 0; i < queryRes.pepes.length; i++) {
                 const pepeData = queryRes.pepes[i];
-                yield addApiPepe(pepeData);
+                yield addApiPepe(pepeData, pepeData.lcb);
+
+                // Also add auction data, which is included in the query api results.
+                yield addApiCozyData(pepeData.cozy_auction, pepeData.lcb);
+                yield addApiSaleData(pepeData.sale_auction, pepeData.lcb);
+
                 pepeIds.push(pepeData.pepeId);
             }
         }
@@ -156,7 +432,11 @@ function* queryPepes({queryStr}) {
 function* pepeSaga() {
     yield takeEvery(pepeAT.QUERY_PEPES, queryPepes);
     yield takeEvery(pepeAT.GET_PEPE, getPepe);
-    yield takeEvery(CALL_DECODE_SUCCESS, checkDataResult);
+    yield takeEvery(pepeAT.GET_COZY_AUCTION, getCozyAuction);
+    yield takeEvery(pepeAT.GET_SALE_AUCTION, getSaleAuction);
+    yield takeEvery(CALL_DECODE_SUCCESS, checkDataCallSuccess);
+    yield takeEvery(CALL_DECODE_FAIL, checkDataCallFailure);
+    yield takeEvery(CALL_FAILED, checkDataCallFailure);
     // TODO: on Call fail or call decode fail: update pepe status to "error"
 }
 
