@@ -16,7 +16,7 @@ const styles = theme => ({
 const PriceText = ({classes, priceWei, ...otherProps}) =>
     (
         <span className={classes.priceText} {...otherProps}> Ξ {
-            (priceWei === null || priceWei === undefined)
+            !priceWei
                 ? "???"
                 : Web3Utils.fromWei(priceWei, "ether")
         }</span>

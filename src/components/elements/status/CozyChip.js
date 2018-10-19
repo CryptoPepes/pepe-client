@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import {Fire} from "mdi-material-ui";
 import {Chip} from "@material-ui/core";
 import PriceText from "../util/PriceText";
+import connect from "react-redux/es/connect/connect";
+import {AuctionData} from "../../../api/model";
 
 const styles = (theme) => ({
     labelRoot: {
@@ -18,22 +20,34 @@ const styles = (theme) => ({
 });
 
 const CozyChip = (props) => {
-    const {auctionPrice, classes} = props;
+    const {auctionData, classes} = props;
+
+    const isLoading = auctionData.status !== "ok";
+
+    const price = isLoading ? null : new AuctionData(auctionData).getCurrentPrice();
 
     return (
         <Chip label={
             <span className={classes.labelRoot}>
                 <Fire/> <i className={classes.mainText}>Wants to hop</i>
-                <PriceText priceWei={auctionPrice}/>
+                <PriceText priceWei={price}/>
             </span>
         }/>
     )
 
 };
 
-CozyChip.propTypes = {
-    // auction price, formatted as string, decimal base, in Wei.
-    auctionPrice: PropTypes.string
+const StyledCozyChip = withStyles(styles)(CozyChip);
+
+const ConnectedCozyChip = connect((state, props) => {
+    const auctionData = state.pepe.saleAuctions[props.pepeId];
+    return ({
+        auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {}
+    });
+})(StyledCozyChip);
+
+ConnectedCozyChip.propTypes = {
+    pepeId: PropTypes.string
 };
 
-export default withStyles(styles)(CozyChip);
+export default ConnectedCozyChip;
