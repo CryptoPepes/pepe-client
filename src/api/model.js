@@ -153,7 +153,7 @@ class PepeData {
                     bio_description=undefined,
                     genotype="",
                     master="0x0",
-                    svg_path=undefined
+                    lcb=0
                 }) {
         this.pepeId = pepeId;
         if(name === "") {
@@ -174,7 +174,7 @@ class PepeData {
         this.bio_description = bio_description;
         this.genotype = genotype;
         this.master = master;
-        this.svgPath = svg_path || PepeAPI.getPepeSvgSrc(pepeId);
+        this.lcb = lcb;
     }
 }
 

@@ -1,5 +1,5 @@
 import {
-    put, takeEvery, select
+    call, put, takeEvery, select
 } from 'redux-saga/effects';
 import {CALL_DECODE_SUCCESS, CALL_DECODE_FAIL, CALL_FAILED} from "redapp/es/tracking/calls/AT";
 import Web3Utils from "web3-utils";
@@ -17,7 +17,8 @@ const refetchWeb3DataTime = 20;
 // Do not make the same API call again within 20 seconds
 const refetchApiDataTime = 20;
 
-function* addApiPepe(pepeData, lcb) {
+function* addApiPepe(pepeId, pepeData, lcb) {
+    // console.log("Adding api pepe: ", pepeData, lcb);
     const pepe = {
         pepeId,
         name: pepeData.name,
@@ -33,21 +34,25 @@ function* addApiPepe(pepeData, lcb) {
     yield put({
         type: pepeAT.ADD_PEPE,
         dataSrc: "api",
+        pepeId,
         lcb,
         pepe
     });
 }
 
-function* addApiCozyData(cozyData, lcb) {
-    if (cozyData === null) {
+function* addApiCozyData(pepeId, cozyData, lcb) {
+    if (!cozyData) {
         yield put({
             type: pepeAT.ADD_COZY_AUCTION,
             dataSrc: "api",
+            pepeId,
             lcb,
             auction: null
         });
         return;
     }
+
+    // console.log("Adding cozy auction data!", cozyData, lcb);
 
     const auction = {
         beginPrice: cozyData.beginPrice,
@@ -60,21 +65,25 @@ function* addApiCozyData(cozyData, lcb) {
     yield put({
         type: pepeAT.ADD_COZY_AUCTION,
         dataSrc: "api",
+        pepeId,
         lcb,
         auction
     });
 }
 
-function* addApiSaleData(saleData, lcb) {
-    if (saleData === null) {
+function* addApiSaleData(pepeId, saleData, lcb) {
+    if (!saleData) {
         yield put({
             type: pepeAT.ADD_SALE_AUCTION,
             dataSrc: "api",
+            pepeId,
             lcb,
             auction: null
         });
         return;
     }
+
+    // console.log("Adding sale auction data!", saleData, lcb);
 
     const auction = {
         beginPrice: saleData.beginPrice,
@@ -87,6 +96,7 @@ function* addApiSaleData(saleData, lcb) {
     yield put({
         type: pepeAT.ADD_SALE_AUCTION,
         dataSrc: "api",
+        pepeId,
         lcb,
         auction
     });
@@ -135,7 +145,7 @@ function* getPepe({pepeId}) {
         try {
             // Get the pepe from the API.
             const pepeData = yield PepeAPI.getPepeData(pepeId);
-            yield addApiPepe(pepeData, pepeData.lcb);
+            yield call(addApiPepe, pepeId, pepeData, pepeData.lcb);
 
         } catch (err) {
             console.log("failed to load pepe data from API", err);
@@ -195,7 +205,7 @@ function* getCozyAuction({pepeId}) {
         try {
             // Get the pepe from the API.
             const auctionData = yield PepeAPI.getCozyAuctionData(pepeId);
-            yield addApiCozyData(auctionData, auctionData.lcb);
+            yield call(addApiCozyData, pepeId, auctionData, auctionData.lcb);
 
         } catch (err) {
             console.log("failed to load cozy auction data from API", err);
@@ -255,7 +265,7 @@ function* getSaleAuction({pepeId}) {
         try {
             // Get the pepe from the API.
             const auctionData = yield PepeAPI.getSaleAuctionData(pepeId);
-            yield addApiSaleData(auctionData, auctionData.lcb);
+            yield call(addApiSaleData, pepeId, auctionData, auctionData.lcb);
 
         } catch (err) {
             console.log("failed to load sale auction data from API", err);
@@ -409,22 +419,22 @@ function* queryPepes({queryStr}) {
         });
     } else {
         const pepeIds = [];
-        if (queryRes.pepes instanceof Array) {
+        if (queryRes.pepes) {
             // Now insert all pepes into the store:
             for (let i = 0; i < queryRes.pepes.length; i++) {
                 const pepeData = queryRes.pepes[i];
-                yield addApiPepe(pepeData, pepeData.lcb);
+                yield call(addApiPepe, pepeData.pepeId, pepeData, pepeData.lcb);
 
                 // Also add auction data, which is included in the query api results.
-                yield addApiCozyData(pepeData.cozy_auction, pepeData.lcb);
-                yield addApiSaleData(pepeData.sale_auction, pepeData.lcb);
+                yield call(addApiCozyData, pepeData.pepeId, pepeData.cozy_auction, pepeData.lcb);
+                yield call(addApiSaleData, pepeData.pepeId, pepeData.sale_auction, pepeData.lcb);
 
                 pepeIds.push(pepeData.pepeId);
             }
         }
         // Add the query to the store
         yield put({
-            type: pepeAT.QUERY_SUCCESS, pepeIds, cursor: queryRes.hasMore ? queryRes.cursor : null
+            type: pepeAT.QUERY_SUCCESS, queryStr, pepeIds, cursor: queryRes.hasMore ? queryRes.cursor : null
         })
     }
 }

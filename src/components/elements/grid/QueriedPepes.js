@@ -7,12 +7,15 @@ import ReporterContent from "../reporting/ReporterContent";
 class QueriedPepes extends React.Component {
 
     render() {
-        const {pepes, errors} = this.props;
+        const {pepes, loading, errors, children} = this.props;
 
         return (
             <div>
                 {
-                    (errors || []).map(err => (<ReporterContent variant="error" message={err}/>))
+                    loading && <ReporterContent variant="info" message="Loading pepes..."/>
+                }
+                {
+                    !loading && ((errors || []).map(err => (<ReporterContent variant="error" message={err}/>)))
                 }
                 {pepes && pepes.length !== 0 && children}
                 <PepeGrid items={pepes}/>
@@ -27,18 +30,26 @@ const ConnectedQueriedPepes = connect((state, props) => {
     const queries = props.queries;
     const nonDuplicates = new Set();
     const errors = [];
+    let loadingQueries = false;
     for (let i = 0; i < queries.length; i++) {
         const queryStr = queries[i];
         const queryData = state.pepe.pepeQueries[queryStr];
-        if (!queryData.err) {
-            errors.push(queryData.err);
+
+        if (!queryData) {
+            loadingQueries = true;
+            continue;
+        }
+
+        if (!queryData.error) {
+            errors.push(queryData.error);
         } else {
-            queryData.pepes.forEach(pepeId => nonDuplicates.add(pepeId));
+            queryData.pepeIds.forEach(pepeId => nonDuplicates.add(pepeId));
         }
     }
 
     return ({
-        pepes: nonDuplicates,
+        pepes: Array.from(nonDuplicates),
+        loading: loadingQueries,
         errors
     })
 })(QueriedPepes);

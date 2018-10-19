@@ -26,7 +26,8 @@ const styles = theme => ({
         position: "relative"
     },
     media: {
-        height: 220,
+        height: 240,
+        width: 240,
         backgroundColor: theme.palette.type === "light" ? "#bbb" : "#444",
     },
     mediaOverlay: {
@@ -130,10 +131,9 @@ class PepeGridItem extends React.Component {
             <Card className={classes.card}>
                 <Link to={"/pepe/"+pepeId}>
                     <div className={classes.mediaLayers}>
-                        <CardMedia
-                            className={classes.media}
-                            component={<PepePicture pepeId={pepeId}/>}
-                            title={`#${pepeId}`} />
+                        <div className={classes.media}>
+                            <PepePicture pepeId={pepeId}/>
+                        </div>
                         <div className={classes.mediaOverlay}>
                             { isForCozy && <CozyChip pepeId={pepeId}/> }
                             { isForSale && <SaleChip pepeId={pepeId}/> }
@@ -188,10 +188,11 @@ class PepeGridItem extends React.Component {
 
 const StyledPepeGridItem = withStyles(styles)(PepeGridItem);
 
-const ConnectedPepeGridItem = connect(state => ({
+const ConnectedPepeGridItem = connect((state, props) => ({
     breeder: state.breeder,
     hasWeb3: state.web3.hasWeb3,
-    wallet: state.redapp.tracking.accounts.wallet
+    wallet: state.redapp.tracking.accounts.wallet,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}
 }))(StyledPepeGridItem);
 
 ConnectedPepeGridItem.propTypes = {

@@ -29,11 +29,11 @@ class PepeGridInfinite extends Component {
         super(props);
 
         // Not using state var here, it has to be instant, and may be dropped without problem if the component changes.
-        this.currentQuery = null;
+        this.currentQuery = "";
     }
 
     makeContentLoader = (force) => (
-        async function loadMoreContent() {
+        (async function loadMoreContent() {
             const { hasMore, cursor, getQuery, dispatch } = this.props;
 
             // Do not load anything if there is no more data to be loaded.
@@ -54,8 +54,9 @@ class PepeGridInfinite extends Component {
             const qStr = q.toURLParamStr();
 
             //If this is a different query, then reset the state.
-            if (!force && this.currentQuery !== qStr) {
+            if (force || this.currentQuery !== qStr) {
                 this.currentQuery = qStr;
+                console.log("Search query changed / moved page!");
             } else {
                 //Query identities match, we are already loading
                 console.log("Avoiding double API query.");
@@ -66,7 +67,7 @@ class PepeGridInfinite extends Component {
             dispatch({
                 type: pepeAT.QUERY_PEPES, queryStr: qStr, force
             });
-        });
+        })).bind(this);
 
     render() {
 
@@ -155,10 +156,10 @@ const ConnectedPepeGridInfinite = connect((state, props) => {
                 } else {
                     // No error, great, add the data to the collection,
                     // then continue looking for more data using the next cursor.
-                    results.push(nextQueryResults.pepeIds);
+                    results.push(...nextQueryResults.pepeIds);
                     cursor = nextQueryResults.cursor;
                     // If we do not have a cursor, there is no more data.
-                    hasMore = !cursor;
+                    hasMore = !!cursor;
                 }
             } else {
                 // Stop when we cannot find new results anymore
@@ -176,7 +177,6 @@ const ConnectedPepeGridInfinite = connect((state, props) => {
 })(StyledPepeGridInfinite);
 
 ConnectedPepeGridInfinite.propTypes = {
-    classes: PropTypes.object.isRequired,
     getQuery: PropTypes.func.isRequired
 };
 

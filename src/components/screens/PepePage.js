@@ -229,8 +229,8 @@ class PepePageInner extends React.Component {
                         { /* Family: children */ }
                         <Grid item xs={12}>
                             <QueriedPepes queries={[
-                                Query.buildQuery({mother: pepeId}),
-                                Query.buildQuery({father: pepeId})
+                                Query.buildQuery({mother: pepeId}).toURLParamStr(),
+                                Query.buildQuery({father: pepeId}).toURLParamStr()
                             ]}>
                                 <h3 className={classes.infoHeading}>Children</h3>
                             </QueriedPepes>

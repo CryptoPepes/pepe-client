@@ -36,6 +36,27 @@ const initialState = {
 };
 
 const mapping = {
+    [pepeAT.QUERY_FAILURE]: (state, {queryStr, err}) => ({
+        ...state,
+        pepeQueries: {
+            ...state.pepeQueries,
+            [queryStr]: {
+                error: err
+            }
+        }
+    }),
+    [pepeAT.QUERY_SUCCESS]: (state, {queryStr, pepeIds, cursor=null}) => ({
+        ...state,
+        pepeQueries: {
+            ...state.pepeQueries,
+            [queryStr]: {
+                pepeIds: pepeIds,
+                // cursor is optional, if present, then it implies "hasMore".
+                // If not, then this is the last api-page of results.
+                cursor: cursor
+            }
+        }
+    }),
     [pepeAT.TRACK_WEB3_CALL]: (state, {dataType, callID, callData}) => ({
         ...state,
         web3Calls: {
@@ -49,8 +70,8 @@ const mapping = {
     [pepeAT.ADD_PEPE]: (state, {
         lcb=0,
         dataSrc = "api",
+        pepeId,
         pepe: {
-            pepeId = "0",
             name = "",
             cool_down_index = 0,
             can_cozy_again = 0,
@@ -65,13 +86,13 @@ const mapping = {
         pepes: {
             ...state.pepes,
             [pepeId]: {
-                ...state.pepes[pepeId],
+                ...(state.pepes[pepeId] || {}),
                 [dataSrc]: {
                     status: "ok",
                     lcb,
                     pepe:
                     // Only insert data if LCB (last-change-bloc, i.e. the number of the block of retrieval of the data) is newer than we already have
-                        ((state.pepes[pepeId][dataSrc].lcb || 0) > lcb)
+                        (state.pepes[pepeId] && state.pepes[pepeId][dataSrc] && ((state.pepes[pepeId][dataSrc].lcb || 0) > lcb))
                             ? state.pepes[pepeId][dataSrc].pepe
                             : {
                                 pepeId,
@@ -91,33 +112,22 @@ const mapping = {
     [pepeAT.ADD_COZY_AUCTION]: (state, {
         lcb=0,
         dataSrc = "api",
-        auction: {
-            beginPrice = "0",
-            endPrice = "0",
-            beginTime = "0",
-            endTime = "0",
-            seller = null
-        }
+        pepeId,
+        auction // null in case of no auction, otherwise { beginPrice, endPrice, beginTime, endTime, seller }
     }) => ({
         ...state,
         cozyAuctions: {
             ...state.cozyAuctions,
             [pepeId]: {
-                ...state.cozyAuctions[pepeId],
+                ...(state.cozyAuctions[pepeId] || {}),
                 [dataSrc]: {
                     status: "ok",
                     lcb,
                     auction:
                         // Only insert data if LCB (last-change-bloc, i.e. the number of the block of retrieval of the data) is newer than we already have
-                        ((state.auction[pepeId][dataSrc].lcb || 0) > lcb)
-                            ? state.auction[pepeId][dataSrc].auction
-                            : {
-                                beginPrice,
-                                endPrice,
-                                beginTime,
-                                endTime,
-                                seller
-                            }
+                        (state.cozyAuctions[pepeId] && state.cozyAuctions[pepeId][dataSrc] && ((state.cozyAuctions[pepeId][dataSrc].lcb || 0) > lcb))
+                            ? state.cozyAuctions[pepeId][dataSrc].auction
+                            : auction
                 }
             }
         }
@@ -125,33 +135,22 @@ const mapping = {
     [pepeAT.ADD_SALE_AUCTION]: (state, {
         lcb=0,
         dataSrc = "api",
-        auction: {
-            beginPrice = "0",
-            endPrice = "0",
-            beginTime = "0",
-            endTime = "0",
-            seller = null
-        }
+        pepeId,
+        auction // null in case of no auction, otherwise { beginPrice, endPrice, beginTime, endTime, seller }
     }) => ({
         ...state,
         saleAuctions: {
             ...state.saleAuctions,
             [pepeId]: {
-                ...state.saleAuctions[pepeId],
+                ...(state.saleAuctions[pepeId] || {}),
                 [dataSrc]: {
                     status: "ok",
                     lcb,
                     auction:
                     // Only insert data if LCB (last-change-bloc, i.e. the number of the block of retrieval of the data) is newer than we already have
-                        ((state.auction[pepeId][dataSrc].lcb || 0) > lcb)
-                            ? state.auction[pepeId][dataSrc].auction
-                            : {
-                                beginPrice,
-                                endPrice,
-                                beginTime,
-                                endTime,
-                                seller
-                            }
+                        (state.saleAuctions[pepeId] && state.saleAuctions[pepeId][dataSrc] && ((state.saleAuctions[pepeId][dataSrc].lcb || 0) > lcb))
+                            ? state.saleAuctions[pepeId][dataSrc].auction
+                            : auction
                 }
             }
         }

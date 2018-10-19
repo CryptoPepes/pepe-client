@@ -3,7 +3,8 @@ import {withStyles} from "@material-ui/core/styles";
 import PepeGridItem from "../grid/PepeGridItem";
 import {Hidden} from "@material-ui/core";
 import PropTypes from "prop-types";
-import loadablePepeCollection from "../grid/loadablePepeCollection";
+import connect from "react-redux/es/connect/connect";
+import Loading from "../util/Loading";
 
 const styles = theme => ({
     root: {
@@ -30,16 +31,20 @@ const styles = theme => ({
     }
 });
 
-const MarketPreviewInner = ({classes, items=[]}) => {
+const MarketPreviewInner = ({classes, items}) => {
+
+    if (!items) {
+        return <Loading variant="circle-tag">Loading pepes...</Loading>
+    }
 
     const deck = [];
     for (let i = items.length - 1; i >= 0 ; i--) {
 
-        const pepe = items[i];
+        const pepeId = items[i];
 
         let component = (
         <div style={{top: i * 50, right: i * 80}} className={classes.entry}>
-            <PepeGridItem pepe={pepe}/>
+            <PepeGridItem pepeId={pepeId}/>
         </div>);
 
         if (i > 2) {
@@ -62,12 +67,22 @@ const MarketPreviewInner = ({classes, items=[]}) => {
     );
 };
 
-const styledMarketPreviewInner = withStyles(styles)(MarketPreviewInner);
+const StyledMarketPreview = withStyles(styles)(MarketPreviewInner);
 
-const MarketPreview = loadablePepeCollection(styledMarketPreviewInner);
+const ConnectedMarketPreview = connect((state, props) => {
 
-MarketPreview.propTypes = {
-    queries: PropTypes.arrayOf(PropTypes.PropTypes.object)
+    const queryStr = props.queryStr;
+
+    const queryData = state.pepe.pepeQueries[queryStr] || { pepes: null, error: null };
+
+    return ({
+        pepes: queryData.pepes,
+        error: queryData.err
+    })
+})(StyledMarketPreview);
+
+ConnectedMarketPreview.propTypes = {
+    queryStr: PropTypes.string.isRequired
 };
 
-export default MarketPreview;
+export default ConnectedMarketPreview;
