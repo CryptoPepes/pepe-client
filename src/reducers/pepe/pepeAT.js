@@ -19,6 +19,8 @@ const pepeAT = {
     ADD_SALE_AUCTION: "ADD_SALE_AUCTION",
     // Query pepes
     QUERY_PEPES: "QUERY_PEPES",
+    // When a query is in progress
+    MAKING_QUERY: "MAKING_QUERY",
     // When query is complete
     QUERY_SUCCESS: "QUERY_SUCCESS",
     // When query failed

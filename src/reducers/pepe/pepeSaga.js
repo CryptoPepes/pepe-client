@@ -411,7 +411,18 @@ function* checkDataCallFailure({callID, err}) {
 
 function* queryPepes({queryStr}) {
     console.log("Querying pepes! ", queryStr);
-    // TODO: check for previous data.
+
+    const prevQueryData = yield select(state => state.pepe.pepeQueries[queryStr]);
+
+    const now = getNowTimestamp();
+    // If we are already getting the pepe, and it's not too long ago, then stop.
+    if (prevQueryData && prevQueryData.status === "getting" && (prevQueryData.timestamp < now - refetchWeb3DataTime)) return;
+
+    // Tell the store we are making the query (for check above next time)
+    yield put({
+        type: pepeAT.MAKING_QUERY, queryStr, timestamp: now
+    });
+
     const queryRes = yield PepeAPI.queryPepes(queryStr);
     if (!(queryRes instanceof QueryData)) {
         yield put({

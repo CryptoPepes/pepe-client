@@ -181,7 +181,7 @@ StartAuctionDialog.propTypes = {
 
 const styledStartAuctionDialog = withStyles(styles)(StartAuctionDialog);
 
-export default connect(state => ({
+export default connect((state, props) => ({
     hasWeb3: state.web3.hasWeb3,
     PepeBase: state.redapp.contracts.PepeBase,
     pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {}

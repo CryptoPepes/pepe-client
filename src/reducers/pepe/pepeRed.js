@@ -36,6 +36,16 @@ const initialState = {
 };
 
 const mapping = {
+    [pepeAT.MAKING_QUERY]: (state, {queryStr, timestamp}) => ({
+        ...state,
+        pepeQueries: {
+            ...state.pepeQueries,
+            [queryStr]: {
+                ...(state.pepeQueries[queryStr] || {}),
+                timestamp: timestamp
+            }
+        }
+    }),
     [pepeAT.QUERY_FAILURE]: (state, {queryStr, err}) => ({
         ...state,
         pepeQueries: {

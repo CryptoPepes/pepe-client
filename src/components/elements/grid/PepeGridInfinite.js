@@ -28,8 +28,9 @@ class PepeGridInfinite extends Component {
     constructor(props) {
         super(props);
 
-        // Not using state var here, it has to be instant, and may be dropped without problem if the component changes.
-        this.currentQuery = "";
+        this.state = {
+            currentQuery:  "*force initial load*"
+        }
     }
 
     makeContentLoader = (force) => (
@@ -39,23 +40,21 @@ class PepeGridInfinite extends Component {
             // Do not load anything if there is no more data to be loaded.
             if (!hasMore) return;
 
-            console.log("Loading pepes...");
-
             let q = getQuery();
 
             //Get a copy of the query, to modify the cursor on.
-            if (q === undefined) q = Query.buildQuery({});
+            if (!q) q = Query.buildQuery({});
             else q = q.getCopy();
 
             //set the cursor if necessary
-            if(cursor !== undefined) q.changeCursor(this.contentCursor);
+            if(cursor) q.changeCursor(cursor);
 
             //get the query string
             const qStr = q.toURLParamStr();
 
             //If this is a different query, then reset the state.
-            if (force || this.currentQuery !== qStr) {
-                this.currentQuery = qStr;
+            if (force || this.state.currentQuery !== qStr) {
+                this.setState({currentQuery: qStr});
                 console.log("Search query changed / moved page!");
             } else {
                 //Query identities match, we are already loading
@@ -136,7 +135,7 @@ const ConnectedPepeGridInfinite = connect((state, props) => {
         // Then keep looking in the store for data...
         while (hasMore) {
             // Get the next query
-            if (cursor) query.changeCursor(cursor);
+            query.changeCursor(cursor);
             const nextQueryStr = query.toURLParamStr();
 
             // Get the data of the query
@@ -153,13 +152,16 @@ const ConnectedPepeGridInfinite = connect((state, props) => {
                     // We know there is more data however.
                     hasMore = true;
                     break;
-                } else {
+                } else if (nextQueryResults.pepeIds) {
                     // No error, great, add the data to the collection,
                     // then continue looking for more data using the next cursor.
                     results.push(...nextQueryResults.pepeIds);
                     cursor = nextQueryResults.cursor;
                     // If we do not have a cursor, there is no more data.
                     hasMore = !!cursor;
+                } else {
+                    // Data is still being fetched, just wait for it.
+                    break;
                 }
             } else {
                 // Stop when we cannot find new results anymore

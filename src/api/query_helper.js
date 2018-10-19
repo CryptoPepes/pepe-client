@@ -85,7 +85,7 @@ class Query {
      * @param newCursor The new cursor.
      */
     changeCursor(newCursor) {
-        if (newCursor === null || newCursor === undefined) this.query.delete("cursor");
+        if (!newCursor) this.query.delete("cursor");
         else this.query.set("cursor", encodeURIComponent(newCursor));
     }
 

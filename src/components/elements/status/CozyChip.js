@@ -24,7 +24,7 @@ const CozyChip = (props) => {
 
     const isLoading = auctionData.status !== "ok";
 
-    const price = isLoading ? null : new AuctionData(auctionData).getCurrentPrice();
+    const price = isLoading ? null : new AuctionData(auctionData.auction).getCurrentPrice();
 
     return (
         <Chip label={
@@ -40,7 +40,7 @@ const CozyChip = (props) => {
 const StyledCozyChip = withStyles(styles)(CozyChip);
 
 const ConnectedCozyChip = connect((state, props) => {
-    const auctionData = state.pepe.saleAuctions[props.pepeId];
+    const auctionData = state.pepe.cozyAuctions[props.pepeId];
     return ({
         auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {}
     });

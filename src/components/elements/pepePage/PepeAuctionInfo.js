@@ -50,7 +50,7 @@ class PepeAuctionInfo extends React.Component {
 
         const auction = isLoading ? null : new AuctionData(auctionData.auction);
 
-        const price = isLoading ? null : auctionData.getCurrentPrice();
+        const price = isLoading ? null : auction.getCurrentPrice();
 
         if (isLoading || price === undefined) {
             return (

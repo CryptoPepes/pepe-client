@@ -173,7 +173,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
 
 const styledSaleBuyDialog = withStyles(styles)(PepeBuyDialogInner);
 
-const PepeBuyDialog = connect(state => {
+const PepeBuyDialog = connect((state, props) => {
     const auctionData = state.pepe.saleAuctions[props.pepeId];
     return ({
         hasWeb3: state.web3.hasWeb3,

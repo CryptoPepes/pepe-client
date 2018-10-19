@@ -23,15 +23,6 @@ const styles = theme => ({
         backgroundColor: theme.palette.type === "light" ? "#ddd" : "#000",
         position: "relative"
     },
-    backgroundFill: {
-        opacity: "0.25",
-        position: "absolute",
-        zIndex: 1,
-        width: "100%",
-        height: "100%",
-        top: 0,
-        left: 0
-    },
     header: {
         display: "flex",
         justifyContent: "space-between",
@@ -140,11 +131,6 @@ class PepePageInner extends React.Component {
         return (
 
             <div className={classes.root}>
-
-                { /* Use an empty div, stretched to the size of the parent element,
-                 to tint the background with the pepe background color*/ }
-                <div className={classes.backgroundFill} style={isLoading ? {} : {backgroundColor: pepe.look.background}}/>
-
 
                 <div className={classes.mainInfo}>
 

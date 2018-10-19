@@ -28,7 +28,7 @@ const SaleChip = (props) => {
 
     const isLoading = auctionData.status !== "ok";
 
-    const price = isLoading ? null : new AuctionData(auctionData).getCurrentPrice();
+    const price = isLoading ? null : new AuctionData(auctionData.auction).getCurrentPrice();
 
     return (
         <Chip label={<span className={classes.labelRoot}>
@@ -44,7 +44,7 @@ const StyledSaleChip = withStyles(styles)(SaleChip);
 
 const ConnectedSaleChip = connect((state, props) => {
     // Get the right auction data
-    const auctionData = state.pepe.cozyAuctions[props.pepeId];
+    const auctionData = state.pepe.saleAuctions[props.pepeId];
     return ({
         auctionData: (auctionData && (auctionData.web3 || auctionData.api)) || {}
     });
