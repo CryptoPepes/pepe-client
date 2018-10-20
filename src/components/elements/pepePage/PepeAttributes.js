@@ -83,7 +83,7 @@ const PepeAttributes = (props) => {
 const StyledPepeAttributes = withStyles(styles)(PepeAttributes);
 
 const ConnectedPepeAttributes = connect((state, props) => ({
-    lookData: (state.pepe.lookData[props.pepeId] && (state.pepe.lookData[props.pepeId].web3 || state.pepe.lookData[props.pepeId].api)) || {}
+    lookData: (state.pepe.looks[props.pepeId] && (state.pepe.looks[props.pepeId].web3 || state.pepe.looks[props.pepeId].api)) || {}
 }))(StyledPepeAttributes);
 
 export default ConnectedPepeAttributes;

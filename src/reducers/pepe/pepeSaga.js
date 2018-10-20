@@ -17,41 +17,132 @@ const refetchWeb3DataTime = 20;
 // Do not make the same API call again within 20 seconds
 const refetchApiDataTime = 20;
 
-function* addApiPepe(pepeId, pepe, lcb) {
-    // console.log("Adding api pepe: ", pepe, lcb);
-
+function* addApiLookData(pepeId, look, lcb) {
     yield put({
-        type: pepeAT.ADD_PEPE,
+        type: pepeAT.ADD_DATA,
         dataSrc: "api",
+        dataType: "looks",
+        dataName: "look",
         pepeId,
         lcb,
-        pepe
+        data: look || null
+    });
+}
+
+function* addApiBioData(pepeId, bio, lcb) {
+    yield put({
+        type: pepeAT.ADD_DATA,
+        dataSrc: "api",
+        dataType: "bios",
+        dataName: "bio",
+        pepeId,
+        lcb,
+        data: bio || null
+    });
+}
+
+function* addApiPepe(pepeId, pepe, lcb) {
+    yield put({
+        type: pepeAT.ADD_DATA,
+        dataSrc: "api",
+        dataType: "pepes",
+        dataName: "pepe",
+        pepeId,
+        lcb,
+        data: pepe || null
     });
 }
 
 function* addApiCozyData(pepeId, auction, lcb) {
-    // console.log("Adding cozy auction data!", auction, lcb);
-
     yield put({
-        type: pepeAT.ADD_COZY_AUCTION,
+        type: pepeAT.ADD_DATA,
         dataSrc: "api",
+        dataType: "cozyAuctions",
+        dataName: "auction",
         pepeId,
         lcb,
-        auction: auction || null
+        data: auction || null
     });
 }
 
-function* addApiSaleData(pepeId, auction, lcb) {/
-    // console.log("Adding sale auction data!", auction, lcb);
-
+function* addApiSaleData(pepeId, auction, lcb) {
     yield put({
-        type: pepeAT.ADD_SALE_AUCTION,
+        type: pepeAT.ADD_DATA,
         dataSrc: "api",
+        dataType: "saleAuctions",
+        dataName: "auction",
         pepeId,
         lcb,
-        auction: auction || null
+        data: auction || null
     });
 }
+
+function* getLook({pepeId}) {
+
+    // Fetch it with the API, there is no way to get it from web3 currently.
+
+    const lookApiData = yield select(state => {
+        const lookData = state.pepe.looks[pepeId];
+        if (lookData && lookData.api) return lookData.api;
+        else return null;
+    });
+    // If we are already getting the pepe, and it's not too long ago, then stop.
+    if (lookApiData && lookApiData.status === "getting" && (lookApiData.timestamp < getNowTimestamp() - refetchApiDataTime)) return;
+
+    // tell the store we are getting the look, no need to get it again while this is still in-progress.
+    yield put({type: pepeAT.GETTING_DATA, dataType: "looks", pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
+
+    try {
+        // Get the pepe from the API.
+        const lookData = yield PepeAPI.getDataLook(pepeId);
+        yield call(addApiLookData, pepeId, lookData.look, lookData.lcb);
+
+    } catch (err) {
+        console.log("failed to load look data from API", err);
+        yield put({
+            type: pepeAT.GETTING_DATA_FAIL,
+            dataSrc: "api",
+            dataType: "looks",
+            lcb: 0,
+            pepeId,
+            err
+        });
+    }
+}
+
+function* getBio({pepeId}) {
+
+    // Fetch it with the API, there is no way to get it from web3 currently.
+
+    const bioApiData = yield select(state => {
+        const bioData = state.pepe.bios[pepeId];
+        if (bioData && bioData.api) return bioData.api;
+        else return null;
+    });
+    // If we are already getting the pepe, and it's not too long ago, then stop.
+    if (bioApiData && bioApiData.status === "getting" && (bioApiData.timestamp < getNowTimestamp() - refetchApiDataTime)) return;
+
+    // tell the store we are getting the bio, no need to get it again while this is still in-progress.
+    yield put({type: pepeAT.GETTING_DATA, dataType: "bios", pepeId, dataSrc: "api", timestamp: getNowTimestamp()});
+
+    try {
+        // Get the pepe from the API.
+        const bioData = yield PepeAPI.getDataBio(pepeId);
+        yield call(addApiBioData, pepeId, bioData.bio, bioData.lcb);
+
+    } catch (err) {
+        console.log("failed to load bio data from API", err);
+        yield put({
+            type: pepeAT.GETTING_DATA_FAIL,
+            dataSrc: "api",
+            dataType: "bios",
+            lcb: 0,
+            pepeId,
+            err
+        });
+    }
+}
+
 
 function* getPepe({pepeId}) {
 
@@ -233,13 +324,6 @@ function* getSaleAuction({pepeId}) {
     }
 }
 
-
-/*
-TODO:
-"bio" (bioData): title, description
-"look" (lookData): look
- */
-
 function* checkDataCallSuccess({callID, value}) {
     const pepeWeb3Call = yield select((state) => state.pepe.web3Calls.pepes[callID]);
     // only if it's a pepe, handle like it's a pepe. It could be another type of call being decoded successfully.
@@ -391,6 +475,8 @@ function* queryPepes({queryStr}) {
                 // Also add auction data, which is included in the query api results.
                 yield call(addApiCozyData, pepeData.pepeId, pepeData.cozy_auction, pepeData.lcb);
                 yield call(addApiSaleData, pepeData.pepeId, pepeData.sale_auction, pepeData.lcb);
+                yield call(addApiBioData, pepeData.pepeId, {title: pepeData.bio_title, description: pepeData.bio_description}, pepeData.lcb);
+                yield call(addApiLookData, pepeData.pepeId, pepeData.look, pepeData.lcb);
 
                 pepeIds.push(pepeData.pepeId);
             }
@@ -407,6 +493,8 @@ function* pepeSaga() {
     yield takeEvery(pepeAT.GET_PEPE, getPepe);
     yield takeEvery(pepeAT.GET_COZY_AUCTION, getCozyAuction);
     yield takeEvery(pepeAT.GET_SALE_AUCTION, getSaleAuction);
+    yield takeEvery(pepeAT.GET_LOOK, getLook);
+    yield takeEvery(pepeAT.GET_BIO, getBio);
     yield takeEvery(CALL_DECODE_SUCCESS, checkDataCallSuccess);
     yield takeEvery(CALL_DECODE_FAIL, checkDataCallFailure);
     yield takeEvery(CALL_FAILED, checkDataCallFailure);

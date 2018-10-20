@@ -52,7 +52,7 @@ const StyledPepeBio = withStyles(styles)(PepeBio);
 
 const ConnectedPepeBio = connect((state, props) => ({
     pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {},
-    bioData: (state.pepe.bioData[props.pepeId] && (state.pepe.bioData[props.pepeId].web3 || state.pepe.bioData[props.pepeId].api)) || {}
+    bioData: (state.pepe.bios[props.pepeId] && (state.pepe.bios[props.pepeId].web3 || state.pepe.bios[props.pepeId].api)) || {}
 }))(StyledPepeBio);
 
 export default ConnectedPepeBio;
