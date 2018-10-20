@@ -1,8 +1,6 @@
 import request from "./request";
-import {QueryError, QueryData, PepeData, UserData, AuctionData} from "./model";
+import {QueryError, QueryData} from "./model";
 import {isValidAccountAddress} from "../util/web3AccountsUtil";
-//TODO API backoffs + retry.
-//import backoff from "backoff";
 
 class PepeAPI {
 
@@ -10,8 +8,6 @@ class PepeAPI {
     //static apiRoot = "http://localhost:3000";
     //Prod main:
     static apiRoot = "https://cryptopepes.io";
-    //Prod dev:
-    // static apiRoot = "https://dev.cryptopepes.io";
 
     /**
      * Execute a query, asynchronously. Parsed results are returned in a Promise.
@@ -37,56 +33,48 @@ class PepeAPI {
         //Other objects are passed to the pepe
         return JSON.parse(queryDataJson,
             (k, v) => (v instanceof Object && v.pepes)
-                ? new QueryData(v) : ((v instanceof Object && v.look) ? new PepeData(v) : v));
+                ? new QueryData(v) : v);
     }
 
-    static async getCozyAuctionData(pepeId="0") {
-        const resp = await request(PepeAPI.apiRoot+"/api/getCozyAuction/"+pepeId);
-        // console.log("retrieved cozy data: ", resp);
-        return PepeAPI.parseAuctionJSON(resp)
+    static async getDataCozyAuction(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/data/cozy/"+pepeId);
+        return JSON.parse(resp);
     }
 
-    static async getSaleAuctionData(pepeId="0") {
-        const resp = await request(PepeAPI.apiRoot+"/api/getSaleAuction/"+pepeId);
-        // console.log("retrieved sale data: ", resp);
-        return PepeAPI.parseAuctionJSON(resp)
+    static async getDataSaleAuction(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/data/sale/"+pepeId);
+        return JSON.parse(resp);
     }
 
-    static async getPepeData(pepeId="0") {
-        const resp = await request(PepeAPI.apiRoot+"/api/getPepe/"+pepeId);
-        // console.log("retrieved pepe data: ", resp);
-        return PepeAPI.parsePepeJSON(resp)
+    static async getDataPepe(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/data/pepe/"+pepeId);
+        return JSON.parse(resp);
     }
 
-    static parseAuctionJSON(pepeDataJson) {
-        //reviver checks for response key being a valid object with a "seller"
-        return JSON.parse(pepeDataJson,
-            (k, v) => (v instanceof Object && v.seller) ? new AuctionData(v) : v);
+    static async getDataBio(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/data/bio/"+pepeId);
+        return JSON.parse(resp);
     }
 
-    static parsePepeJSON(pepeDataJson) {
-        //reviver checks for response key being a valid object with a "look"
-        return JSON.parse(pepeDataJson,
-            (k, v) => (v instanceof Object && v.look) ? new PepeData(v) : v);
+    static async getDataLook(pepeId="0") {
+        const resp = await request(PepeAPI.apiRoot+"/api/data/look/"+pepeId);
+        return JSON.parse(resp);
     }
 
     static getPepeSvgSrc(pepeId="0") {
-        return PepeAPI.apiRoot+"/api/getPepeSVG/"+pepeId;
+        return PepeAPI.apiRoot+"/api/img/pepe/"+pepeId;
     }
 
+    // legacy
     static async getUserData(address=undefined) {
         if (!address || !isValidAccountAddress(address)) {
             return undefined;
         } else {
             const resp = await request(PepeAPI.apiRoot+"/api/getUser/"+address.toLowerCase());
-            return PepeAPI.parseUserJSON(resp);
+            return JSON.parse(resp);
         }
     }
 
-    static parseUserJSON(userDataJson) {
-        return JSON.parse(userDataJson,
-            (k, v) => (v instanceof Object && v.username) ? new UserData(v) : v);
-    }
 }
 
 export default PepeAPI;

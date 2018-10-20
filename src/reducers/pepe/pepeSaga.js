@@ -95,7 +95,7 @@ function* getPepe({pepeId}) {
 
         try {
             // Get the pepe from the API.
-            const pepeData = yield PepeAPI.getPepeData(pepeId);
+            const pepeData = yield PepeAPI.getDataPepe(pepeId);
             yield call(addApiPepe, pepeId, pepeData.pepe, pepeData.lcb);
 
         } catch (err) {
@@ -155,7 +155,7 @@ function* getCozyAuction({pepeId}) {
 
         try {
             // Get the pepe from the API.
-            const auctionData = yield PepeAPI.getCozyAuctionData(pepeId);
+            const auctionData = yield PepeAPI.getDataCozyAuction(pepeId);
             yield call(addApiCozyData, pepeId, auctionData.auction, auctionData.lcb);
 
         } catch (err) {
@@ -215,7 +215,7 @@ function* getSaleAuction({pepeId}) {
 
         try {
             // Get the pepe from the API.
-            const auctionData = yield PepeAPI.getSaleAuctionData(pepeId);
+            const auctionData = yield PepeAPI.getDataSaleAuction(pepeId);
             yield call(addApiSaleData, pepeId, auctionData.auction, auctionData.lcb);
 
         } catch (err) {
