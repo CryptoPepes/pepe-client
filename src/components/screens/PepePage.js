@@ -20,7 +20,8 @@ import QueriedPepes from "../elements/grid/QueriedPepes";
 const styles = theme => ({
     root: {
         width: "100%",
-        backgroundColor: theme.palette.type === "light" ? "#ddd" : "#000",
+        backgroundColor:
+            theme.palette.type === 'light' ? theme.palette.primary.main : theme.palette.background.default,
         position: "relative"
     },
     header: {
@@ -73,7 +74,7 @@ const styles = theme => ({
         fontWeight: 400,
         marginTop: theme.spacing.unit * 4,
         marginBottom: theme.spacing.unit,
-        color: theme.palette.type === "light" ? "#444" : "#ddd"
+        color: "#fff"
     },
     placeholderCard: {
         height: 250
