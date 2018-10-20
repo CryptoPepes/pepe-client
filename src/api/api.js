@@ -62,7 +62,7 @@ class PepeAPI {
     }
 
     static getPepeSvgSrc(pepeId="0") {
-        return PepeAPI.apiRoot+"/api/img/pepe/"+pepeId;
+        return PepeAPI.apiRoot+"/api/img/pepe/"+pepeId+".svg";
     }
 
     // legacy

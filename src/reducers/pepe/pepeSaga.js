@@ -49,7 +49,16 @@ function* addApiPepe(pepeId, pepe, lcb) {
         dataName: "pepe",
         pepeId,
         lcb,
-        data: pepe || null
+        data: pepe ? {
+            name: pepe.name === "" ? null : value.name,
+            cool_down_index: pepe.cool_down_index,
+            can_cozy_again: pepe.can_cozy_again,
+            gen: pepe.gen,
+            father: pepe.father,
+            mother: pepe.mother,
+            genotype: pepe.genotype,
+            master: pepe.master,
+        } : null
     });
 }
 
@@ -337,7 +346,7 @@ function* checkDataCallSuccess({callID, value}) {
         // Transform the data to what we expect, remove all web3 extras.
         const pepe = {
             pepeId: pepeWeb3Call.pepeId,
-            name: value.pepeName,
+            name: value.pepeName === "" ? null : value.pepeName,
             cool_down_index: value.coolDownIndex,
             can_cozy_again: value.canCozyAgain,
             gen: value.generation,
