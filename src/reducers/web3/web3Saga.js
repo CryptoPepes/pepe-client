@@ -33,7 +33,7 @@ async function getNewWeb3() {
     } else if (window.web3) {
         console.log("Connecting web3 using legacy protocol (window.web3).");
         // Legacy dapp browsers...
-        window.pepeWeb3v1 = new Web3(web3.currentProvider);
+        window.pepeWeb3v1 = new Web3(window.web3.currentProvider);
         return 'CONNECTED'
     } else {
         console.log("No window.ethereum or window.web3 found, cannot connect to web3.");

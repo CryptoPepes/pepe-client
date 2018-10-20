@@ -17,19 +17,8 @@ const refetchWeb3DataTime = 20;
 // Do not make the same API call again within 20 seconds
 const refetchApiDataTime = 20;
 
-function* addApiPepe(pepeId, pepeData, lcb) {
-    // console.log("Adding api pepe: ", pepeData, lcb);
-    const pepe = {
-        pepeId,
-        name: pepeData.name,
-        cool_down_index: pepeData.cool_down_index,
-        can_cozy_again: pepeData.can_cozy_again,
-        gen: pepeData.gen,
-        father: pepeData.father,
-        mother: pepeData.mother,
-        genotype: pepeData.genotype,
-        master: pepeData.master
-    };
+function* addApiPepe(pepeId, pepe, lcb) {
+    // console.log("Adding api pepe: ", pepe, lcb);
 
     yield put({
         type: pepeAT.ADD_PEPE,
@@ -40,65 +29,27 @@ function* addApiPepe(pepeId, pepeData, lcb) {
     });
 }
 
-function* addApiCozyData(pepeId, cozyData, lcb) {
-    if (!cozyData) {
-        yield put({
-            type: pepeAT.ADD_COZY_AUCTION,
-            dataSrc: "api",
-            pepeId,
-            lcb,
-            auction: null
-        });
-        return;
-    }
-
-    // console.log("Adding cozy auction data!", cozyData, lcb);
-
-    const auction = {
-        beginPrice: cozyData.beginPrice,
-        endPrice: cozyData.endPrice,
-        beginTime: cozyData.beginTime,
-        endTime: cozyData.endTime,
-        seller: cozyData.seller
-    };
+function* addApiCozyData(pepeId, auction, lcb) {
+    // console.log("Adding cozy auction data!", auction, lcb);
 
     yield put({
         type: pepeAT.ADD_COZY_AUCTION,
         dataSrc: "api",
         pepeId,
         lcb,
-        auction
+        auction: auction || null
     });
 }
 
-function* addApiSaleData(pepeId, saleData, lcb) {
-    if (!saleData) {
-        yield put({
-            type: pepeAT.ADD_SALE_AUCTION,
-            dataSrc: "api",
-            pepeId,
-            lcb,
-            auction: null
-        });
-        return;
-    }
-
-    // console.log("Adding sale auction data!", saleData, lcb);
-
-    const auction = {
-        beginPrice: saleData.beginPrice,
-        endPrice: saleData.endPrice,
-        beginTime: saleData.beginTime,
-        endTime: saleData.endTime,
-        seller: saleData.seller
-    };
+function* addApiSaleData(pepeId, auction, lcb) {/
+    // console.log("Adding sale auction data!", auction, lcb);
 
     yield put({
         type: pepeAT.ADD_SALE_AUCTION,
         dataSrc: "api",
         pepeId,
         lcb,
-        auction
+        auction: auction || null
     });
 }
 
@@ -145,7 +96,7 @@ function* getPepe({pepeId}) {
         try {
             // Get the pepe from the API.
             const pepeData = yield PepeAPI.getPepeData(pepeId);
-            yield call(addApiPepe, pepeId, pepeData, pepeData.lcb);
+            yield call(addApiPepe, pepeId, pepeData.pepe, pepeData.lcb);
 
         } catch (err) {
             console.log("failed to load pepe data from API", err);
@@ -205,7 +156,7 @@ function* getCozyAuction({pepeId}) {
         try {
             // Get the pepe from the API.
             const auctionData = yield PepeAPI.getCozyAuctionData(pepeId);
-            yield call(addApiCozyData, pepeId, auctionData, auctionData.lcb);
+            yield call(addApiCozyData, pepeId, auctionData.auction, auctionData.lcb);
 
         } catch (err) {
             console.log("failed to load cozy auction data from API", err);
@@ -265,7 +216,7 @@ function* getSaleAuction({pepeId}) {
         try {
             // Get the pepe from the API.
             const auctionData = yield PepeAPI.getSaleAuctionData(pepeId);
-            yield call(addApiSaleData, pepeId, auctionData, auctionData.lcb);
+            yield call(addApiSaleData, pepeId, auctionData.auction, auctionData.lcb);
 
         } catch (err) {
             console.log("failed to load sale auction data from API", err);
@@ -434,6 +385,7 @@ function* queryPepes({queryStr}) {
             // Now insert all pepes into the store:
             for (let i = 0; i < queryRes.pepes.length; i++) {
                 const pepeData = queryRes.pepes[i];
+                // Legacy format is used in search output still: pepe attributes are not nested in a "pepe" attribute.
                 yield call(addApiPepe, pepeData.pepeId, pepeData, pepeData.lcb);
 
                 // Also add auction data, which is included in the query api results.

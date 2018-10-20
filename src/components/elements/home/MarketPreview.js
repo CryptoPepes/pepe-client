@@ -48,11 +48,11 @@ const MarketPreviewInner = ({classes, items}) => {
         </div>);
 
         if (i > 2) {
-            component = (<Hidden key={pepe.pepeId} mdDown>{component}</Hidden>);
+            component = (<Hidden key={pepeId} mdDown>{component}</Hidden>);
         } else if (i > 1) {
-            component = (<Hidden key={pepe.pepeId} xsDown>{component}</Hidden>);
+            component = (<Hidden key={pepeId} xsDown>{component}</Hidden>);
         } else {
-            component = (<div key={pepe.pepeId}>{component}</div>)
+            component = (<div key={pepeId}>{component}</div>)
         }
 
         deck.push(component);

@@ -36,7 +36,7 @@ class PepeSummary extends React.Component {
         } else if (pepe.name != null) {
             nameEl = (<strong>{pepe.name}</strong>)
         } else {
-            nameEl = (<span>Pepe #{pepe.pepeId}<Typography variant="caption"
+            nameEl = (<span>Pepe #{pepeId}<Typography variant="caption"
                                                            component="i">(Not named)</Typography></span>)
         }
 
