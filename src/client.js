@@ -9,8 +9,6 @@ import AppWrapper from "./components/AppWrapper";
 import setAffiliate from "./util/affiliate";
 import storeCreator from "./reducers/store";
 
-import { PersistGate } from 'redux-persist/integration/react';
-
 const {store, persistor} = storeCreator();
 
 setAffiliate(store);
@@ -19,11 +17,9 @@ const render = Component => {
     ReactDOM.render(
         <ReactHotLoader>
             <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    <Router>
-                        <Component />
-                    </Router>
-                </PersistGate>
+                <Router>
+                    <Component />
+                </Router>
             </Provider>
         </ReactHotLoader>,
         document.getElementById('root'),
