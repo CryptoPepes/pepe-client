@@ -5,6 +5,7 @@ import {Hidden} from "@material-ui/core";
 import PropTypes from "prop-types";
 import connect from "react-redux/es/connect/connect";
 import Loading from "../util/Loading";
+import pepeAT from "../../../reducers/pepe/pepeAT";
 
 const styles = theme => ({
     root: {
@@ -31,41 +32,54 @@ const styles = theme => ({
     }
 });
 
-const MarketPreviewInner = ({classes, items}) => {
+class MarketPreviewInner extends React.Component {
 
-    if (!items) {
-        return <Loading variant="circle-tag">Loading pepes...</Loading>
+    componentDidMount() {
+        this.props.dispatch({
+            type: pepeAT.QUERY_PEPES,
+            queryStr: this.props.queryStr,
+            force: false
+        });
     }
 
-    const deck = [];
-    for (let i = items.length - 1; i >= 0 ; i--) {
+    render() {
 
-        const pepeId = items[i];
+        const {classes, pepeIds} = this.props;
 
-        let component = (
-        <div style={{top: i * 50, right: i * 80}} className={classes.entry}>
-            <PepeGridItem pepeId={pepeId}/>
-        </div>);
-
-        if (i > 2) {
-            component = (<Hidden key={pepeId} mdDown>{component}</Hidden>);
-        } else if (i > 1) {
-            component = (<Hidden key={pepeId} xsDown>{component}</Hidden>);
-        } else {
-            component = (<div key={pepeId}>{component}</div>)
+        if (!pepeIds) {
+            return <Loading variant="circle-tag">Loading pepes...</Loading>
         }
 
-        deck.push(component);
-    }
+        const deck = [];
+        for (let i = pepeIds.length - 1; i >= 0; i--) {
 
-    return (
-        <div className={classes.root}>
-            <div className={classes.deck}>
-                {deck}
+            const pepeId = pepeIds[i];
+
+            let component = (
+                <div style={{top: i * 50, right: i * 80}} className={classes.entry}>
+                    <PepeGridItem pepeId={pepeId}/>
+                </div>);
+
+            if (i > 2) {
+                component = (<Hidden key={pepeId} mdDown>{component}</Hidden>);
+            } else if (i > 1) {
+                component = (<Hidden key={pepeId} xsDown>{component}</Hidden>);
+            } else {
+                component = (<div key={pepeId}>{component}</div>)
+            }
+
+            deck.push(component);
+        }
+
+        return (
+            <div className={classes.root}>
+                <div className={classes.deck}>
+                    {deck}
+                </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 const StyledMarketPreview = withStyles(styles)(MarketPreviewInner);
 
@@ -73,10 +87,10 @@ const ConnectedMarketPreview = connect((state, props) => {
 
     const queryStr = props.queryStr;
 
-    const queryData = state.pepe.pepeQueries[queryStr] || { pepes: null, error: null };
+    const queryData = state.pepe.pepeQueries[queryStr] || { pepeIds: null, err: null };
 
     return ({
-        pepes: queryData.pepes,
+        pepeIds: queryData.pepeIds,
         error: queryData.err
     })
 })(StyledMarketPreview);

@@ -17,6 +17,7 @@ import {findDOMNode} from "react-dom";
 import {hasAccount} from "../../../util/web3AccountsUtil";
 import {cozyAddr, saleAddr} from "../../../web3Settings";
 import PepePicture from "../pepePage/PepePicture";
+import pepeAT from "../../../reducers/pepe/pepeAT";
 
 const styles = theme => ({
     card: {
@@ -79,6 +80,13 @@ class PepeGridItem extends React.Component {
             breederMenuOpen: false,
             breederMenuAnchorEl: null,
         };
+    }
+
+    componentDidMount() {
+        this.props.dispatch({
+            type: pepeAT.GET_PEPE,
+            pepeId: this.props.pepeId
+        });
     }
 
     breederMenuButton = null;

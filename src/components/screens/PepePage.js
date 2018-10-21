@@ -15,6 +15,7 @@ import PepeAuctionChart from "../elements/pepePage/PepeAuctionChart";
 import PepeBio from "../elements/pepePage/PepeBio";
 import {cozyAddr, saleAddr} from "../../web3Settings";
 import QueriedPepes from "../elements/grid/QueriedPepes";
+import pepeAT from "../../reducers/pepe/pepeAT";
 
 
 const styles = theme => ({
@@ -105,6 +106,13 @@ const styles = theme => ({
 });
 
 class PepePageInner extends React.Component {
+
+    componentDidMount() {
+        this.props.dispatch({
+            type: pepeAT.GET_PEPE,
+            pepeId: this.props.pepeId
+        });
+    }
 
     render() {
         const { pepeId, pepeData, hasWeb3, classes } = this.props;

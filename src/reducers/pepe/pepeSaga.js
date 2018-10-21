@@ -168,8 +168,16 @@ function* getPepe({pepeId}) {
         if (pepeWeb3Data && pepeWeb3Data.status === "getting" && (pepeWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
 
         const PepeBaseContract = yield select(state => state.redapp.contracts.PepeBase);
+        if (!PepeBaseContract) {
+            console.log("PepeBaseContract interface not loaded yet, delaying web3 pepe data retrieval.");
+            return;
+        }
         // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
         const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
+        if (lcb === 0) {
+            console.log("Latest know block not available, delaying web3 pepe data retrieval");
+            return;
+        }
         // Create the call thunk and get our callID
         const {callID, thunk} = PepeBaseContract.methods.getPepe.cacheCall({blockNr: lcb}, pepeId);
         console.log("making pepe web3 call", callID);
@@ -228,11 +236,18 @@ function* getCozyAuction({pepeId}) {
         if (auctionWeb3Data && auctionWeb3Data.status === "getting" && (auctionWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
 
         const CozyTimeAuctionContract = yield select(state => state.redapp.contracts.CozyTimeAuction);
+        if (!CozyTimeAuctionContract) {
+            console.log("CozyTimeAuctionContract interface not loaded yet, delaying web3 auction data retrieval.");
+            return;
+        }
         // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
         const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
+        if (lcb === 0) {
+            console.log("Latest know block not available, delaying web3 auction data retrieval");
+            return;
+        }
         // Create the call thunk and get our callID
         const {callID, thunk} = CozyTimeAuctionContract.methods.auctions.cacheCall({blockNr: lcb}, pepeId);
-        console.log("making cozy auction web3 call", callID);
         // First, save the context of the call, so we can track progress.
         yield put({type: pepeAT.TRACK_WEB3_CALL, dataType: "cozyAuctions", callID, callData: {pepeId, lcb}});
         // Second, tell the store we are getting the pepe, no need to get it again while this is still in-progress.
@@ -284,14 +299,20 @@ function* getSaleAuction({pepeId}) {
             if (auctionData && auctionData.web3) return auctionData.web3;
             else return null;
         });
-        console.log("Web3 sale auction call, old data: ", auctionWeb3Data);
         // If we are already getting the pepe, and it's not too long ago, then stop.
         if (auctionWeb3Data && auctionWeb3Data.status === "getting" && (auctionWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
 
-        console.log("Preparing new web3 sale auction call");
         const PepeAuctionSaleContract = yield select(state => state.redapp.contracts.PepeAuctionSale);
+        if (!PepeAuctionSaleContract) {
+            console.log("PepeAuctionSaleContract interface not loaded yet, delaying web3 auction data retrieval.");
+            return;
+        }
         // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
         const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
+        if (lcb === 0) {
+            console.log("Latest know block not available, delaying web3 auction data retrieval");
+            return;
+        }
         // Create the call thunk and get our callID
         const {callID, thunk} = PepeAuctionSaleContract.methods.auctions.cacheCall({blockNr: lcb}, pepeId);
         console.log("making sale auction web3 call", callID);

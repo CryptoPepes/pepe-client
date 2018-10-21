@@ -6,6 +6,7 @@ import PriceText from "../util/PriceText";
 import PepeBuyDialog from "../actions/auction-taker/PepeBuyDialog";
 import connect from "react-redux/es/connect/connect";
 import {AuctionData} from "../../../api/model";
+import pepeAT from "../../../reducers/pepe/pepeAT";
 
 const styles = (theme) => ({
     root: {
@@ -27,6 +28,13 @@ class PepeAuctionInfo extends React.Component {
         this.state = {
             buyDialogOpen: false
         };
+    }
+
+    componentDidMount() {
+        this.props.dispatch({
+            type: this.props.auctionType === "cozy" ? pepeAT.GET_COZY_AUCTION : pepeAT.GET_SALE_AUCTION,
+            pepeId: this.props.pepeId
+        });
     }
 
     handleBuyDialog = (open) => () => {

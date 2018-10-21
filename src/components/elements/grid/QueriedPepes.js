@@ -3,8 +3,22 @@ import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
 import PepeGrid from "./PepeGrid";
 import ReporterContent from "../reporting/ReporterContent";
+import pepeAT from "../../../reducers/pepe/pepeAT";
 
 class QueriedPepes extends React.Component {
+
+    componentDidMount() {
+        if (this.props.queries) {
+            for (let i = 0; i < this.props.queries.length; i++) {
+                const queryStr = this.props.queries[i];
+                this.props.dispatch({
+                    type: pepeAT.QUERY_PEPES,
+                    queryStr,
+                    force: false
+                });
+            }
+        }
+    }
 
     render() {
         const {pepes, loading, errors, children} = this.props;
@@ -15,7 +29,7 @@ class QueriedPepes extends React.Component {
                     loading && <ReporterContent variant="info" message="Loading pepes..."/>
                 }
                 {
-                    !loading && ((errors || []).map(err => (<ReporterContent variant="error" message={err}/>)))
+                    !loading && ((errors || []).map((err, i) => (<ReporterContent key={"error-"+i} variant="error" message={err}/>)))
                 }
                 {pepes && pepes.length !== 0 && children}
                 <PepeGrid items={pepes}/>
@@ -40,9 +54,9 @@ const ConnectedQueriedPepes = connect((state, props) => {
             continue;
         }
 
-        if (!queryData.error) {
+        if (queryData.error) {
             errors.push(queryData.error);
-        } else {
+        } else if (queryData.pepeIds) {
             queryData.pepeIds.forEach(pepeId => nonDuplicates.add(pepeId));
         }
     }

@@ -19,8 +19,8 @@ class PepeGrid extends Component {
         return (
             <div className={classes.root}>
                 <Grid container spacing={40} {...otherProps}>
-                    {(items || []).map(v => (
-                        <Grid key={v || "pepe"} item>
+                    {(items || []).map((v, i) => (
+                        <Grid key={"pepe-"+i} item>
                             <PepeGridItem pepeId={v}/>
                         </Grid>
                     ))}

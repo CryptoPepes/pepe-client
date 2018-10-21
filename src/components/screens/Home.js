@@ -192,7 +192,7 @@ function Home(props) {
 
                         <Grid item sm={12} md={6} className={classes.topSectionHalf}>
                             <MarketPreview queryStr={
-                                Query.buildQuery({sort: "oldest-first", limit: 4}).toURLParamStr()
+                                Query.buildQuery({sort: "newest-first", gen: 1, limit: 4}).toURLParamStr()
                             }/>
                         </Grid>
                     </Grid>
