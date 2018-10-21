@@ -51,9 +51,15 @@ const CollectingSection = ({classes}) => (
 
 
             <Grid item xs={12}>
-                <QueriedPepes justify="center" queries={[
-                    Query.buildQuery({sort: "newest-first", limit: 4}).toURLParamStr()
-                ]}/>
+                <Grid container spacing={0} justify="center"
+                      direction="column"
+                      alignItems="center">
+                    <Grid item>
+                        <QueriedPepes justify="center" queries={[
+                            Query.buildQuery({sort: "newest-first", limit: 4}).toURLParamStr()
+                        ]}/>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <Grid item xs={12} className={classes.getYourPepeContainer}>
