@@ -34,7 +34,7 @@ const BreedingSection = ({classes}) => (
                     on the genes of it's parents.
                     Some characteristics are rarer than others but make your pepe more
                     valuable if they have them.
-                    There are literaly billions of possible CryptoPepes so no two will be
+                    There are literally billions of possible CryptoPepes so no two will be
                     the same.
                 </p>
             </Grid>

@@ -34,7 +34,7 @@ const MiningSection = ({classes}) => (
                         </h3>
                         <p className={classes.sectionText}>
                             CryptoPepes is a blockchain based game powered by Ethereum.
-                            Each Pepe is born unique and and has it own characteristics.
+                            Each Pepe is born unique and has its own characteristics.
                             Each Pepe is 100% owned by you and safely stored in your wallet.
                         </p>
                         <p className={classes.sectionText}>
