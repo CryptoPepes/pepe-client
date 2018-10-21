@@ -27,13 +27,14 @@ const styles = theme => ({
         backgroundColor: theme.palette.error.dark,
     },
     info: {
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: theme.palette.type === 'light' ? "#77e" : "#118",
     },
     warning: {
         backgroundColor: amber[700],
     },
     icon: {
         fontSize: 20,
+        color: "#fff"
     },
     iconVariant: {
         opacity: 0.9,
@@ -42,6 +43,7 @@ const styles = theme => ({
     message: {
         display: 'flex',
         alignItems: 'center',
+        color: "#fff"
     },
 });
 

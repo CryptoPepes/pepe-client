@@ -76,8 +76,8 @@ class PepeActions extends React.Component {
 
         const nameable = isLoadingPepe ? false : (!pepe.name);
 
-        const cozyAuction = isLoadingSaleAuction ? null : new AuctionData(saleAuctionData.auction);
-        const saleAuction = isLoadingCozyAuction ? null : new AuctionData(cozyAuctionData.auction);
+        const cozyAuction = isLoadingSaleAuction ? null : (cozyAuctionData.auction ? new AuctionData(cozyAuctionData.auction) : null);
+        const saleAuction = isLoadingCozyAuction ? null : (saleAuctionData.auction ? new AuctionData(saleAuctionData.auction) : null);
 
         // Check if the pepe is being auctioned, and format the prices if so.
         const isInCozyAuction = !!cozyAuction;
@@ -205,6 +205,7 @@ export default connect((state, props) => ({
     breeder: state.breeder,
     hasWeb3: state.web3.hasWeb3,
     wallet: state.redapp.tracking.accounts.wallet,
+    pepeData: (state.pepe.pepes[props.pepeId] && (state.pepe.pepes[props.pepeId].web3 || state.pepe.pepes[props.pepeId].api)) || {},
     saleAuctionData: (state.pepe.saleAuctions[props.pepeId] && (state.pepe.saleAuctions[props.pepeId].web3 || state.pepe.saleAuctions[props.pepeId].api)) || {},
     cozyAuctionData: (state.pepe.cozyAuctions[props.pepeId] && (state.pepe.cozyAuctions[props.pepeId].web3 || state.pepe.cozyAuctions[props.pepeId].api)) || {}
 }))(StyledPepeActions);

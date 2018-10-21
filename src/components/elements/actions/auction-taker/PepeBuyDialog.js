@@ -77,7 +77,7 @@ class PepeBuyDialogInner extends BidAuctionDialog {
         const {open, onClose, auctionData, pepeId, hasWeb3, auctionAddress, classes} = this.props;
 
 
-        if (auctionData.status !== "ok") {
+        if (auctionData.status !== "ok" || !auctionData.auction) {
             return (
                 <TxDialog
                     open={open}

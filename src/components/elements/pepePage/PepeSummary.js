@@ -30,6 +30,9 @@ class PepeSummary extends React.Component {
         const pepe = pepeData.pepe;
         const isLoading = pepeData.status !== "ok";
 
+        // Data is not available, return null
+        if (!isLoading && !pepe) return null;
+
         let nameEl;
         if (isLoading) {
             nameEl = (<span>Pepe ?</span>)

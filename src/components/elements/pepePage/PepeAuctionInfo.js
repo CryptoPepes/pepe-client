@@ -45,14 +45,13 @@ class PepeAuctionInfo extends React.Component {
                 <Typography variant="headline" component="h2">Failed to load auction data.</Typography>
             </div>;
         }
-
         const isLoading = auctionData.status !== "ok";
 
-        const auction = isLoading ? null : new AuctionData(auctionData.auction);
+        const auction = isLoading ? null : (auctionData.auction ? new AuctionData(auctionData.auction) : null);
 
-        const price = isLoading ? null : auction.getCurrentPrice();
+        const price = isLoading ? null : (auction ? auction.getCurrentPrice() : null);
 
-        if (isLoading || price === undefined) {
+        if (isLoading || price === null || price === undefined) {
             return (
             <Card className={classes.root}>
                 <CardContent>

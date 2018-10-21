@@ -31,6 +31,11 @@ const PepeAttributes = (props) => {
     const look = lookData.look;
     const lookIsLoading = lookData.status !== "ok";
 
+    if (!lookIsLoading && !look) {
+        return <div className={classes.root}>
+            <Typography variant="headline" component="h2">No data about the look available.</Typography>
+        </div>;
+    }
 
     // TODO also view the colors (square colored using the hex color in look data)
     return (

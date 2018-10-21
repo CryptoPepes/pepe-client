@@ -28,6 +28,9 @@ const SaleChip = (props) => {
 
     const isLoading = auctionData.status !== "ok";
 
+    // Auction is not available, return null
+    if (!isLoading && !auctionData.auction) return null;
+
     const price = isLoading ? null : new AuctionData(auctionData.auction).getCurrentPrice();
 
     return (

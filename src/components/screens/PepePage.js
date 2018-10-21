@@ -96,6 +96,11 @@ const styles = theme => ({
         height: 800,
         padding: theme.spacing.unit * 16,
         textAlign: "center"
+    },
+    nonExistantPepe: {
+        height: 800,
+        padding: theme.spacing.unit * 16,
+        textAlign: "center"
     }
 });
 
@@ -112,8 +117,15 @@ class PepePageInner extends React.Component {
             </div>;
         }
 
-        const pepe = pepeData.pepe;
         const isLoading = pepeData.status !== "ok";
+        const pepe = pepeData.pepe;
+        if (!isLoading && pepe === null) {
+            // Pepe does not exist.
+            return <div className={classes.nonExistantPepe}>
+                { /* TODO some funny pepe ghost art (?) */ }
+                <Typography variant="title">Pepe could not be found.</Typography>
+            </div>;
+        }
 
         let motherEl;
         if (!isLoading && pepe.mother !== "0") {

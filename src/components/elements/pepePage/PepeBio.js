@@ -19,8 +19,15 @@ const PepeBio = (props) => {
 
     const pepe = pepeData.pepe;
     const pepeIsLoading = pepeData.status !== "ok";
+
+    // Data is not available, return null
+    if (!pepeIsLoading && !pepe) return null;
+
     const bio = bioData.bio;
     const bioIsLoading = bioData.status !== "ok";
+
+    // Data is not available, return null
+    if (!bioIsLoading && !bio) return null;
 
     let nameEl;
     if (pepeIsLoading) {

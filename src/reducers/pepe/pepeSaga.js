@@ -50,7 +50,7 @@ function* addApiPepe(pepeId, pepe, lcb) {
         pepeId,
         lcb,
         data: pepe ? {
-            name: pepe.name === "" ? null : value.name,
+            name: pepe.name === "" ? null : pepe.name,
             cool_down_index: pepe.cool_down_index,
             can_cozy_again: pepe.can_cozy_again,
             gen: pepe.gen,
@@ -284,9 +284,11 @@ function* getSaleAuction({pepeId}) {
             if (auctionData && auctionData.web3) return auctionData.web3;
             else return null;
         });
+        console.log("Web3 sale auction call, old data: ", auctionWeb3Data);
         // If we are already getting the pepe, and it's not too long ago, then stop.
         if (auctionWeb3Data && auctionWeb3Data.status === "getting" && (auctionWeb3Data.timestamp < getNowTimestamp() - refetchWeb3DataTime)) return;
 
+        console.log("Preparing new web3 sale auction call");
         const PepeAuctionSaleContract = yield select(state => state.redapp.contracts.PepeAuctionSale);
         // Get the latest block, this will be the guaranteed block-context of the call, so we know the exact LCB.
         const lcb = yield select(state => state.redapp.tracking.blocks.latest.number);
@@ -340,26 +342,34 @@ function* checkDataCallSuccess({callID, value}) {
         // Yeah, we retrieved pepe data successfully from web3. Now we need to forward it to the pepe reducer.
         // Get the number of the block when the call was made, this is our LCB reference
         const lcb = pepeWeb3Call.lcb;
-        // Convert decimal values to hex.
-        const genotypeSide0 = Web3Utils.toBN(value.genotype[0]).toString(16, 64);
-        const genotypeSide1 = Web3Utils.toBN(value.genotype[1]).toString(16, 64);
-        // Transform the data to what we expect, remove all web3 extras.
-        const pepe = {
-            pepeId: pepeWeb3Call.pepeId,
-            name: value.pepeName === "" ? null : value.pepeName,
-            cool_down_index: value.coolDownIndex,
-            can_cozy_again: value.canCozyAgain,
-            gen: value.generation,
-            father: value.father,
-            mother: value.mother,
-            genotype: genotypeSide1 + genotypeSide0,
-            master: value.master
-        };
+
+        let pepe = null;
+        if (value) {
+            // Convert decimal values to hex.
+            const genotypeSide0 = Web3Utils.toBN(value.genotype[0]).toString(16, 64);
+            const genotypeSide1 = Web3Utils.toBN(value.genotype[1]).toString(16, 64);
+            const name = value.pepeName === "0x0000000000000000000000000000000000000000000000000000000000000000" ? null : Web3Utils.hexToUtf8(value.pepeName);
+            // Transform the data to what we expect, remove all web3 extras.
+            pepe = {
+                name: name,
+                cool_down_index: value.coolDownIndex,
+                can_cozy_again: value.canCozyAgain,
+                gen: value.generation,
+                father: value.father,
+                mother: value.mother,
+                genotype: genotypeSide1 + genotypeSide0,
+                master: value.master
+            };
+        }
+
         yield put({
-            type: pepeAT.ADD_PEPE,
+            type: pepeAT.ADD_DATA,
             dataSrc: "web3",
+            dataType: "pepes",
+            dataName: "pepe",
+            pepeId: pepeWeb3Call.pepeId,
             lcb,
-            pepe
+            data: pepe
         });
         return;
     }
@@ -369,7 +379,8 @@ function* checkDataCallSuccess({callID, value}) {
         // Get the number of the block when the call was made, this is our LCB reference
         const lcb = cozyAuctionWeb3Call.lcb;
         // Transform the data to what we expect, remove all web3 extras.
-        const auction = {
+        // Also, detect non-existant auctions, and replace them with null value.
+        const auction = (!value || (value.seller === "0x0000000000000000000000000000000000000000")) ? null : {
             beginPrice: value.beginPrice,
             endPrice: value.endPrice,
             beginTime: value.auctionBegin,
@@ -377,10 +388,13 @@ function* checkDataCallSuccess({callID, value}) {
             seller: value.seller
         };
         yield put({
-            type: pepeAT.ADD_COZY_AUCTION,
+            type: pepeAT.ADD_DATA,
             dataSrc: "web3",
+            dataType: "cozyAuctions",
+            dataName: "auction",
+            pepeId: cozyAuctionWeb3Call.pepeId,
             lcb,
-            auction
+            data: auction
         });
 
         return;
@@ -391,7 +405,8 @@ function* checkDataCallSuccess({callID, value}) {
         // Get the number of the block when the call was made, this is our LCB reference
         const lcb = saleAuctionWeb3Call.lcb;
         // Transform the data to what we expect, remove all web3 extras.
-        const auction = {
+        // Also, detect non-existant auctions, and replace them with null value.
+        const auction = (!value || (value.seller === "0x0000000000000000000000000000000000000000")) ? null : {
             beginPrice: value.beginPrice,
             endPrice: value.endPrice,
             beginTime: value.auctionBegin,
@@ -399,10 +414,13 @@ function* checkDataCallSuccess({callID, value}) {
             seller: value.seller
         };
         yield put({
-            type: pepeAT.ADD_SALE_AUCTION,
+            type: pepeAT.ADD_DATA,
             dataSrc: "web3",
+            dataType: "saleAuctions",
+            dataName: "auction",
+            pepeId: saleAuctionWeb3Call.pepeId,
             lcb,
-            auction
+            data: auction
         });
     }
 

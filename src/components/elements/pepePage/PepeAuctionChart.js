@@ -21,6 +21,11 @@ const PepeAuctionChart = (props) => {
     }
 
     const auction = auctionData.auction;
+    if (!auction) {
+        return <div>
+            <Typography variant="caption" component="h3">No auction data found...</Typography>
+        </div>;
+    }
 
     return <PepeAuctionChartInner auction={auction} auctionType={auctionType}/>;
 

@@ -97,7 +97,7 @@ class CozyBuyDialogInner extends BidAuctionDialog {
             motherPepeId, fatherPepeId, auctionSubjectId, candidateId, cozyCandidateAsFather} = this.props;
 
 
-        if (auctionData.status !== "ok") {
+        if (auctionData.status !== "ok" || !auctionData.auction) {
             return (
                 <TxDialog
                     open={open}
