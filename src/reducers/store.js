@@ -23,7 +23,7 @@ const rootPersistConfig = {
     key: 'root',
     storage,
     // Do not whitelist breeder, that reducer has its own persistor
-    whitelist: ["theme", "wallet", "affiliate"]
+    whitelist: ["theme", "wallet", "affiliate", "pepe"]
 };
 
 export default () => {

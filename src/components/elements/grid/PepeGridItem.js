@@ -112,6 +112,11 @@ class PepeGridItem extends React.Component {
         const pepe = pepeData.pepe;
         const isLoading = pepeData.status !== "ok";
 
+        if (!isLoading && !pepe) {
+            console.log("Tried showing a pepe (id: "+pepeId+" that does not seem to exist.");
+            return null;
+        }
+
         let nameEl;
         if (isLoading) {
             nameEl = (<span>#{pepeId}<Typography variant="caption" component="i">(Loading name)</Typography></span>)

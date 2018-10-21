@@ -30,7 +30,9 @@ const pepeAT = {
     // When query failed
     QUERY_FAILURE: "QUERY_FAILURE",
     // Clear everything that was updated last before the given block-number
-    CLEANUP: "CLEANUP"
+    CLEANUP_PEPES: "CLEANUP_PEPES",
+    START_INTERVAL_CLEANUP: "START_INTERVAL_CLEANUP",
+    STOP_INTERVAL_CLEANUP: "STOP_INTERVAL_CLEANUP"
 };
 
 export default pepeAT;
